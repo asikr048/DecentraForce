@@ -1,1346 +1,156 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DecentraForce — Decentralize Education. Equalize Power.</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
-<style>
-  /* Font fallbacks if Google Fonts fails (file:// or offline) */
-  body { font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif; }
-  .logo, h1, h2, h3, .sec-title, .db-page-title, .profile-name,
-  .hstat-num, .fcn, .st-big, .ctitle, .db-ctitle, .wy-title, .rv-name,
-  .sub-title, .auth-left h2, .reward-val, .sl { 
-    font-family: 'Syne', 'Segoe UI', system-ui, sans-serif !important; 
-  }
-  :root {
-    --navy:  #04091a;
-    --navy2: #080f22;
-    --navy3: #0b1530;
-    --blue:  #1a56ff;
-    --bglow: rgba(26,86,255,0.38);
-    --viol:  #7c3aed;
-    --vglow: rgba(124,58,237,0.3);
-    --cyan:  #00e5ff;
-    --gold:  #f5c542;
-    --green: #22c55e;
-    --white: #ffffff;
-    --muted: rgba(255,255,255,0.52);
-    --muted2:rgba(255,255,255,0.28);
-    --card:  rgba(255,255,255,0.04);
-    --cardb: rgba(255,255,255,0.08);
-    --r:     20px;
-  }
-  *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-  html{scroll-behavior:smooth}
-  body{font-family:'DM Sans',sans-serif;background:var(--navy);color:var(--white);overflow-x:hidden}
+import React from 'react';
 
-  /* NAV */
-  nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:16px 60px;background:rgba(4,9,26,.82);backdrop-filter:blur(22px);border-bottom:1px solid var(--cardb)}
-  .logo{font-family:'Syne',sans-serif;font-size:21px;font-weight:800;color:var(--white);text-decoration:none;display:flex;align-items:center;gap:9px}
-  .logo-ico{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--blue),var(--viol));display:flex;align-items:center;justify-content:center;font-size:17px}
-  .logo .ac{color:var(--cyan)}
-  .nav-links{display:flex;gap:32px;list-style:none}
-  .nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color .2s}
-  .nav-links a:hover{color:var(--white)}
-  .nav-cta{display:flex;gap:10px;align-items:center}
-  .btn-ghost{color:var(--white);background:transparent;border:1.5px solid var(--cardb);padding:9px 22px;border-radius:50px;font-size:14px;font-weight:500;cursor:pointer;transition:border-color .2s,background .2s;font-family:'DM Sans',sans-serif}
-  .btn-ghost:hover{border-color:var(--blue);background:rgba(26,86,255,.1)}
-  .btn-primary{color:var(--white);background:linear-gradient(135deg,var(--blue),var(--viol));border:none;padding:10px 24px;border-radius:50px;font-size:14px;font-weight:600;cursor:pointer;box-shadow:0 0 28px var(--bglow);transition:transform .2s,box-shadow .2s;font-family:'DM Sans',sans-serif}
-  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 40px var(--bglow)}
-
-  /* HERO */
-  .hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:140px 60px 80px;overflow:hidden}
-  .orb{position:absolute;border-radius:50%;filter:blur(100px);pointer-events:none}
-  .o1{width:650px;height:650px;background:radial-gradient(circle,rgba(26,86,255,.28) 0%,transparent 70%);top:-150px;right:-120px;animation:fA 9s ease-in-out infinite}
-  .o2{width:420px;height:420px;background:radial-gradient(circle,rgba(124,58,237,.2) 0%,transparent 70%);bottom:0;right:250px;animation:fB 11s ease-in-out infinite}
-  .o3{width:320px;height:320px;background:radial-gradient(circle,rgba(0,229,255,.12) 0%,transparent 70%);top:250px;left:-60px;animation:fA 13s ease-in-out infinite reverse}
-  @keyframes fA{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-28px) scale(1.04)}}
-  @keyframes fB{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(22px) scale(.96)}}
-  .hex-bg{position:absolute;inset:0;z-index:0;opacity:.06;background-image:repeating-linear-gradient(0deg,rgba(26,86,255,.15) 0px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,rgba(26,86,255,.15) 0px,transparent 1px,transparent 40px);background-size:40px 40px}
-  .hero-content{position:relative;z-index:2;max-width:640px}
-  .hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(26,86,255,.12);border:1px solid rgba(26,86,255,.35);padding:6px 16px;border-radius:30px;font-size:13px;font-weight:500;color:var(--cyan);margin-bottom:28px;animation:fu .6s ease forwards}
-  .hero-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--cyan);box-shadow:0 0 8px var(--cyan)}
-  .hero h1{font-family:'Syne',sans-serif;font-size:clamp(44px,5.8vw,76px);font-weight:800;line-height:1.04;letter-spacing:-2.5px;animation:fu .6s .1s ease forwards}
-  .hb{background:linear-gradient(135deg,var(--blue) 0%,var(--cyan) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-  .hv{background:linear-gradient(135deg,var(--viol) 0%,#ec4899 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-  .hero-sub{margin-top:22px;color:var(--muted);font-size:16.5px;line-height:1.75;max-width:500px;animation:fu .6s .2s ease forwards}
-  .hero-actions{margin-top:38px;display:flex;gap:14px;align-items:center;animation:fu .6s .3s ease forwards}
-  .btn-hero{background:linear-gradient(135deg,var(--blue),var(--viol));color:var(--white);border:none;padding:15px 34px;border-radius:50px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 40px var(--bglow);transition:transform .2s,box-shadow .2s}
-  .btn-hero:hover{transform:translateY(-3px);box-shadow:0 10px 60px var(--bglow)}
-  .btn-vid{display:flex;align-items:center;gap:10px;color:var(--white);background:transparent;border:none;font-size:15px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif}
-  .play{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;transition:background .2s}
-  .btn-vid:hover .play{background:rgba(255,255,255,.14)}
-  .hero-stats{margin-top:60px;display:flex;gap:42px;animation:fu .6s .4s ease forwards}
-  .hs{border-left:2px solid rgba(26,86,255,.5);padding-left:16px}
-  .hs-num{font-family:'Syne',sans-serif;font-size:28px;font-weight:800}
-  .hs-num .u{color:var(--blue)}
-  .hs-lbl{font-size:12px;color:var(--muted);margin-top:2px}
-  /* hero visual */
-  .hero-vis{position:absolute;right:60px;top:50%;transform:translateY(-50%);z-index:2;animation:fu .6s .2s ease forwards}
-  .hcg{position:relative;width:380px;height:460px}
-  .fcrd{position:absolute;background:rgba(255,255,255,.04);border:1px solid var(--cardb);backdrop-filter:blur(20px);border-radius:20px;padding:22px 26px}
-  .fc-a{top:0;right:0;width:205px;animation:fA 6s ease-in-out infinite}
-  .fc-b{bottom:50px;left:0;width:215px;animation:fB 7s ease-in-out infinite}
-  .fc-c{top:155px;right:-20px;width:175px;animation:fA 9s ease-in-out infinite 1s}
-  .fci{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--blue),var(--viol));display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
-  .fcn{font-family:'Syne',sans-serif;font-size:26px;font-weight:800}
-  .fcl{font-size:12px;color:var(--muted);margin-top:2px}
-  .avr{display:flex;margin-top:10px}
-  .av{width:28px;height:28px;border-radius:50%;border:2px solid var(--navy);margin-left:-8px;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700}
-  .av:first-child{margin-left:0}
-  .a1{background:linear-gradient(135deg,#f5c542,#ff6b35)}
-  .a2{background:linear-gradient(135deg,#1a56ff,#00e5ff)}
-  .a3{background:linear-gradient(135deg,#a855f7,#ec4899)}
-  .a4{background:linear-gradient(135deg,#22c55e,#16a34a)}
-  .stars{color:var(--gold);font-size:15px}
-  .hex-c{position:absolute;top:50%;left:50%;transform:translate(-50%,-60%);width:220px;height:220px;display:flex;align-items:center;justify-content:center;font-size:70px}
-  .hex-c::before{content:'';position:absolute;inset:0;background:radial-gradient(circle,rgba(26,86,255,.22) 0%,transparent 70%);border-radius:50%;animation:pulse 3s ease-in-out infinite}
-  @keyframes pulse{0%,100%{box-shadow:0 0 40px rgba(26,86,255,.3)}50%{box-shadow:0 0 80px rgba(26,86,255,.55)}}
-  @keyframes fu{from{opacity:.4;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
-
-  /* MARQUEE */
-  .mq-wrap{overflow:hidden;border-top:1px solid var(--cardb);border-bottom:1px solid var(--cardb);padding:26px 0}
-  .mq-track{display:flex;gap:56px;width:max-content;animation:mq 22s linear infinite}
-  .mq-item{display:flex;align-items:center;gap:10px;font-size:13.5px;font-weight:600;color:var(--muted);white-space:nowrap}
-  .mdot{width:5px;height:5px;border-radius:50%;background:var(--blue);flex-shrink:0}
-  @keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
-
-  /* SECTION UTILS */
-  section{padding:96px 60px;position:relative;z-index:1}
-  .pill{display:inline-block;background:rgba(26,86,255,.1);border:1px solid rgba(26,86,255,.28);border-radius:30px;padding:5px 16px;font-size:13px;color:var(--blue);font-weight:500;margin-bottom:14px}
-  .sec-title{font-family:'Syne',sans-serif;font-size:clamp(30px,4vw,46px);font-weight:800;letter-spacing:-1px;line-height:1.1}
-  .sec-sub{color:var(--muted);font-size:15.5px;line-height:1.72;max-width:520px;margin-top:12px}
-  .sec-hdr{text-align:center;margin-bottom:56px}
-  /* REVEAL — always visible. JS adds .animated for the nice fade, but content shows regardless */
-  .reveal{opacity:1;transform:none}
-  .reveal.animated{animation:sectionIn .7s ease both}
-  @keyframes sectionIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:none}}
-
-  /* COURSES */
-  .crs-sec{background:var(--navy2)}
-  .c-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:42px;justify-content:center}
-  .tab{padding:9px 22px;border-radius:50px;cursor:pointer;font-size:13.5px;font-weight:500;border:1.5px solid var(--cardb);color:var(--muted);background:transparent;font-family:'DM Sans',sans-serif;transition:all .2s}
-  .tab.active{background:linear-gradient(135deg,var(--blue),var(--viol));border-color:transparent;color:var(--white);box-shadow:0 0 24px var(--bglow)}
-  .tab:hover:not(.active){border-color:var(--blue);color:var(--white)}
-  .crs-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-  .ccard{background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);overflow:hidden;transition:transform .25s,border-color .25s,box-shadow .25s;cursor:pointer;display:flex;flex-direction:column}
-  .ccard.hidden{display:none}
-  .ccard:hover{transform:translateY(-6px);border-color:rgba(26,86,255,.45);box-shadow:0 20px 60px rgba(0,0,0,.45),0 0 0 1px rgba(26,86,255,.18)}
-  .cthumb{height:190px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;font-size:52px}
-  .th-ai   {background:linear-gradient(135deg,#0a0020,#5b21b6,#1a56ff)}
-  .th-blk  {background:linear-gradient(135deg,#0d1b6e,#1a56ff,#00e5ff)}
-  .th-web  {background:linear-gradient(135deg,#0f3800,#15803d,#84cc16)}
-  .th-ds   {background:linear-gradient(135deg,#1a0537,#7c3aed,#ec4899)}
-  .th-nano {background:linear-gradient(135deg,#001f3f,#0ea5e9,#38bdf8)}
-  .th-fin  {background:linear-gradient(135deg,#1a0a00,#c05621,#f5c542)}
-  .th-defi {background:linear-gradient(135deg,#00200a,#065f46,#22c55e)}
-  .cbadge{position:absolute;top:13px;right:13px;font-size:10.5px;font-weight:700;padding:3px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:.5px}
-  .live{background:#ef4444;color:#fff;box-shadow:0 0 14px rgba(239,68,68,.6);animation:blink 2s ease-in-out infinite}
-  .fin {background:rgba(255,255,255,.15);color:rgba(255,255,255,.7)}
-  @keyframes blink{0%,100%{opacity:1}50%{opacity:.7}}
-  .cbody{padding:22px;flex:1;display:flex;flex-direction:column}
-  .ccat{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
-  .ctitle{font-family:'Syne',sans-serif;font-size:16px;font-weight:700;line-height:1.4;margin-bottom:14px;flex:1}
-  .cmeta{display:flex;gap:14px;color:var(--muted);font-size:12.5px;flex-wrap:wrap}
-  .cmeta span{display:flex;align-items:center;gap:4px}
-  .cfoot{display:flex;align-items:center;justify-content:space-between;padding:14px 22px;border-top:1px solid var(--cardb)}
-  .cprice{font-family:'Syne',sans-serif;font-size:19px;font-weight:800;color:var(--gold)}
-  .closed-lbl{color:var(--muted);font-size:14px;font-weight:500}
-  .btn-enroll{background:rgba(26,86,255,.14);color:var(--blue);border:1px solid rgba(26,86,255,.3);padding:8px 18px;border-radius:50px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background .2s,color .2s}
-  .btn-enroll:hover{background:var(--blue);color:var(--white)}
-  .btn-enroll:disabled{opacity:.45;cursor:not-allowed}
-  .see-all-crd{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;min-height:280px;text-align:center}
-
-  /* STATS */
-  .st-sec{background:var(--navy)}
-  .st-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:22px}
-  .st-card{background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);padding:38px 28px;text-align:center;position:relative;overflow:hidden;transition:border-color .25s,box-shadow .25s}
-  .st-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(26,86,255,.06) 0%,transparent 60%);pointer-events:none}
-  .st-card:hover{border-color:rgba(26,86,255,.4);box-shadow:0 0 40px rgba(26,86,255,.1)}
-  .st-ico{width:54px;height:54px;border-radius:15px;background:linear-gradient(135deg,rgba(26,86,255,.18),rgba(124,58,237,.12));border:1px solid rgba(26,86,255,.25);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 18px}
-  .st-big{font-family:'Syne',sans-serif;font-size:44px;font-weight:800;background:linear-gradient(135deg,var(--white) 0%,rgba(255,255,255,.65) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-  .st-big .ac{background:linear-gradient(135deg,var(--blue),var(--cyan));-webkit-background-clip:text;background-clip:text}
-  .st-dsc{color:var(--muted);font-size:13.5px;margin-top:6px}
-
-  /* WHY */
-  .wy-sec{background:var(--navy2)}
-  .wy-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
-  .wy-card{background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);padding:34px 30px;transition:border-color .25s,box-shadow .25s}
-  .wy-card:hover{border-color:rgba(26,86,255,.32);box-shadow:0 0 40px rgba(26,86,255,.07)}
-  .wy-ico{width:50px;height:50px;border-radius:14px;background:linear-gradient(135deg,rgba(26,86,255,.18),rgba(124,58,237,.1));display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:18px}
-  .wy-title{font-family:'Syne',sans-serif;font-size:17px;font-weight:700;margin-bottom:10px}
-  .wy-desc{color:var(--muted);font-size:13.5px;line-height:1.72}
-
-  /* TESTIMONIALS */
-  .ts-sec{background:var(--navy)}
-  .rv-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .rv-card{background:var(--card);border:1px solid var(--cardb);border-radius:var(--r);padding:28px;transition:border-color .25s,transform .25s;display:flex;flex-direction:column;gap:18px}
-  .rv-card:hover{border-color:rgba(26,86,255,.3);transform:translateY(-4px)}
-  .rv-card.feat{background:linear-gradient(135deg,rgba(26,86,255,.13),rgba(124,58,237,.07));border-color:rgba(26,86,255,.38)}
-  .rv-top{display:flex;justify-content:space-between;align-items:flex-start}
-  .qi{font-size:30px;color:var(--blue);line-height:1;font-family:Georgia,serif}
-  .rv-stars{color:var(--gold);font-size:14px}
-  .rv-text{font-size:14.5px;line-height:1.75;color:rgba(255,255,255,.83);flex:1}
-  .rv-lang{font-size:11px;color:var(--muted2);font-style:italic}
-  .reviewer{display:flex;align-items:center;gap:12px}
-  .rv-av{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;flex-shrink:0}
-  .rv-name{font-weight:600;font-size:14px}
-  .rv-id{font-size:12px;color:var(--muted);margin-top:2px}
-
-  /* AUTH */
-  .auth-sec{padding:96px 60px;display:flex;align-items:center;justify-content:center}
-  .auth-wrap{background:var(--navy2);border:1px solid var(--cardb);border-radius:32px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;max-width:900px;width:100%;box-shadow:0 40px 120px rgba(0,0,0,.55)}
-  .auth-left{background:linear-gradient(160deg,#0e1f60,#06103a,#04091a);padding:56px 48px;position:relative;overflow:hidden}
-  .auth-left::before{content:'';position:absolute;top:-80px;left:-80px;width:320px;height:320px;border-radius:50%;background:radial-gradient(circle,rgba(26,86,255,.28),transparent 70%)}
-  .al-inner{position:relative;z-index:2}
-  .al-inner h2{font-family:'Syne',sans-serif;font-size:26px;font-weight:800;line-height:1.3;margin-bottom:10px}
-  .al-inner p{color:var(--muted);font-size:14px;line-height:1.7}
-  .a-steps{margin-top:40px;display:flex;flex-direction:column;gap:26px}
-  .a-step{display:flex;gap:16px;align-items:flex-start}
-  .sn{width:34px;height:34px;border-radius:50%;flex-shrink:0;background:linear-gradient(135deg,var(--blue),var(--viol));display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-size:15px;font-weight:800}
-  .sl{font-size:17px;font-weight:700;color:var(--cyan);font-family:'Syne',sans-serif}
-  .sd{font-size:13px;color:var(--muted);margin-top:4px}
-  .auth-right{padding:52px 48px}
-  .a-tabs{display:flex;gap:4px;background:rgba(255,255,255,.04);border-radius:12px;padding:4px;margin-bottom:28px}
-  .a-tab{flex:1;padding:9px 0;text-align:center;border-radius:9px;font-size:13.5px;font-weight:600;cursor:pointer;color:var(--muted);border:none;background:transparent;font-family:'DM Sans',sans-serif;transition:all .2s}
-  .a-tab.active{background:var(--blue);color:var(--white);box-shadow:0 0 18px var(--bglow)}
-  .a-panel{display:none}
-  .a-panel.active{display:block}
-  .flbl{font-size:13px;font-weight:500;color:var(--muted);margin-bottom:7px;display:block}
-  .frow{margin-bottom:16px}
-  .fi{width:100%;background:rgba(255,255,255,.05);border:1.5px solid var(--cardb);border-radius:12px;padding:12px 16px;color:var(--white);font-size:15px;font-family:'DM Sans',sans-serif;transition:border-color .2s,box-shadow .2s;outline:none}
-  .fi:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,255,.14)}
-  .fi::placeholder{color:rgba(255,255,255,.22)}
-  .fi.err{border-color:#ef4444}
-  .ferr{font-size:12px;color:#ef4444;margin-top:5px;display:none}
-  .ferr.show{display:block}
-  .iw{position:relative}
-  .ptog{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--muted);cursor:pointer;font-size:16px;padding:0}
-  .btn-auth{width:100%;background:linear-gradient(135deg,var(--blue),var(--viol));color:var(--white);border:none;padding:13px;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;box-shadow:0 0 28px var(--bglow);transition:transform .2s,box-shadow .2s;margin-top:4px}
-  .btn-auth:hover{transform:translateY(-2px);box-shadow:0 10px 46px var(--bglow)}
-  .a-footer{text-align:center;font-size:13px;color:var(--muted);margin-top:16px}
-  .a-footer a{color:var(--blue);text-decoration:none;cursor:pointer}
-  .a-footer a:hover{text-decoration:underline}
-  .alert{border-radius:12px;padding:14px 16px;font-size:13.5px;line-height:1.65;margin-bottom:16px;display:none}
-  .alert.show{display:block}
-  .a-info{background:rgba(26,86,255,.12);border:1px solid rgba(26,86,255,.3);color:var(--cyan)}
-  .a-success{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.3);color:var(--green)}
-  .a-err{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);color:#fca5a5}
-  .otp-row{display:flex;gap:10px;justify-content:center;margin:18px 0}
-  .otp-b{width:48px;height:54px;background:rgba(255,255,255,.05);border:1.5px solid var(--cardb);border-radius:12px;text-align:center;color:var(--white);font-size:22px;font-weight:700;font-family:'Syne',sans-serif;outline:none;transition:border-color .2s,box-shadow .2s}
-  .otp-b:focus{border-color:var(--blue);box-shadow:0 0 0 3px rgba(26,86,255,.14)}
-  .resend{text-align:center;font-size:13px;color:var(--muted);margin-top:6px}
-  .resend a{color:var(--blue);cursor:pointer}
-  .back-btn{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);cursor:pointer;margin-bottom:20px;background:none;border:none;font-family:'DM Sans',sans-serif;transition:color .2s}
-  .back-btn:hover{color:var(--white)}
-  .str-bar{height:4px;border-radius:2px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:8px}
-  .str-fill{height:100%;border-radius:2px;transition:width .3s,background .3s;width:0%}
-  .str-txt{font-size:11px;margin-top:4px;color:var(--muted)}
-  .sub-title{font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:6px}
-  .sub-desc{font-size:13.5px;color:var(--muted);margin-bottom:22px}
-
-  /* FOOTER */
-  footer{background:var(--navy2);border-top:1px solid var(--cardb);padding:68px 60px 38px}
-  .ft-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
-  .ft-brand p{color:var(--muted);font-size:13.5px;line-height:1.75;margin-top:14px;max-width:280px}
-  .ft-soc{display:flex;gap:10px;margin-top:20px}
-  .soc{width:36px;height:36px;border-radius:10px;background:var(--card);border:1px solid var(--cardb);display:flex;align-items:center;justify-content:center;font-size:15px;cursor:pointer;transition:all .2s}
-  .soc:hover{background:rgba(26,86,255,.2);border-color:var(--blue)}
-  .fc h4{font-family:'Syne',sans-serif;font-size:14px;font-weight:700;margin-bottom:16px}
-  .fl{list-style:none;display:flex;flex-direction:column;gap:10px}
-  .fl a{color:var(--muted);text-decoration:none;font-size:13.5px;transition:color .2s}
-  .fl a:hover{color:var(--white)}
-  .ft-bot{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--cardb);padding-top:28px;font-size:13px;color:var(--muted)}
-
-  .wa{position:fixed;bottom:26px;right:26px;width:52px;height:52px;border-radius:50%;background:#25d366;color:white;border:none;cursor:pointer;font-size:24px;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 30px rgba(37,211,102,.5);z-index:999;transition:transform .2s}
-  .wa:hover{transform:scale(1.1)}
-
-  /* ─── DASHBOARD ─── */
-  #dashboard{display:none;position:fixed;inset:0;z-index:300;background:var(--navy);overflow:hidden;flex-direction:column}
-  #dashboard.open{display:flex}
-
-  /* Dashboard nav */
-  .db-nav{display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:64px;background:var(--navy2);border-bottom:1px solid var(--cardb);flex-shrink:0;position:relative;z-index:10}
-  .db-nav-left{display:flex;align-items:center;gap:14px}
-  .db-student{font-size:13.5px;color:var(--muted)}
-  .db-student strong{color:var(--white);font-weight:600}
-  .db-nav-right{display:flex;align-items:center;gap:14px}
-  .db-notif{position:relative;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--card);border:1px solid var(--cardb);font-size:17px;transition:background .2s}
-  .db-notif:hover{background:rgba(26,86,255,.15)}
-  .db-badge{position:absolute;top:-3px;right:-3px;width:17px;height:17px;border-radius:50%;background:#ef4444;color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy2)}
-  .db-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--viol));display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;cursor:pointer;border:2px solid rgba(26,86,255,.4)}
-
-  /* Dashboard body */
-  .db-body{display:flex;flex:1;overflow:hidden}
-
-  /* Sidebar */
-  .db-sidebar{width:220px;flex-shrink:0;background:var(--navy2);border-right:1px solid var(--cardb);padding:24px 0;display:flex;flex-direction:column;gap:4px}
-  .db-menu-item{display:flex;align-items:center;gap:12px;padding:13px 24px;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);transition:all .2s;border-left:3px solid transparent;text-decoration:none}
-  .db-menu-item:hover{color:var(--white);background:rgba(255,255,255,.04)}
-  .db-menu-item.active{color:var(--white);background:rgba(26,86,255,.12);border-left-color:var(--blue)}
-  .db-menu-icon{font-size:18px;width:22px;text-align:center}
-  .db-logout{margin-top:auto;padding:0 16px 16px}
-  .db-logout button{width:100%;padding:10px;border-radius:10px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.25);color:#fca5a5;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
-  .db-logout button:hover{background:rgba(239,68,68,.2)}
-
-  /* Main content */
-  .db-main{flex:1;overflow-y:auto;padding:36px 40px}
-  .db-main::-webkit-scrollbar{width:6px}
-  .db-main::-webkit-scrollbar-track{background:transparent}
-  .db-main::-webkit-scrollbar-thumb{background:var(--cardb);border-radius:3px}
-  .db-page{display:none}
-  .db-page.active{display:block}
-  .db-page-title{font-family:'Syne',sans-serif;font-size:24px;font-weight:800;margin-bottom:28px;letter-spacing:-.5px}
-
-  /* Course tabs inside dashboard */
-  .db-tabs{display:flex;gap:0;background:var(--card);border:1px solid var(--cardb);border-radius:12px;padding:4px;margin-bottom:32px;width:fit-content}
-  .db-tab{padding:9px 22px;border-radius:9px;cursor:pointer;font-size:13.5px;font-weight:500;color:var(--muted);border:none;background:transparent;font-family:'DM Sans',sans-serif;transition:all .2s;white-space:nowrap}
-  .db-tab.active{background:linear-gradient(135deg,var(--blue),var(--viol));color:var(--white);box-shadow:0 0 16px var(--bglow)}
-  .db-tab:hover:not(.active){color:var(--white)}
-
-  /* Dashboard course grid */
-  .db-course-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
-  .db-ccard{background:var(--card);border:1px solid var(--cardb);border-radius:16px;overflow:hidden;transition:transform .2s,border-color .2s,box-shadow .2s;cursor:pointer}
-  .db-ccard:hover{transform:translateY(-4px);border-color:rgba(26,86,255,.4);box-shadow:0 16px 50px rgba(0,0,0,.4)}
-  .db-cthumb{height:170px;background:linear-gradient(135deg,#0a0020,#5b21b6,#1a56ff);display:flex;align-items:center;justify-content:center;font-size:48px;position:relative}
-  .db-clive{position:absolute;top:12px;left:12px;background:#ef4444;color:#fff;font-size:10px;font-weight:700;padding:3px 9px;border-radius:20px;animation:blink 2s ease-in-out infinite}
-  .db-cbody{padding:18px}
-  .db-ccat{font-size:11px;font-weight:700;color:var(--blue);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
-  .db-ctitle{font-family:'Syne',sans-serif;font-size:15px;font-weight:700;line-height:1.4;margin-bottom:14px}
-  .db-cmeta{display:flex;gap:10px;flex-wrap:wrap}
-  .db-ctag{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--muted);background:rgba(255,255,255,.05);border:1px solid var(--cardb);padding:4px 10px;border-radius:20px}
-  .db-continue-btn{display:block;width:100%;margin-top:14px;padding:10px;background:linear-gradient(135deg,var(--blue),var(--viol));color:#fff;border:none;border-radius:10px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;text-align:center;transition:opacity .2s}
-  .db-continue-btn:hover{opacity:.85}
-  .db-empty{text-align:center;padding:60px 20px;color:var(--muted)}
-  .db-empty .db-empty-ico{font-size:48px;margin-bottom:14px}
-  .db-empty p{font-size:15px;line-height:1.7}
-
-  /* Profile page */
-  .profile-card{background:var(--card);border:1px solid var(--cardb);border-radius:20px;padding:36px;max-width:540px}
-  .profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--viol));display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;margin-bottom:20px}
-  .profile-name{font-family:'Syne',sans-serif;font-size:22px;font-weight:800;margin-bottom:4px}
-  .profile-email{color:var(--muted);font-size:14px;margin-bottom:24px}
-  .profile-row{display:flex;justify-content:space-between;align-items:center;padding:14px 0;border-bottom:1px solid var(--cardb)}
-  .profile-row:last-child{border-bottom:none}
-  .profile-lbl{font-size:13px;color:var(--muted)}
-  .profile-val{font-size:14px;font-weight:500}
-
-  /* Rewards page */
-  .rewards-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;max-width:680px}
-  .reward-card{background:var(--card);border:1px solid var(--cardb);border-radius:16px;padding:28px 20px;text-align:center;transition:border-color .2s}
-  .reward-card:hover{border-color:rgba(26,86,255,.3)}
-  .reward-ico{font-size:36px;margin-bottom:12px}
-  .reward-label{font-size:13px;color:var(--muted);margin-bottom:6px}
-  .reward-val{font-family:'Syne',sans-serif;font-size:22px;font-weight:800}
-
-  /* Nav logged-in state */
-  .nav-logged{display:none;align-items:center;gap:12px}
-  .nav-logged.show{display:flex}
-  .nav-logged .nb{position:relative;cursor:pointer;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:50%;background:var(--card);border:1px solid var(--cardb);font-size:16px;transition:background .2s}
-  .nav-logged .nb:hover{background:rgba(26,86,255,.15)}
-  .nav-logged .nb-badge{position:absolute;top:-2px;right:-2px;width:16px;height:16px;border-radius:50%;background:#ef4444;color:#fff;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid var(--navy)}
-  .nav-user-btn{display:flex;align-items:center;gap:8px;background:rgba(26,86,255,.1);border:1px solid rgba(26,86,255,.3);border-radius:50px;padding:6px 14px 6px 8px;cursor:pointer;transition:background .2s}
-  .nav-user-btn:hover{background:rgba(26,86,255,.18)}
-  .nav-user-av{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--blue),var(--viol));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700}
-  .nav-user-name{font-size:13px;font-weight:500;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-
-  @media(max-width:768px){.db-sidebar{display:none}.db-main{padding:20px 16px}.db-course-grid{grid-template-columns:1fr}.rewards-grid{grid-template-columns:1fr 1fr}}
-
-</head>
-<body>
-
-<nav>
-  <a class="logo" href="#" onclick="if(isLoggedIn())openDashboard('mycourses');return!isLoggedIn()">
-    <div class="logo-ico">⛓</div>
-    Decentra<span class="ac">Force</span>
-  </a>
-  <ul class="nav-links" id="nav-links-public">
-    <li><a href="#">Home</a></li>
-    <li><a href="#" onclick="handleCoursesClick(event)">Courses</a></li>
-    <li><a href="#">NanoDegree</a></li>
-    <li><a href="#">Community</a></li>
-    <li><a href="#">Explore</a></li>
-  </ul>
-  <div class="nav-cta" id="nav-cta-guest">
-    <button class="btn-ghost" onclick="openAuth('login')">Log In</button>
-    <button class="btn-primary" onclick="openAuth('register')">Get Started →</button>
-  </div>
-  <div class="nav-logged" id="nav-cta-user">
-    <div class="nb" onclick="openDashboard('mycourses')">🔔<span class="nb-badge">4</span></div>
-    <div class="nav-user-btn" onclick="openDashboard('mycourses')">
-      <div class="nav-user-av" id="nav-av-letter">U</div>
-      <span class="nav-user-name" id="nav-user-name">User</span>
-    </div>
-  </div>
-</nav>
-
-<section class="hero">
-  <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
-  <div class="hex-bg"></div>
-  <div class="hero-content">
-    <div class="hero-badge">⚡ Decentralize Education &amp; Finance</div>
-    <h1>Equal Power.<br>Equal <span class="hb">Knowledge.</span><br><span class="hv">DecentraForce.</span></h1>
-    <p class="hero-sub">We believe education, money, and power should be accessible to everyone. Master Blockchain, AI, DeFi &amp; Web3 — taught in Bangla by real industry experts.</p>
-    <div class="hero-actions">
-      <button class="btn-hero" onclick="handleGetStarted()">Start Learning Free</button>
-      <button class="btn-vid"><div class="play">▶</div>Watch Our Story</button>
-    </div>
-    <div class="hero-stats">
-      <div class="hs"><div class="hs-num">17<span class="u">k+</span></div><div class="hs-lbl">Active Learners</div></div>
-      <div class="hs"><div class="hs-num">20<span class="u">+</span></div><div class="hs-lbl">Expert Mentors</div></div>
-      <div class="hs"><div class="hs-num">300<span class="u">+</span></div><div class="hs-lbl">Video Lessons</div></div>
-    </div>
-  </div>
-  <div class="hero-vis">
-    <div class="hcg">
-      <div class="hex-c">⛓️</div>
-      <div class="fcrd fc-a">
-        <div class="fci">👥</div><div class="fcn">17k+</div><div class="fcl">Active Members</div>
-        <div class="avr"><div class="av a1">G</div><div class="av a2">A</div><div class="av a3">S</div><div class="av a4">R</div></div>
-      </div>
-      <div class="fcrd fc-b"><div class="fci">🎓</div><div class="fcn">20+</div><div class="fcl">Expert Mentors</div><div class="stars">★★★★★</div></div>
-      <div class="fcrd fc-c"><div class="fci">🏅</div><div class="fcn">500+</div><div class="fcl">Certified</div></div>
-    </div>
-  </div>
-</section>
-
-<div class="mq-wrap">
-  <div class="mq-track">
-    <div class="mq-item"><span class="mdot"></span>Blockchain Development</div>
-    <div class="mq-item"><span class="mdot"></span>DeFi &amp; Web3</div>
-    <div class="mq-item"><span class="mdot"></span>AI &amp; Automation</div>
-    <div class="mq-item"><span class="mdot"></span>n8n Workflows</div>
-    <div class="mq-item"><span class="mdot"></span>IoT Systems</div>
-    <div class="mq-item"><span class="mdot"></span>Data Science</div>
-    <div class="mq-item"><span class="mdot"></span>Smart Contracts</div>
-    <div class="mq-item"><span class="mdot"></span>Financial Freedom</div>
-    <div class="mq-item"><span class="mdot"></span>Decentralization</div>
-    <div class="mq-item"><span class="mdot"></span>Blockchain Development</div>
-    <div class="mq-item"><span class="mdot"></span>DeFi &amp; Web3</div>
-    <div class="mq-item"><span class="mdot"></span>AI &amp; Automation</div>
-    <div class="mq-item"><span class="mdot"></span>n8n Workflows</div>
-    <div class="mq-item"><span class="mdot"></span>IoT Systems</div>
-    <div class="mq-item"><span class="mdot"></span>Data Science</div>
-    <div class="mq-item"><span class="mdot"></span>Smart Contracts</div>
-    <div class="mq-item"><span class="mdot"></span>Financial Freedom</div>
-    <div class="mq-item"><span class="mdot"></span>Decentralization</div>
-  </div>
-</div>
-
-<section class="crs-sec reveal" id="courses">
-  <div class="sec-hdr">
-    <div class="pill">Explore Our Top-Rated Courses</div>
-    <h2 class="sec-title">Popular Courses</h2>
-    <p class="sec-sub">World-class curriculum designed by industry experts — taught in Bangla so everyone can learn.</p>
-  </div>
-  <div class="c-tabs">
-    <button class="tab active" data-filter="all">All Courses</button>
-    <button class="tab" data-filter="ai">AI &amp; Automation</button>
-    <button class="tab" data-filter="blockchain">Blockchain Dev</button>
-    <button class="tab" data-filter="defi">DeFi &amp; Web3</button>
-    <button class="tab" data-filter="web">Web Development</button>
-    <button class="tab" data-filter="ds">Data Science &amp; ML</button>
-    <button class="tab" data-filter="nano">NanoDegree</button>
-  </div>
-  <div class="crs-grid">
-
-    <div class="ccard" data-cat="ai">
-      <div class="cthumb th-ai"><span class="cbadge live">🔴 Live Now</span>🤖</div>
-      <div class="cbody">
-        <div class="ccat">AI &amp; Automation</div>
-        <div class="ctitle">Build Anything with AI: Apps, AI Agents, Automation, n8n &amp; IoT</div>
-        <div class="cmeta"><span>📹 120+ Videos</span><span>⏱ 200 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="cprice">৳ 6,999</div><button class="btn-enroll">Enroll Now →</button></div>
-    </div>
-
-    <div class="ccard" data-cat="blockchain">
-      <div class="cthumb th-blk"><span class="cbadge fin">Batch 4 — Ended</span>⛓️</div>
-      <div class="cbody">
-        <div class="ccat">Blockchain Development</div>
-        <div class="ctitle">Zero to Complete Blockchain Development — Live Batch 04</div>
-        <div class="cmeta"><span>📹 65 Videos</span><span>⏱ 130 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard" data-cat="blockchain">
-      <div class="cthumb th-blk"><span class="cbadge fin">Batch 3 — Ended</span>⛓️</div>
-      <div class="cbody">
-        <div class="ccat">Blockchain Development</div>
-        <div class="ctitle">Zero to Complete Blockchain Development — Live Batch 03</div>
-        <div class="cmeta"><span>📹 55 Videos</span><span>⏱ 110 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard" data-cat="blockchain">
-      <div class="cthumb th-blk"><span class="cbadge fin">Batch 2 — Ended</span>⛓️</div>
-      <div class="cbody">
-        <div class="ccat">Blockchain Development</div>
-        <div class="ctitle">Zero to Complete Blockchain Development — Live Batch 02</div>
-        <div class="cmeta"><span>📹 50 Videos</span><span>⏱ 100 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard" data-cat="blockchain">
-      <div class="cthumb th-blk"><span class="cbadge fin">Batch 1 — Ended</span>⛓️</div>
-      <div class="cbody">
-        <div class="ccat">Blockchain Development</div>
-        <div class="ctitle">Zero to Complete Blockchain Development — Live Batch 01</div>
-        <div class="cmeta"><span>📹 45 Videos</span><span>⏱ 90 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard" data-cat="defi">
-      <div class="cthumb th-defi"><span class="cbadge fin">Batch 1 — Ended</span>🌐</div>
-      <div class="cbody">
-        <div class="ccat">DeFi &amp; Web3</div>
-        <div class="ctitle">DeFi Foundations: Smart Contracts, Protocols &amp; Financial Freedom</div>
-        <div class="cmeta"><span>📹 48 Videos</span><span>⏱ 80 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard" data-cat="defi">
-      <div class="cthumb th-fin"><span class="cbadge fin">Batch 1 — Ended</span>💰</div>
-      <div class="cbody">
-        <div class="ccat">DeFi &amp; Finance</div>
-        <div class="ctitle">Crypto Trading &amp; Decentralized Finance Masterclass</div>
-        <div class="cmeta"><span>📹 40 Videos</span><span>⏱ 65 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard" data-cat="web">
-      <div class="cthumb th-web"><span class="cbadge fin">Batch 2 — Ended</span>💻</div>
-      <div class="cbody">
-        <div class="ccat">Web Development</div>
-        <div class="ctitle">Full-Stack Web Development with React &amp; Node.js — Batch 02</div>
-        <div class="cmeta"><span>📹 95 Videos</span><span>⏱ 170 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard" data-cat="web">
-      <div class="cthumb th-web"><span class="cbadge fin">Batch 1 — Ended</span>💻</div>
-      <div class="cbody">
-        <div class="ccat">Web Development</div>
-        <div class="ctitle">Full-Stack Web Development with React &amp; Node.js — Batch 01</div>
-        <div class="cmeta"><span>📹 80 Videos</span><span>⏱ 145 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard" data-cat="ds">
-      <div class="cthumb th-ds"><span class="cbadge fin">Batch 1 — Ended</span>🧠</div>
-      <div class="cbody">
-        <div class="ccat">Data Science &amp; Machine Learning</div>
-        <div class="ctitle">Complete Data Science &amp; ML Bootcamp — Zero to Hero, Batch 01</div>
-        <div class="cmeta"><span>📹 78 Videos</span><span>⏱ 150 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard" data-cat="nano">
-      <div class="cthumb th-nano"><span class="cbadge fin">Cohort 1 — Ended</span>🎓</div>
-      <div class="cbody">
-        <div class="ccat">NanoDegree</div>
-        <div class="ctitle">Blockchain &amp; Web3 NanoDegree — Industry Certified, Cohort 01</div>
-        <div class="cmeta"><span>📹 200 Videos</span><span>⏱ 300 hrs</span><span>🌐 Bangla</span></div>
-      </div>
-      <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
-    </div>
-
-    <div class="ccard see-all-crd" id="see-all-card">
-      <div style="font-size:48px">✨</div>
-      <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700">Explore All Courses</div>
-      <div style="color:var(--muted);font-size:13px;max-width:190px">More topics launching soon</div>
-      <button class="btn-primary">See All →</button>
-    </div>
-
-  </div>
-</section>
-
-<section class="st-sec">
-  <div class="sec-hdr reveal">
-    <div class="pill">Why Choose Us</div>
-    <h2 class="sec-title">Choose DecentraForce For<br>Personalized Excellence &amp; 24/7 Support</h2>
-  </div>
-  <div class="st-grid reveal">
-    <div class="st-card"><div class="st-ico">🎓</div><div class="st-big">10<span class="ac">k+</span></div><div class="st-dsc">Learners &amp; counting</div></div>
-    <div class="st-card"><div class="st-ico">📹</div><div class="st-big">300<span class="ac">+</span></div><div class="st-dsc">Course Videos</div></div>
-    <div class="st-card"><div class="st-ico">🏅</div><div class="st-big">500<span class="ac">+</span></div><div class="st-dsc">Certified Students</div></div>
-    <div class="st-card"><div class="st-ico">📝</div><div class="st-big">1<span class="ac">k+</span></div><div class="st-dsc">Registered Enrollments</div></div>
-  </div>
-</section>
-
-<section class="wy-sec">
-  <div class="sec-hdr reveal">
-    <div class="pill">Education For Everyone</div>
-    <h2 class="sec-title">Why DecentraForce<br>Is Your Best Choice</h2>
-  </div>
-  <div class="wy-grid reveal">
-    <div class="wy-card"><div class="wy-ico">⚖️</div><div class="wy-title">Equal Access to Education</div><div class="wy-desc">We believe knowledge should not be gatekept. Every course is accessible and taught in Bangla so no one is left behind.</div></div>
-    <div class="wy-card"><div class="wy-ico">⛓️</div><div class="wy-title">Decentralization First</div><div class="wy-desc">From Blockchain to DeFi, we teach you to take control — of your finances, your data, and your future.</div></div>
-    <div class="wy-card"><div class="wy-ico">👨‍🏫</div><div class="wy-title">Expert Mentors</div><div class="wy-desc">Learn from 20+ industry professionals actively working in Blockchain, AI, and Web3 who guide you every step.</div></div>
-    <div class="wy-card"><div class="wy-ico">⚡</div><div class="wy-title">Live Interactive Classes</div><div class="wy-desc">Join live batch sessions with real-time Q&amp;A, code reviews, and instant feedback from your instructors.</div></div>
-    <div class="wy-card"><div class="wy-ico">🏆</div><div class="wy-title">Industry Certification</div><div class="wy-desc">Earn recognized certificates that boost your resume and signal real expertise to employers worldwide.</div></div>
-    <div class="wy-card"><div class="wy-ico">🤝</div><div class="wy-title">Community &amp; Support</div><div class="wy-desc">Join Bangladesh's most active Web3 community for 24/7 support, peer learning, and networking opportunities.</div></div>
-  </div>
-</section>
-
-<section class="ts-sec">
-  <div class="sec-hdr reveal">
-    <div class="pill">Student Reviews</div>
-    <h2 class="sec-title">See What Our Learners<br>Are Saying</h2>
-  </div>
-  <div class="rv-grid reveal">
-
-    <div class="rv-card feat">
-      <div class="rv-top"><div class="qi">"</div><div class="rv-stars">★★★★★</div></div>
-      <div class="rv-lang">বাংলা</div>
-      <div class="rv-text">মেন্টরের অসাধারণ শেখানোর পদ্ধতি আমাকে প্রতিটি বিষয় গভীরভাবে বুঝতে সাহায্য করেছে। DecentraForce আমার জীবন বদলে দিয়েছে — এখন আমি নিজে ব্লকচেইন প্রজেক্ট তৈরি করতে পারি।</div>
-      <div class="reviewer"><div class="rv-av a3">N</div><div><div class="rv-name">নুরী ফাতেমা</div><div class="rv-id">Student · DF-DE1FD2</div></div></div>
-    </div>
-
-    <div class="rv-card">
-      <div class="rv-top"><div class="qi">"</div><div class="rv-stars">★★★★★</div></div>
-      <div class="rv-text">I have learned a lot from here. I would say DecentraForce is the best institution for Blockchain and Web3 in Bangladesh. I would rate it 5 stars without hesitation!</div>
-      <div class="reviewer"><div class="rv-av a1">G</div><div><div class="rv-name">Gonesh Chandra Adhikary</div><div class="rv-id">Student · DF-18B266</div></div></div>
-    </div>
-
-    <div class="rv-card">
-      <div class="rv-top"><div class="qi">"</div><div class="rv-stars">★★★★★</div></div>
-      <div class="rv-lang">বাংলা</div>
-      <div class="rv-text">এই কোর্সটা করার আগে আমি AI সম্পর্কে কিছুই জানতাম অ্যাকাউন্টে ঢুকলে আমার n8n দিয়ে অটোমেশন বানাতে পারি। শিক্ষক অনেক ধৈর্য নিয়ে সব বুঝিয়ে দেন — অসাধারণ অভিজ্ঞতা।</div>
-      <div class="reviewer"><div class="rv-av a2">R</div><div><div class="rv-name">রাফিউল ইসলাম</div><div class="rv-id">Student · DF-A3C91F</div></div></div>
-    </div>
-
-    <div class="rv-card feat">
-      <div class="rv-top"><div class="qi">"</div><div class="rv-stars">★★★★★</div></div>
-      <div class="rv-lang">বাংলা</div>
-      <div class="rv-text">DecentraForce-এ যোগ দেওয়াটা আমার জীবনের অন্যতম সেরা সিদ্ধান্ত। ব্লকচেইন শিখে এখন আমি একটা Web3 স্টার্টআপে কাজ করছি। সবাইকে রেকমেন্ড করব।</div>
-      <div class="reviewer"><div class="rv-av a4">A</div><div><div class="rv-name">আরকো রয় বাধন</div><div class="rv-id">Student · DF-E05231</div></div></div>
-    </div>
-
-    <div class="rv-card">
-      <div class="rv-top"><div class="qi">"</div><div class="rv-stars">★★★★★</div></div>
-      <div class="rv-text">I was in FOP Batch 01. The course was amazing — teacher is humble, friendly and taught with lots of patience. The community support is truly unmatched!</div>
-      <div class="reviewer"><div class="rv-av a2">S</div><div><div class="rv-name">Shahnaz</div><div class="rv-id">Student · DF-9F22AC</div></div></div>
-    </div>
-
-    <div class="rv-card">
-      <div class="rv-top"><div class="qi">"</div><div class="rv-stars">★★★★★</div></div>
-      <div class="rv-lang">বাংলা</div>
-      <div class="rv-text">কোর্সের কনটেন্ট অনেক সহজভাবে বোঝানো হয়েছে। Smart Contract থেকে DeFi পর্যন্ত সব কিছুই পরিষ্কার। এই প্ল্যাটফর্মটা বাংলাদেশের শিক্ষায় একটা বিপ্লব!</div>
-      <div class="reviewer"><div class="rv-av a1">K</div><div><div class="rv-name">কাজী সাইফুল আনোয়ার</div><div class="rv-id">Student · DF-DE1FD2</div></div></div>
-    </div>
-
-  </div>
-</section>
-
-<section class="auth-sec" id="auth">
-  <div class="auth-wrap reveal">
-    <div class="auth-left">
-      <div class="al-inner">
-        <div class="pill">Join DecentraForce</div>
-        <h2>Start Your Journey<br>Toward Freedom</h2>
-        <p>Decentralize your future. Master Blockchain, AI, and Web3 — in your own language.</p>
-        <div class="a-steps">
-          <div class="a-step"><div class="sn">1</div><div><div class="sl">LEARN</div><div class="sd">Access 10+ expert-led courses in Bangla.</div></div></div>
-          <div class="a-step"><div class="sn">2</div><div><div class="sl">APPLY</div><div class="sd">Build real projects and earn certifications.</div></div></div>
-          <div class="a-step"><div class="sn">3</div><div><div class="sl">GROW</div><div class="sd">Land your dream job or launch your startup.</div></div></div>
-        </div>
-      </div>
-    </div>
-
-    <div class="auth-right">
-      <div class="a-tabs">
-        <button class="a-tab active" id="tab-login" onclick="switchTab('login')">Log In</button>
-        <button class="a-tab" id="tab-register" onclick="switchTab('register')">Create Account</button>
-      </div>
-
-      <div class="a-panel active" id="panel-login">
-        <div class="alert a-err" id="lg-err">Incorrect email or password. Please try again.</div>
-        <div class="frow">
-          <label class="flbl">Email Address</label>
-          <input class="fi" id="lg-email" type="email" placeholder="you@example.com">
-          <div class="ferr" id="lg-email-e">Please enter a valid email.</div>
-        </div>
-        <div class="frow">
-          <label class="flbl">Password</label>
-          <div class="iw">
-            <input class="fi" id="lg-pass" type="password" placeholder="Enter your password">
-            <button class="ptog" type="button" onclick="tPwd('lg-pass',this)">👁</button>
+const DecentraforceLanding = () => {
+  return (
+    <div className="min-h-screen bg-slate-50 font-sans text-slate-800">
+      
+      {/* 1. NAVIGATION BAR */}
+      <nav className="flex justify-between items-center px-8 py-5 bg-white shadow-sm sticky top-0 z-50">
+        <div className="flex items-center gap-2">
+          {/* Decentraforce Logo Placeholder */}
+          <div className="text-2xl font-black text-blue-700 tracking-tighter">
+            Decentra<span className="text-slate-800">force</span>
           </div>
-          <div class="ferr" id="lg-pass-e">Password is required.</div>
         </div>
-        <div style="text-align:right;margin-bottom:16px">
-          <a onclick="showPanel('forgot')" style="font-size:13px;color:var(--blue);cursor:pointer">Forgot password?</a>
+        <div className="hidden md:flex gap-8 font-medium text-slate-600">
+          <a href="#" className="hover:text-blue-600">Home</a>
+          <a href="#" className="hover:text-blue-600">Training</a>
+          <a href="#" className="hover:text-blue-600">Systems</a>
+          <a href="#" className="hover:text-blue-600">Explore ⌄</a>
         </div>
-        <button class="btn-auth" onclick="doLogin()">Log In →</button>
-        <div class="a-footer">Don't have an account? <a onclick="switchTab('register')">Create one free</a></div>
-      </div>
+        <button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-full font-semibold transition-all">
+          Login
+        </button>
+      </nav>
 
-      <div class="a-panel" id="panel-forgot">
-        <div id="fp1">
-          <button class="back-btn" onclick="showPanel('login')">← Back to Login</button>
-          <div class="sub-title">Reset Password</div>
-          <div class="sub-desc">Enter your registered email and we'll send you a 6-digit verification code.</div>
-          <div class="frow">
-            <label class="flbl">Email Address</label>
-            <input class="fi" id="fp-email" type="email" placeholder="you@example.com">
-            <div class="ferr" id="fp-email-e">Please enter a valid email.</div>
+      {/* 2. HERO SECTION */}
+      <section className="px-8 md:px-20 py-24 flex flex-col md:flex-row items-center gap-12 bg-white">
+        <div className="md:w-1/2 space-y-6 text-left">
+          <p className="text-blue-600 font-bold tracking-wide uppercase text-sm">Empower Your Future Right Now</p>
+          <h1 className="text-5xl md:text-7xl font-bold text-slate-900 leading-tight">
+            We build systems <br /> to make everyone <br />
+            <span className="relative inline-block text-slate-900 mt-2">
+              Equal.
+              {/* Hand-drawn circle effect SVG */}
+              <svg className="absolute -inset-2 w-[110%] h-[120%] text-blue-500" viewBox="0 0 100 40" preserveAspectRatio="none">
+                <path d="M10,20 C10,5 90,5 90,20 C90,35 10,35 10,20" stroke="currentColor" strokeWidth="2" fill="none" className="opacity-80"/>
+              </svg>
+            </span>
+          </h1>
+          <p className="text-lg text-slate-500 max-w-lg">
+            Decentraforce is committed to providing top-quality training and decentralized architectures. Dive in and master the skills to level the playing field.
+          </p>
+          <div className="flex items-center gap-4 pt-4">
+            <button className="bg-blue-600 text-white px-8 py-3 rounded-full font-semibold hover:shadow-lg hover:-translate-y-1 transition-all">
+              Join the Force
+            </button>
+            <button className="flex items-center gap-3 text-slate-700 font-medium hover:text-blue-600 transition-colors">
+              <span className="flex items-center justify-center w-12 h-12 border border-slate-200 rounded-full shadow-sm">
+                ▶
+              </span>
+              Watch Our Vision
+            </button>
           </div>
-          <button class="btn-auth" id="fp-send-btn" onclick="fpSend()">Send Reset Code →</button>
         </div>
-        <div id="fp2" style="display:none">
-          <button class="back-btn" onclick="fpGoBack()">← Change Email</button>
-          <div class="alert a-info show">A 6-digit code was sent to <strong id="fp-to"></strong>.</div>
-          <div class="sub-title">Enter Verification Code</div>
-          <div class="otp-row" id="fp-otp-row">
-            <input class="otp-b" maxlength="1"><input class="otp-b" maxlength="1"><input class="otp-b" maxlength="1">
-            <input class="otp-b" maxlength="1"><input class="otp-b" maxlength="1"><input class="otp-b" maxlength="1">
+        
+        {/* Right side abstract graphic / Stats */}
+        <div className="md:w-1/2 relative flex justify-center">
+          <div className="w-full max-w-md h-96 bg-slate-100 rounded-2xl border-4 border-white shadow-2xl overflow-hidden relative">
+             {/* Placeholder for Hero Image */}
+             <div className="absolute inset-0 bg-gradient-to-tr from-blue-100 to-indigo-50 flex items-center justify-center text-slate-400">
+               [ Futuristic Web3 Hero Image ]
+             </div>
           </div>
-          <div class="resend">Didn't get it? <a id="fp-resend-a" onclick="fpResend()">Resend code</a> <span id="fp-timer"></span></div>
-          <div class="ferr" id="fp-otp-e" style="text-align:center;margin-top:8px"></div>
-          <button class="btn-auth" style="margin-top:14px" onclick="fpVerify()">Verify Code →</button>
-        </div>
-        <div id="fp3" style="display:none">
-          <div class="sub-title">Set New Password</div>
-          <div class="frow">
-            <label class="flbl">New Password</label>
-            <div class="iw">
-              <input class="fi" id="fp-np" type="password" placeholder="Min. 8 characters" oninput="checkStr(this.value,'fp-sf','fp-st')">
-              <button class="ptog" type="button" onclick="tPwd('fp-np',this)">👁</button>
-            </div>
-            <div class="str-bar"><div class="str-fill" id="fp-sf"></div></div>
-            <div class="str-txt" id="fp-st">Enter a password</div>
-          </div>
-          <div class="frow">
-            <label class="flbl">Confirm New Password</label>
-            <div class="iw">
-              <input class="fi" id="fp-cp" type="password" placeholder="Repeat password">
-              <button class="ptog" type="button" onclick="tPwd('fp-cp',this)">👁</button>
-            </div>
-            <div class="ferr" id="fp-cp-e">Passwords do not match.</div>
-          </div>
-          <button class="btn-auth" onclick="fpReset()">Save New Password →</button>
-        </div>
-        <div id="fp4" style="display:none;text-align:center">
-          <div style="font-size:54px;margin-bottom:14px">✅</div>
-          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">Password Reset!</div>
-          <div style="color:var(--muted);font-size:14px;margin-bottom:22px">Your password has been updated. You can now log in.</div>
-          <button class="btn-auth" onclick="switchTab('login')">Back to Login →</button>
-        </div>
-      </div>
-
-      <div class="a-panel" id="panel-register">
-        <div id="rg1">
-          <div class="frow">
-            <label class="flbl">Full Name</label>
-            <input class="fi" id="rg-name" type="text" placeholder="Your full name">
-            <div class="ferr" id="rg-name-e">Please enter your name.</div>
-          </div>
-          <div class="frow">
-            <label class="flbl">Email Address</label>
-            <input class="fi" id="rg-email" type="email" placeholder="you@example.com">
-            <div class="ferr" id="rg-email-e">Please enter a valid email.</div>
-          </div>
-          <div class="frow">
-            <label class="flbl">Confirm Email Address</label>
-            <input class="fi" id="rg-cemail" type="email" placeholder="Repeat your email">
-            <div class="ferr" id="rg-cemail-e">Emails do not match.</div>
-          </div>
-          <div class="frow">
-            <label class="flbl">Password</label>
-            <div class="iw">
-              <input class="fi" id="rg-pass" type="password" placeholder="Min. 8 characters" oninput="checkStr(this.value,'rg-sf','rg-st')">
-              <button class="ptog" type="button" onclick="tPwd('rg-pass',this)">👁</button>
-            </div>
-            <div class="str-bar"><div class="str-fill" id="rg-sf"></div></div>
-            <div class="str-txt" id="rg-st">Enter a password</div>
-            <div class="ferr" id="rg-pass-e">Password must be at least 8 characters.</div>
-          </div>
-          <div class="frow">
-            <label class="flbl">Confirm Password</label>
-            <div class="iw">
-              <input class="fi" id="rg-cpass" type="password" placeholder="Repeat password">
-              <button class="ptog" type="button" onclick="tPwd('rg-cpass',this)">👁</button>
-            </div>
-            <div class="ferr" id="rg-cpass-e">Passwords do not match.</div>
-          </div>
-          <button class="btn-auth" id="rg-submit-btn" onclick="doRegister()">Create Account →</button>
-          <div class="a-footer">Already have an account? <a onclick="switchTab('login')">Log in</a></div>
-        </div>
-        <div id="rg2" style="display:none;text-align:center;padding-top:10px">
-          <div style="font-size:56px;margin-bottom:18px">🎉</div>
-          <div style="font-family:'Syne',sans-serif;font-size:21px;font-weight:800;margin-bottom:10px">Account Created!</div>
-          <div style="color:var(--muted);font-size:14px;line-height:1.75;margin-bottom:6px">Welcome to DecentraForce,</div>
-          <div style="color:var(--cyan);font-weight:600;font-size:15px;margin-bottom:18px" id="rg-welcome-name"></div>
-          <div style="color:var(--muted);font-size:13.5px;line-height:1.75;margin-bottom:28px">
-            Your account is ready. Start your journey toward decentralized knowledge and financial freedom.
-          </div>
-          <button class="btn-auth" onclick="switchTab('login')">Go to Login →</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<div id="dashboard">
-
-  <div class="db-nav">
-    <div class="db-nav-left">
-      <a class="logo" href="#" onclick="closeDashboard();return false" style="text-decoration:none">
-        <div class="logo-ico">⛓</div>
-        Decentra<span class="ac">Force</span>
-      </a>
-      <div class="db-student">Student ID: <strong id="db-student-id">DF-000000</strong></div>
-    </div>
-    <div class="db-nav-right">
-      <div class="db-notif">🔔<span class="db-badge">4</span></div>
-      <div class="db-avatar" id="db-av-letter" onclick="dbNav('profile')">U</div>
-    </div>
-  </div>
-
-  <div class="db-body">
-    <div class="db-sidebar">
-      <a class="db-menu-item active" id="sb-mycourses" onclick="dbNav('mycourses')">
-        <span class="db-menu-icon">⊞</span> My Courses
-      </a>
-      <a class="db-menu-item" id="sb-profile" onclick="dbNav('profile')">
-        <span class="db-menu-icon">👤</span> Profile
-      </a>
-      <a class="db-menu-item" id="sb-rewards" onclick="dbNav('rewards')">
-        <span class="db-menu-icon">🏆</span> Rewards
-      </a>
-      <div class="db-logout">
-        <button onclick="doLogout()">↩ Log Out</button>
-      </div>
-    </div>
-
-    <div class="db-main">
-
-      <div class="db-page active" id="page-mycourses">
-        <div class="db-page-title">My Courses — Continue Your Learning Journey</div>
-        <div class="db-tabs">
-          <button class="db-tab active" data-dtab="ongoing" onclick="switchDbTab(this,'ongoing')">Ongoing Courses</button>
-          <button class="db-tab" data-dtab="subscription" onclick="switchDbTab(this,'subscription')">Subscription Courses</button>
-          <button class="db-tab" data-dtab="free" onclick="switchDbTab(this,'free')">Free Courses</button>
-        </div>
-
-        <div id="dtab-ongoing">
-          <div class="db-course-grid">
-            <div class="db-ccard">
-              <div class="db-cthumb">
-                <span class="db-clive">🔴 LIVE</span>
-                🤖
-              </div>
-              <div class="db-cbody">
-                <div class="db-ccat">AI &amp; Automation</div>
-                <div class="db-ctitle">Build Anything with AI: Apps, AI Agents, Automation, n8n &amp; IoT</div>
-                <div class="db-cmeta">
-                  <div class="db-ctag">📹 120 Lectures</div>
-                  <div class="db-ctag">📝 30 Exercises</div>
-                  <div class="db-ctag">📋 15 Assignments</div>
-                </div>
-                <button class="db-continue-btn">Continue Learning →</button>
-              </div>
+          {/* Floating Stat Card */}
+          <div className="absolute -right-4 top-10 bg-white p-4 shadow-xl rounded-xl flex items-center gap-4 border border-slate-50">
+            <div className="bg-blue-100 p-3 rounded-full text-blue-700 font-bold">17k+</div>
+            <div>
+              <p className="font-bold text-slate-800">Active Builders</p>
+              <p className="text-sm text-slate-500">In our ecosystem</p>
             </div>
           </div>
         </div>
+      </section>
 
-        <div id="dtab-subscription" style="display:none">
-          <div class="db-empty">
-            <div class="db-empty-ico">📦</div>
-            <p>No subscription courses yet.<br>Explore our premium plans to unlock more content.</p>
+      {/* 3. BANNER SECTION */}
+      <section className="bg-blue-700 py-10 flex flex-col items-center text-center text-white px-4">
+        <h2 className="text-3xl md:text-4xl font-bold mb-6">
+          Join The Largest & Most Active Decentralized Community
+        </h2>
+        <button className="bg-white text-blue-800 font-bold px-8 py-3 rounded-full flex items-center gap-2 hover:bg-slate-100">
+          👥 Join Here
+        </button>
+      </section>
+
+      {/* 4. COURSES / TRAINING GRID */}
+      <section className="py-20 px-8 md:px-20 text-center bg-slate-50">
+        <p className="text-blue-600 font-medium mb-2 bg-blue-100 inline-block px-4 py-1 rounded-full text-sm">
+          Explore Our Core Systems
+        </p>
+        <h2 className="text-4xl font-bold text-slate-900 mb-12">Popular Training Paths</h2>
+        
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto text-left">
+          {/* Card 1 */}
+          <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-lg transition-all cursor-pointer">
+            <div className="h-48 bg-slate-900 relative">
+               <div className="absolute top-4 right-4 bg-black text-yellow-400 text-xs font-bold px-2 py-1 rounded">BATCH-05</div>
+               <div className="flex items-center justify-center h-full text-white font-black text-2xl tracking-widest text-center px-4">
+                 BLOCKCHAIN<br/>DEVELOPMENT
+               </div>
+            </div>
+            <div className="p-6">
+              <h3 className="font-bold text-xl text-slate-800 mb-6">Zero to Complete Blockchain Architecture</h3>
+              <button className="w-full bg-slate-100 text-slate-700 font-medium py-3 rounded-lg hover:bg-slate-200 transition">
+                View Details →
+              </button>
+            </div>
+          </div>
+          {/* You can duplicate the card above for other courses like "Smart Contracts", "Data Science", etc. */}
+        </div>
+      </section>
+
+      {/* 5. FOOTER */}
+      <footer className="bg-slate-900 text-slate-300 py-16 px-8 md:px-20 mt-10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-12">
+          <div className="space-y-6">
+            <div className="text-2xl font-black text-white tracking-tighter">
+              Decentra<span className="text-blue-500">force</span>
+            </div>
+            <p className="text-sm text-slate-400 leading-relaxed">
+              Discover Decentraforce, the platform transforming education and systems for all. Empower your future and unlock true equality with us today.
+            </p>
+          </div>
+          <div>
+            <h4 className="text-white font-bold text-lg mb-6">Quick Links</h4>
+            <ul className="space-y-3 text-sm">
+              <li><a href="#" className="hover:text-blue-400">About Us</a></li>
+              <li><a href="#" className="hover:text-blue-400">Mission</a></li>
+              <li><a href="#" className="hover:text-blue-400">Terms & Conditions</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-bold text-lg mb-6">Useful Links</h4>
+            <ul className="space-y-3 text-sm">
+              <li><a href="#" className="hover:text-blue-400">Contact Us</a></li>
+              <li><a href="#" className="hover:text-blue-400">Ecosystem</a></li>
+              <li><a href="#" className="hover:text-blue-400">Sign Up</a></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-bold text-lg mb-6">Contact Us</h4>
+            <ul className="space-y-3 text-sm">
+              <li>hello@decentraforce.net</li>
+              <li>Global Node, Earth</li>
+            </ul>
           </div>
         </div>
-
-        <div id="dtab-free" style="display:none">
-          <div class="db-empty">
-            <div class="db-empty-ico">🎁</div>
-            <p>No free courses enrolled yet.<br>Check our course catalog for free offerings.</p>
-          </div>
+        <div className="mt-16 pt-8 border-t border-slate-800 text-center text-sm text-slate-500">
+          © 2026 Decentraforce. All rights reserved.
         </div>
-      </div>
+      </footer>
 
-      <div class="db-page" id="page-profile">
-        <div class="db-page-title">Profile</div>
-        <div class="profile-card">
-          <div class="profile-avatar" id="pf-av-letter">U</div>
-          <div class="profile-name" id="pf-name">Your Name</div>
-          <div class="profile-email" id="pf-email">your@email.com</div>
-          <div class="profile-row">
-            <span class="profile-lbl">Student ID</span>
-            <span class="profile-val" id="pf-sid">DF-000000</span>
-          </div>
-          <div class="profile-row">
-            <span class="profile-lbl">Enrolled Courses</span>
-            <span class="profile-val">1</span>
-          </div>
-          <div class="profile-row">
-            <span class="profile-lbl">Certificates Earned</span>
-            <span class="profile-val">0</span>
-          </div>
-          <div class="profile-row">
-            <span class="profile-lbl">Member Since</span>
-            <span class="profile-val" id="pf-since">2025</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="db-page" id="page-rewards">
-        <div class="db-page-title">Rewards</div>
-        <div class="rewards-grid">
-          <div class="reward-card">
-            <div class="reward-ico">⭐</div>
-            <div class="reward-label">Total Points</div>
-            <div class="reward-val">0</div>
-          </div>
-          <div class="reward-card">
-            <div class="reward-ico">🏅</div>
-            <div class="reward-label">Badges Earned</div>
-            <div class="reward-val">0</div>
-          </div>
-          <div class="reward-card">
-            <div class="reward-ico">🎓</div>
-            <div class="reward-label">Certificates</div>
-            <div class="reward-val">0</div>
-          </div>
-        </div>
-        <div style="color:var(--muted);font-size:14px;margin-top:28px;line-height:1.75">
-          Complete course assignments and exercises to earn points and badges!
-        </div>
-      </div>
-
-    </div></div></div><footer>
-  <div class="ft-grid">
-    <div class="ft-brand">
-      <a class="logo" href="#"><div class="logo-ico">⛓</div>Decentra<span class="ac">Force</span></a>
-      <p>Bangladesh's premier decentralized learning platform for Blockchain, AI, DeFi, and Web3. Equal education for everyone.</p>
-      <div class="ft-soc">
-        <div class="soc">📘</div><div class="soc">📸</div><div class="soc">💼</div><div class="soc">▶️</div>
-      </div>
     </div>
-    <div class="fc"><h4>Courses</h4><ul class="fl"><li><a href="#">AI &amp; Automation</a></li><li><a href="#">Blockchain Dev</a></li><li><a href="#">DeFi &amp; Web3</a></li><li><a href="#">Web Development</a></li><li><a href="#">NanoDegree</a></li></ul></div>
-    <div class="fc"><h4>Company</h4><ul class="fl"><li><a href="#">About Us</a></li><li><a href="#">Mentors</a></li><li><a href="#">Community</a></li><li><a href="#">Blog</a></li><li><a href="#">Careers</a></li></ul></div>
-    <div class="fc"><h4>Support</h4><ul class="fl"><li><a href="#">Help Center</a></li><li><a href="#">Privacy Policy</a></li><li><a href="#">Terms of Service</a></li><li><a href="#">Refund Policy</a></li><li><a href="#auth">Contact Us</a></li></ul></div>
-  </div>
-  <div class="ft-bot">
-    <span>© 2025 DecentraForce. All rights reserved.</span>
-    <span>Decentralizing education, one learner at a time 🇧🇩</span>
-  </div>
-</footer>
-
-<button class="wa">💬</button>
-
-<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" onerror="console.warn('EmailJS CDN failed to load. Forgot password email will not work.')"></script>
-<script>
-/* ═══════════════════════════════════════════════
-   EMAILJS CONFIG  ← fill in your 3 values below
-   Sign up free at https://emailjs.com
-   → Add Service (Gmail) → copy Service ID
-   → Add Template      → copy Template ID
-   → Account > API Keys→ copy Public Key
-   Template must have variables:
-     {{to_email}}  {{subject}}  {{message}}
-═══════════════════════════════════════════════ */
-const EJS_PUBLIC_KEY  = 'TxlilKkHJZDum1C5v';   // ← paste from EmailJS Account > API Keys
-const EJS_SERVICE_ID  = 'service_wn7dn1f';   // ✅ your Gmail service
-const EJS_TEMPLATE_ID = 'template_2067o6n';
-
-try { if(typeof emailjs!=='undefined') emailjs.init({ publicKey: EJS_PUBLIC_KEY }); } catch(e){}
-
-/* ── SCROLL REVEAL — content always visible, animation is cosmetic only ── */
-function initReveal() {
-  if (!('IntersectionObserver' in window)) return;
-  const ro = new IntersectionObserver(
-    e => e.forEach(x => {
-      if (x.isIntersecting) {
-        x.target.classList.add('animated');
-        ro.unobserve(x.target);
-      }
-    }),
-    { threshold: 0.05 }
   );
-  document.querySelectorAll('.reveal').forEach(el => ro.observe(el));
-}
-initReveal();
+};
 
-/* ── COURSE TABS ── */
-document.querySelectorAll('.tab[data-filter]').forEach(tab => {
-  tab.addEventListener('click', () => {
-    document.querySelectorAll('.tab[data-filter]').forEach(t => t.classList.remove('active'));
-    tab.classList.add('active');
-    const f = tab.dataset.filter;
-    document.querySelectorAll('.ccard').forEach(c => {
-      if (c.classList.contains('see-all-crd')) { c.classList.remove('hidden'); return; }
-      c.classList.toggle('hidden', f !== 'all' && c.dataset.cat !== f);
-    });
-  });
-});
-
-/* ── AUTH PANELS ── */
-function showPanel(p) {
-  document.querySelectorAll('.a-panel').forEach(x => x.classList.remove('active'));
-  document.getElementById('panel-' + p).classList.add('active');
-  document.getElementById('auth').scrollIntoView({ behavior: 'smooth' });
-}
-function switchTab(t) {
-  document.getElementById('tab-login').classList.toggle('active', t === 'login');
-  document.getElementById('tab-register').classList.toggle('active', t === 'register');
-  showPanel(t);
-}
-function openAuth(t) { switchTab(t); }
-
-/* ── FIELD HELPERS ── */
-const isEmail = v => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
-function sErr(id, msg) { const e = document.getElementById(id); if (msg) e.textContent = msg; e.classList.add('show'); }
-function cErr(id) { document.getElementById(id).classList.remove('show'); }
-function sInv(id) { document.getElementById(id).classList.add('err'); }
-function cInv(id) { document.getElementById(id).classList.remove('err'); }
-function tPwd(id, btn) {
-  const i = document.getElementById(id);
-  i.type = i.type === 'password' ? 'text' : 'password';
-  btn.textContent = i.type === 'password' ? '👁' : '🙈';
-}
-function checkStr(v, fillId, txtId) {
-  let s = 0;
-  if (v.length >= 8) s++; if (/[A-Z]/.test(v)) s++;
-  if (/[0-9]/.test(v)) s++; if (/[^A-Za-z0-9]/.test(v)) s++;
-  const cols = ['#ef4444', '#f97316', '#eab308', '#22c55e'];
-  const lbls = ['Weak', 'Fair', 'Good', 'Strong'];
-  const f = document.getElementById(fillId);
-  if (f) { f.style.width = (s / 4 * 100) + '%'; f.style.background = v ? (cols[s - 1] || '#ef4444') : 'transparent'; }
-  const t = document.getElementById(txtId);
-  if (t) t.textContent = v ? (lbls[s - 1] || 'Weak') : 'Enter a password';
-}
-function getOtp(rowId) {
-  return Array.from(document.getElementById(rowId).querySelectorAll('.otp-b')).map(b => b.value).join('');
-}
-function genOtp() { return String(Math.floor(100000 + Math.random() * 900000)); }
-function setBtnLoading(btnId, loading, label) {
-  const btn = document.getElementById(btnId);
-  btn.disabled = loading;
-  btn.textContent = loading ? 'Sending…' : label;
-  btn.style.opacity = loading ? '0.7' : '1';
-}
-
-/* ── COUNTDOWN TIMER ── */
-function startTimer(spanId, linkId, secs) {
-  const span = document.getElementById(spanId), link = document.getElementById(linkId);
-  link.style.pointerEvents = 'none'; link.style.opacity = '.4';
-  let s = secs; span.textContent = `(${s}s)`;
-  const iv = setInterval(() => {
-    s--; span.textContent = s > 0 ? `(${s}s)` : '';
-    if (s <= 0) { clearInterval(iv); link.style.pointerEvents = 'auto'; link.style.opacity = '1'; }
-  }, 1000);
-}
-
-/* ── OTP FOCUS NAVIGATION ── */
-document.querySelectorAll('.otp-row').forEach(row => {
-  row.querySelectorAll('.otp-b').forEach((box, i, all) => {
-    box.addEventListener('input', () => { if (box.value && all[i + 1]) all[i + 1].focus(); });
-    box.addEventListener('keydown', e => { if (e.key === 'Backspace' && !box.value && all[i - 1]) all[i - 1].focus(); });
-    box.addEventListener('paste', e => {
-      e.preventDefault();
-      const p = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 6);
-      p.split('').forEach((ch, j) => { if (all[j]) all[j].value = ch; });
-      const last = all[Math.min(p.length, 5)]; if (last) last.focus();
-    });
-  });
-});
-
-/* ── SEND EMAIL via EmailJS ── */
-async function sendEmail(to, subject, message) {
-  if (typeof emailjs === 'undefined') {
-    throw new Error('Email service not available. Please check your internet connection.');
-  }
-  await emailjs.send(EJS_SERVICE_ID, EJS_TEMPLATE_ID, {
-    to_email: to,
-    subject:  subject,
-    message:  message
-  });
-}
-
-/* ── ACCOUNT STORE (localStorage) ── */
-function getAccounts() {
-  try { return JSON.parse(localStorage.getItem('df_accounts') || '{}'); } catch(e) { return {}; }
-}
-function saveAccount(email, name, passHash) {
-  const accounts = getAccounts();
-  accounts[email.toLowerCase()] = { name, pass: passHash };
-  localStorage.setItem('df_accounts', JSON.stringify(accounts));
-}
-function findAccount(email) {
-  return getAccounts()[email.toLowerCase()] || null;
-}
-/* Simple repeatable hash — not cryptographic, fine for a frontend demo */
-function hashPass(pass) {
-  let h = 0;
-  for (let i = 0; i < pass.length; i++) {
-    h = Math.imul(31, h) + pass.charCodeAt(i) | 0;
-  }
-  return h.toString(36);
-}
-
-/* OTP store in sessionStorage so it survives accidental scroll/render but stays per-tab */
-function setOtp(key, val) { sessionStorage.setItem('df_otp_' + key, val); }
-function getOtpStored(key) { return sessionStorage.getItem('df_otp_' + key) || ''; }
-function clearOtp(key) { sessionStorage.removeItem('df_otp_' + key); }
-
-/* ════════════════════════════
-   LOGIN — checks localStorage accounts
-════════════════════════════ */
-function doLogin() {
-  const email = document.getElementById('lg-email').value.trim();
-  const pass  = document.getElementById('lg-pass').value;
-  let ok = true;
-  ['lg-email-e', 'lg-pass-e'].forEach(cErr);
-  ['lg-email', 'lg-pass'].forEach(cInv);
-  document.getElementById('lg-err').classList.remove('show');
-  if (!isEmail(email)) { sErr('lg-email-e'); sInv('lg-email'); ok = false; }
-  if (!pass)           { sErr('lg-pass-e');  sInv('lg-pass');  ok = false; }
-  if (!ok) return;
-
-  const account = findAccount(email);
-  if (!account || account.pass !== hashPass(pass)) {
-    document.getElementById('lg-err').classList.add('show');
-    return;
-  }
-  /* ✅ Login success — open dashboard */
-  document.getElementById('lg-err').classList.remove('show');
-  showLoginSuccess(account.name, email);
-}
-
-/* ── SESSION CHECK ── */
-function isLoggedIn() {
-  return !!sessionStorage.getItem('df_current_user');
-}
-function getCurrentUser() {
-  try { return JSON.parse(sessionStorage.getItem('df_current_user')); } catch(e) { return null; }
-}
-
-/* Generate a student ID from email */
-function makeStudentId(email) {
-  let h = 0;
-  for (let i = 0; i < email.length; i++) h = Math.imul(31, h) + email.charCodeAt(i) | 0;
-  return 'DF-' + Math.abs(h).toString(16).toUpperCase().slice(0, 6).padStart(6,'0');
-}
-
-function showLoginSuccess(name, email) {
-  const sid = makeStudentId(email);
-  sessionStorage.setItem('df_current_user', JSON.stringify({ name, email, sid }));
-  setNavLoggedIn(name);
-  openDashboard('mycourses');
-}
-
-function setNavLoggedIn(name) {
-  document.getElementById('nav-cta-guest').style.display = 'none';
-  const userNav = document.getElementById('nav-cta-user');
-  userNav.classList.add('show');
-  document.getElementById('nav-user-name').textContent = name;
-  document.getElementById('nav-av-letter').textContent = name.charAt(0).toUpperCase();
-}
-
-function openDashboard(page) {
-  const user = getCurrentUser();
-  if (!user) { openAuth('login'); return; }
-  // Populate profile data
-  document.getElementById('db-student-id').textContent = user.sid;
-  document.getElementById('db-av-letter').textContent   = user.name.charAt(0).toUpperCase();
-  document.getElementById('pf-av-letter').textContent   = user.name.charAt(0).toUpperCase();
-  document.getElementById('pf-name').textContent        = user.name;
-  document.getElementById('pf-email').textContent       = user.email;
-  document.getElementById('pf-sid').textContent         = user.sid;
-  document.getElementById('pf-since').textContent       = new Date().getFullYear();
-  document.getElementById('dashboard').classList.add('open');
-  document.body.style.overflow = 'hidden';
-  dbNav(page || 'mycourses');
-}
-
-function closeDashboard() {
-  document.getElementById('dashboard').classList.remove('open');
-  document.body.style.overflow = '';
-}
-
-function dbNav(page) {
-  // Sidebar active state
-  ['mycourses','profile','rewards'].forEach(p => {
-    const sb = document.getElementById('sb-' + p);
-    if (sb) sb.classList.toggle('active', p === page);
-    const pg = document.getElementById('page-' + p);
-    if (pg) pg.classList.toggle('active', p === page);
-  });
-}
-
-function switchDbTab(btn, tab) {
-  document.querySelectorAll('.db-tab').forEach(t => t.classList.remove('active'));
-  btn.classList.add('active');
-  ['ongoing','subscription','free'].forEach(t => {
-    const el = document.getElementById('dtab-' + t);
-    if (el) el.style.display = t === tab ? 'block' : 'none';
-  });
-}
-
-function handleGetStarted() {
-  if (isLoggedIn()) openDashboard('mycourses');
-  else openAuth('register');
-}
-
-function handleCoursesClick(e) {
-  e.preventDefault();
-  if (isLoggedIn()) openDashboard('mycourses');
-  else document.getElementById('courses').scrollIntoView({ behavior: 'smooth' });
-}
-
-function doLogout() {
-  sessionStorage.removeItem('df_current_user');
-  closeDashboard();
-  document.getElementById('nav-cta-guest').style.display = '';
-  document.getElementById('nav-cta-user').classList.remove('show');
-}
-
-/* Check on page load if already logged in (session persists on same tab) */
-window.addEventListener('DOMContentLoaded', () => {
-  const user = getCurrentUser();
-  if (user) setNavLoggedIn(user.name);
-});
-
-/* ════════════════════════════
-   REGISTER — saves to localStorage
-════════════════════════════ */
-function doRegister() {
-  const name   = document.getElementById('rg-name').value.trim();
-  const email  = document.getElementById('rg-email').value.trim();
-  const cemail = document.getElementById('rg-cemail').value.trim();
-  const pass   = document.getElementById('rg-pass').value;
-  const cpass  = document.getElementById('rg-cpass').value;
-  let ok = true;
-  ['rg-name-e','rg-email-e','rg-cemail-e','rg-pass-e','rg-cpass-e'].forEach(cErr);
-  ['rg-name','rg-email','rg-cemail','rg-pass','rg-cpass'].forEach(cInv);
-  if (!name)              { sErr('rg-name-e',  'Please enter your name.');          sInv('rg-name');   ok = false; }
-  if (!isEmail(email))    { sErr('rg-email-e', 'Please enter a valid email.');       sInv('rg-email');  ok = false; }
-  if (isEmail(email) && email.toLowerCase() !== cemail.toLowerCase()) {
-                            sErr('rg-cemail-e','Emails do not match.');              sInv('rg-cemail'); ok = false; }
-  if (pass.length < 8)    { sErr('rg-pass-e',  'Password must be at least 8 characters.'); sInv('rg-pass'); ok = false; }
-  if (pass !== cpass)     { sErr('rg-cpass-e', 'Passwords do not match.');          sInv('rg-cpass');  ok = false; }
-  if (!ok) return;
-
-  /* Check email not already registered */
-  if (findAccount(email)) {
-    sErr('rg-email-e', 'This email is already registered. Try logging in.');
-    sInv('rg-email'); return;
-  }
-
-  saveAccount(email, name, hashPass(pass));
-  showLoginSuccess(name, email);
-}
-
-function rgGoBack() {
-  document.getElementById('rg2').style.display = 'none';
-  document.getElementById('rg1').style.display = 'block';
-}
-
-/* ════════════════════════════
-   FORGOT PASSWORD — OTP via EmailJS
-════════════════════════════ */
-async function fpSend() {
-  const email = document.getElementById('fp-email').value.trim();
-  cErr('fp-email-e'); cInv('fp-email');
-  if (!isEmail(email)) { sErr('fp-email-e'); sInv('fp-email'); return; }
-
-  const btn = document.getElementById('fp-send-btn');
-  btn.disabled = true; btn.textContent = 'Sending…'; btn.style.opacity = '0.7';
-
-  const otp = genOtp();
-  setOtp('fp', otp);                        /* ← sessionStorage, survives scroll */
-  sessionStorage.setItem('df_fp_email', email);
-
-  try {
-    await sendEmail(
-      email,
-      '🔐 DecentraForce — Password Reset Code',
-      `Hi,\n\nYour password reset code is:\n\n${otp}\n\nThis code expires in 10 minutes. Do not share it with anyone.\n\nIf you did not request this, you can safely ignore this email.\n\n— The DecentraForce Team 🇧🇩`
-    );
-    document.getElementById('fp-to').textContent = email;
-    document.getElementById('fp1').style.display = 'none';
-    document.getElementById('fp2').style.display = 'block';
-    startTimer('fp-timer', 'fp-resend-a', 60);
-  } catch (err) {
-    console.error('EmailJS error:', err);
-    sErr('fp-email-e', 'Failed to send code. Check your connection and try again.');
-    sInv('fp-email');
-  } finally {
-    btn.disabled = false; btn.textContent = 'Send Reset Code →'; btn.style.opacity = '1';
-  }
-}
-
-async function fpResend() {
-  const email = sessionStorage.getItem('df_fp_email');
-  if (!email) return;
-  const otp = genOtp();
-  setOtp('fp', otp);
-  startTimer('fp-timer', 'fp-resend-a', 60);
-  try {
-    await sendEmail(
-      email,
-      '🔐 DecentraForce — New Reset Code',
-      `Hi,\n\nYour new password reset code is:\n\n${otp}\n\nThis code expires in 10 minutes.\n\n— The DecentraForce Team 🇧🇩`
-    );
-  } catch (e) { console.error('Resend failed', e); }
-}
-
-function fpGoBack() {
-  document.getElementById('fp2').style.display = 'none';
-  document.getElementById('fp1').style.display = 'block';
-}
-
-function fpVerify() {
-  const code    = getOtp('fp-otp-row');
-  const stored  = getOtpStored('fp');
-  const eEl     = document.getElementById('fp-otp-e');
-  eEl.style.display = 'none';
-  if (code.length < 6) {
-    eEl.textContent = 'Please enter the full 6-digit code.'; eEl.style.display = 'block'; return;
-  }
-  if (code.trim() !== stored.trim()) {
-    eEl.textContent = 'Incorrect code. Please check your email and try again.'; eEl.style.display = 'block'; return;
-  }
-  clearOtp('fp');
-  document.getElementById('fp2').style.display = 'none';
-  document.getElementById('fp3').style.display = 'block';
-}
-
-function fpReset() {
-  const np    = document.getElementById('fp-np').value;
-  const cp    = document.getElementById('fp-cp').value;
-  const email = sessionStorage.getItem('df_fp_email') || '';
-  cErr('fp-cp-e'); cInv('fp-cp');
-  if (np.length < 8) { alert('Password must be at least 8 characters.'); return; }
-  if (np !== cp)     { sErr('fp-cp-e'); sInv('fp-cp'); return; }
-
-  /* Update stored password */
-  if (email) {
-    const accounts = getAccounts();
-    const key = email.toLowerCase();
-    if (accounts[key]) {
-      accounts[key].pass = hashPass(np);
-      localStorage.setItem('df_accounts', JSON.stringify(accounts));
-    }
-  }
-  sessionStorage.removeItem('df_fp_email');
-  document.getElementById('fp3').style.display = 'none';
-  document.getElementById('fp4').style.display = 'block';
-}
-</script>
-</body>
-</html>
+export default DecentraforceLanding;
