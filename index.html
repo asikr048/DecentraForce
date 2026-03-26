@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DecentraForce — Decentralize Education. Equalize Power.</title>
-<!-- Fonts loaded with crossorigin + fallback system fonts if blocked -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
@@ -353,7 +352,6 @@
 </head>
 <body>
 
-<!-- NAV -->
 <nav>
   <a class="logo" href="#" onclick="if(isLoggedIn())openDashboard('mycourses');return!isLoggedIn()">
     <div class="logo-ico">⛓</div>
@@ -366,12 +364,10 @@
     <li><a href="#">Community</a></li>
     <li><a href="#">Explore</a></li>
   </ul>
-  <!-- Logged-out CTA -->
   <div class="nav-cta" id="nav-cta-guest">
     <button class="btn-ghost" onclick="openAuth('login')">Log In</button>
     <button class="btn-primary" onclick="openAuth('register')">Get Started →</button>
   </div>
-  <!-- Logged-in CTA -->
   <div class="nav-logged" id="nav-cta-user">
     <div class="nb" onclick="openDashboard('mycourses')">🔔<span class="nb-badge">4</span></div>
     <div class="nav-user-btn" onclick="openDashboard('mycourses')">
@@ -381,7 +377,6 @@
   </div>
 </nav>
 
-<!-- HERO -->
 <section class="hero">
   <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
   <div class="hex-bg"></div>
@@ -412,7 +407,6 @@
   </div>
 </section>
 
-<!-- MARQUEE -->
 <div class="mq-wrap">
   <div class="mq-track">
     <div class="mq-item"><span class="mdot"></span>Blockchain Development</div>
@@ -436,7 +430,6 @@
   </div>
 </div>
 
-<!-- COURSES -->
 <section class="crs-sec reveal" id="courses">
   <div class="sec-hdr">
     <div class="pill">Explore Our Top-Rated Courses</div>
@@ -454,7 +447,6 @@
   </div>
   <div class="crs-grid">
 
-    <!-- ▶ RUNNING — AI (always first) -->
     <div class="ccard" data-cat="ai">
       <div class="cthumb th-ai"><span class="cbadge live">🔴 Live Now</span>🤖</div>
       <div class="cbody">
@@ -465,7 +457,6 @@
       <div class="cfoot"><div class="cprice">৳ 6,999</div><button class="btn-enroll">Enroll Now →</button></div>
     </div>
 
-    <!-- Blockchain Batch 4 -->
     <div class="ccard" data-cat="blockchain">
       <div class="cthumb th-blk"><span class="cbadge fin">Batch 4 — Ended</span>⛓️</div>
       <div class="cbody">
@@ -476,7 +467,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- Blockchain Batch 3 -->
     <div class="ccard" data-cat="blockchain">
       <div class="cthumb th-blk"><span class="cbadge fin">Batch 3 — Ended</span>⛓️</div>
       <div class="cbody">
@@ -487,7 +477,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- Blockchain Batch 2 -->
     <div class="ccard" data-cat="blockchain">
       <div class="cthumb th-blk"><span class="cbadge fin">Batch 2 — Ended</span>⛓️</div>
       <div class="cbody">
@@ -498,7 +487,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- Blockchain Batch 1 -->
     <div class="ccard" data-cat="blockchain">
       <div class="cthumb th-blk"><span class="cbadge fin">Batch 1 — Ended</span>⛓️</div>
       <div class="cbody">
@@ -509,7 +497,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- DeFi Batch 1 -->
     <div class="ccard" data-cat="defi">
       <div class="cthumb th-defi"><span class="cbadge fin">Batch 1 — Ended</span>🌐</div>
       <div class="cbody">
@@ -520,7 +507,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- Crypto Trading -->
     <div class="ccard" data-cat="defi">
       <div class="cthumb th-fin"><span class="cbadge fin">Batch 1 — Ended</span>💰</div>
       <div class="cbody">
@@ -531,7 +517,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- Web Dev Batch 2 -->
     <div class="ccard" data-cat="web">
       <div class="cthumb th-web"><span class="cbadge fin">Batch 2 — Ended</span>💻</div>
       <div class="cbody">
@@ -542,7 +527,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- Web Dev Batch 1 -->
     <div class="ccard" data-cat="web">
       <div class="cthumb th-web"><span class="cbadge fin">Batch 1 — Ended</span>💻</div>
       <div class="cbody">
@@ -553,7 +537,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- Data Science Batch 1 -->
     <div class="ccard" data-cat="ds">
       <div class="cthumb th-ds"><span class="cbadge fin">Batch 1 — Ended</span>🧠</div>
       <div class="cbody">
@@ -564,7 +547,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- NanoDegree Cohort 1 -->
     <div class="ccard" data-cat="nano">
       <div class="cthumb th-nano"><span class="cbadge fin">Cohort 1 — Ended</span>🎓</div>
       <div class="cbody">
@@ -575,7 +557,6 @@
       <div class="cfoot"><div class="closed-lbl">Enrollment Closed</div><button class="btn-enroll" disabled>Finished</button></div>
     </div>
 
-    <!-- See All card -->
     <div class="ccard see-all-crd" id="see-all-card">
       <div style="font-size:48px">✨</div>
       <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:700">Explore All Courses</div>
@@ -586,7 +567,6 @@
   </div>
 </section>
 
-<!-- STATS -->
 <section class="st-sec">
   <div class="sec-hdr reveal">
     <div class="pill">Why Choose Us</div>
@@ -600,7 +580,6 @@
   </div>
 </section>
 
-<!-- WHY US -->
 <section class="wy-sec">
   <div class="sec-hdr reveal">
     <div class="pill">Education For Everyone</div>
@@ -616,7 +595,6 @@
   </div>
 </section>
 
-<!-- TESTIMONIALS -->
 <section class="ts-sec">
   <div class="sec-hdr reveal">
     <div class="pill">Student Reviews</div>
@@ -640,7 +618,7 @@
     <div class="rv-card">
       <div class="rv-top"><div class="qi">"</div><div class="rv-stars">★★★★★</div></div>
       <div class="rv-lang">বাংলা</div>
-      <div class="rv-text">এই কোর্সটা করার আগে আমি AI সম্পর্কে কিছুই জানতাম না। এখন নিজেই n8n দিয়ে অটোমেশন বানাতে পারি। শিক্ষক অনেক ধৈর্য নিয়ে সব বুঝিয়ে দেন — অসাধারণ অভিজ্ঞতা।</div>
+      <div class="rv-text">এই কোর্সটা করার আগে আমি AI সম্পর্কে কিছুই জানতাম অ্যাকাউন্টে ঢুকলে আমার n8n দিয়ে অটোমেশন বানাতে পারি। শিক্ষক অনেক ধৈর্য নিয়ে সব বুঝিয়ে দেন — অসাধারণ অভিজ্ঞতা।</div>
       <div class="reviewer"><div class="rv-av a2">R</div><div><div class="rv-name">রাফিউল ইসলাম</div><div class="rv-id">Student · DF-A3C91F</div></div></div>
     </div>
 
@@ -667,7 +645,6 @@
   </div>
 </section>
 
-<!-- AUTH SECTION -->
 <section class="auth-sec" id="auth">
   <div class="auth-wrap reveal">
     <div class="auth-left">
@@ -689,7 +666,6 @@
         <button class="a-tab" id="tab-register" onclick="switchTab('register')">Create Account</button>
       </div>
 
-      <!-- LOGIN -->
       <div class="a-panel active" id="panel-login">
         <div class="alert a-err" id="lg-err">Incorrect email or password. Please try again.</div>
         <div class="frow">
@@ -712,9 +688,7 @@
         <div class="a-footer">Don't have an account? <a onclick="switchTab('register')">Create one free</a></div>
       </div>
 
-      <!-- FORGOT PASSWORD -->
       <div class="a-panel" id="panel-forgot">
-        <!-- Step 1: enter email -->
         <div id="fp1">
           <button class="back-btn" onclick="showPanel('login')">← Back to Login</button>
           <div class="sub-title">Reset Password</div>
@@ -726,7 +700,6 @@
           </div>
           <button class="btn-auth" id="fp-send-btn" onclick="fpSend()">Send Reset Code →</button>
         </div>
-        <!-- Step 2: OTP -->
         <div id="fp2" style="display:none">
           <button class="back-btn" onclick="fpGoBack()">← Change Email</button>
           <div class="alert a-info show">A 6-digit code was sent to <strong id="fp-to"></strong>.</div>
@@ -739,7 +712,6 @@
           <div class="ferr" id="fp-otp-e" style="text-align:center;margin-top:8px"></div>
           <button class="btn-auth" style="margin-top:14px" onclick="fpVerify()">Verify Code →</button>
         </div>
-        <!-- Step 3: new password -->
         <div id="fp3" style="display:none">
           <div class="sub-title">Set New Password</div>
           <div class="frow">
@@ -761,7 +733,6 @@
           </div>
           <button class="btn-auth" onclick="fpReset()">Save New Password →</button>
         </div>
-        <!-- Step 4: success -->
         <div id="fp4" style="display:none;text-align:center">
           <div style="font-size:54px;margin-bottom:14px">✅</div>
           <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;margin-bottom:8px">Password Reset!</div>
@@ -770,7 +741,6 @@
         </div>
       </div>
 
-      <!-- REGISTER -->
       <div class="a-panel" id="panel-register">
         <div id="rg1">
           <div class="frow">
@@ -809,7 +779,6 @@
           <button class="btn-auth" id="rg-submit-btn" onclick="doRegister()">Create Account →</button>
           <div class="a-footer">Already have an account? <a onclick="switchTab('login')">Log in</a></div>
         </div>
-        <!-- Success screen -->
         <div id="rg2" style="display:none;text-align:center;padding-top:10px">
           <div style="font-size:56px;margin-bottom:18px">🎉</div>
           <div style="font-family:'Syne',sans-serif;font-size:21px;font-weight:800;margin-bottom:10px">Account Created!</div>
@@ -825,10 +794,8 @@
   </div>
 </section>
 
-<!-- ═══════════ DASHBOARD ═══════════ -->
 <div id="dashboard">
 
-  <!-- Dashboard Nav -->
   <div class="db-nav">
     <div class="db-nav-left">
       <a class="logo" href="#" onclick="closeDashboard();return false" style="text-decoration:none">
@@ -844,7 +811,6 @@
   </div>
 
   <div class="db-body">
-    <!-- Sidebar -->
     <div class="db-sidebar">
       <a class="db-menu-item active" id="sb-mycourses" onclick="dbNav('mycourses')">
         <span class="db-menu-icon">⊞</span> My Courses
@@ -860,10 +826,8 @@
       </div>
     </div>
 
-    <!-- Main -->
     <div class="db-main">
 
-      <!-- MY COURSES PAGE -->
       <div class="db-page active" id="page-mycourses">
         <div class="db-page-title">My Courses — Continue Your Learning Journey</div>
         <div class="db-tabs">
@@ -872,7 +836,6 @@
           <button class="db-tab" data-dtab="free" onclick="switchDbTab(this,'free')">Free Courses</button>
         </div>
 
-        <!-- Ongoing -->
         <div id="dtab-ongoing">
           <div class="db-course-grid">
             <div class="db-ccard">
@@ -894,7 +857,6 @@
           </div>
         </div>
 
-        <!-- Subscription -->
         <div id="dtab-subscription" style="display:none">
           <div class="db-empty">
             <div class="db-empty-ico">📦</div>
@@ -902,7 +864,6 @@
           </div>
         </div>
 
-        <!-- Free -->
         <div id="dtab-free" style="display:none">
           <div class="db-empty">
             <div class="db-empty-ico">🎁</div>
@@ -911,7 +872,6 @@
         </div>
       </div>
 
-      <!-- PROFILE PAGE -->
       <div class="db-page" id="page-profile">
         <div class="db-page-title">Profile</div>
         <div class="profile-card">
@@ -937,7 +897,6 @@
         </div>
       </div>
 
-      <!-- REWARDS PAGE -->
       <div class="db-page" id="page-rewards">
         <div class="db-page-title">Rewards</div>
         <div class="rewards-grid">
@@ -962,12 +921,7 @@
         </div>
       </div>
 
-    </div><!-- /db-main -->
-  </div><!-- /db-body -->
-</div><!-- /dashboard -->
-
-<!-- FOOTER -->
-<footer>
+    </div></div></div><footer>
   <div class="ft-grid">
     <div class="ft-brand">
       <a class="logo" href="#"><div class="logo-ico">⛓</div>Decentra<span class="ac">Force</span></a>
