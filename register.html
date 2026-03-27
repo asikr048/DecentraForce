@@ -322,6 +322,20 @@
         <div class="input-hint">Type your email again to ensure there are no typos.</div>
       </div>
 
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" class="form-input" placeholder="Create a strong password" required>
+        <div class="error-message" id="passwordError">Password must be at least 8 characters</div>
+        <div class="input-hint">Use at least 8 characters with letters, numbers, and symbols.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmPassword" class="form-label">Confirm Password</label>
+        <input type="password" id="confirmPassword" class="form-input" placeholder="Re-type your password" required>
+        <div class="error-message" id="confirmPasswordError">Passwords do not match</div>
+        <div class="success-message" id="passwordMatchSuccess">✓ Passwords match</div>
+      </div>
+
       <button type="submit" class="btn btn-primary btn-block">
         Create Account
       </button>
@@ -337,10 +351,17 @@
     const usernameInput = document.getElementById('username');
     const emailInput = document.getElementById('email');
     const confirmEmailInput = document.getElementById('confirmEmail');
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    
     const usernameError = document.getElementById('usernameError');
     const emailError = document.getElementById('emailError');
     const confirmEmailError = document.getElementById('confirmEmailError');
+    const passwordError = document.getElementById('passwordError');
+    const confirmPasswordError = document.getElementById('confirmPasswordError');
+    
     const emailMatchSuccess = document.getElementById('emailMatchSuccess');
+    const passwordMatchSuccess = document.getElementById('passwordMatchSuccess');
 
     function validateUsername(username) {
       const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
@@ -350,6 +371,10 @@
     function validateEmail(email) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       return emailRegex.test(email);
+    }
+
+    function validatePassword(password) {
+      return password.length >= 8;
     }
 
     function validateEmailsMatch() {
@@ -367,6 +392,25 @@
       } else {
         confirmEmailError.style.display = 'none';
         emailMatchSuccess.style.display = 'block';
+        return true;
+      }
+    }
+
+    function validatePasswordsMatch() {
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
+      
+      if (password === '' || confirmPassword === '') {
+        return false;
+      }
+      
+      if (password !== confirmPassword) {
+        confirmPasswordError.style.display = 'block';
+        passwordMatchSuccess.style.display = 'none';
+        return false;
+      } else {
+        confirmPasswordError.style.display = 'none';
+        passwordMatchSuccess.style.display = 'block';
         return true;
       }
     }
@@ -397,6 +441,20 @@
 
     confirmEmailInput.addEventListener('input', validateEmailsMatch);
 
+    passwordInput.addEventListener('input', function() {
+      const password = passwordInput.value;
+      if (password === '') {
+        passwordError.style.display = 'none';
+      } else if (!validatePassword(password)) {
+        passwordError.style.display = 'block';
+      } else {
+        passwordError.style.display = 'none';
+      }
+      validatePasswordsMatch();
+    });
+
+    confirmPasswordInput.addEventListener('input', validatePasswordsMatch);
+
     // Form submission
     document.getElementById('registerForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -404,6 +462,8 @@
       const username = usernameInput.value.trim();
       const email = emailInput.value.trim();
       const confirmEmail = confirmEmailInput.value.trim();
+      const password = passwordInput.value;
+      const confirmPassword = confirmPasswordInput.value;
       
       // Validate username
       if (!validateUsername(username)) {
@@ -430,6 +490,22 @@
         return;
       }
       
+      // Validate password
+      if (!validatePassword(password)) {
+        passwordError.style.display = 'block';
+        passwordInput.focus();
+        return;
+      } else {
+        passwordError.style.display = 'none';
+      }
+      
+      // Validate passwords match
+      if (!validatePasswordsMatch()) {
+        confirmPasswordError.style.display = 'block';
+        confirmPasswordInput.focus();
+        return;
+      }
+      
       // All validations passed - make API call
       const submitBtn = e.target.querySelector('button[type="submit"]');
       const originalText = submitBtn.textContent;
@@ -441,7 +517,7 @@
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email })
+        body: JSON.stringify({ username, email, password })
       })
       .then(response => response.json())
       .then(data => {

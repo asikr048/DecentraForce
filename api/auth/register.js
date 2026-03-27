@@ -1,5 +1,6 @@
 import { query, initDatabase } from '../../lib/db.js';
 import { v4 as uuidv4 } from 'uuid';
+import crypto from 'crypto';
 
 /**
  * User registration API endpoint
@@ -44,7 +45,7 @@ export default async function handler(req, res) {
   try {
     // ADD THIS LINE:
     await initDatabase();
-    const { username, email } = req.body;
+    const { username, email, password } = req.body;
 
     // Validate username
     if (!username || typeof username !== 'string') {
@@ -59,6 +60,21 @@ export default async function handler(req, res) {
       return res.status(400).json({
         success: false,
         error: 'Email is required'
+      });
+    }
+
+    // Validate password
+    if (!password || typeof password !== 'string') {
+      return res.status(400).json({
+        success: false,
+        error: 'Password is required'
+      });
+    }
+
+    if (password.length < 8) {
+      return res.status(400).json({
+        success: false,
+        error: 'Password must be at least 8 characters'
       });
     }
 
@@ -110,12 +126,15 @@ export default async function handler(req, res) {
     const verificationToken = uuidv4();
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
 
+    // Hash the password (simple SHA-256 for demonstration, use bcrypt in production)
+    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+
     // Create new user
     const result = await query(
-      `INSERT INTO users (username, email, verification_token, verification_expires)
-       VALUES ($1, $2, $3, $4)
+      `INSERT INTO users (username, email, password_hash, verification_token, verification_expires)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING id, username, email, created_at, verified`,
-      [username.toLowerCase().trim(), email.toLowerCase().trim(), verificationToken, verificationExpires]
+      [username.toLowerCase().trim(), email.toLowerCase().trim(), passwordHash, verificationToken, verificationExpires]
     );
 
     const newUser = result.rows[0];
