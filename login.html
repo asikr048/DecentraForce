@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In - DecentraForce</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050a18;
+    --bg2: #080f22;
+    --surface: #0d1630;
+    --surface2: #111d3a;
+    --accent: #00e5ff;
+    --accent2: #7b5cff;
+    --accent3: #ff4d8d;
+    --text: #e8eeff;
+    --muted: #7d8fb3;
+    --border: rgba(0, 229, 255, 0.12);
+    --glow: rgba(0, 229, 255, 0.15);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ── Noise overlay ── */
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    opacity: .45;
+  }
+
+  /* ── Grid background ── */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* ── Glow blobs ── */
+  .blob {
+    position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0;
+  }
+  .blob-1 { width: 600px; height: 600px; background: rgba(123,92,255,.18); top: -200px; right: -100px; animation: drift1 12s ease-in-out infinite alternate; }
+  .blob-2 { width: 500px; height: 500px; background: rgba(0,229,255,.12); bottom: 100px; left: -150px; animation: drift2 15s ease-in-out infinite alternate; }
+  .blob-3 { width: 350px; height: 350px; background: rgba(255,77,141,.1); top: 50%; right: 10%; animation: drift1 10s ease-in-out infinite alternate-reverse; }
+
+  @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(40px, 60px) scale(1.1); } }
+  @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-30px, -50px) scale(1.05); } }
+
+  /* ══════════ NAV ══════════ */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 5%;
+    height: 70px;
+    background: rgba(5,10,24,.7);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem;
+    color: var(--text); text-decoration: none; letter-spacing: -.5px;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 8px;
+    display: grid; place-items: center;
+    font-size: .8rem; font-weight: 900;
+    color: #fff;
+    box-shadow: 0 0 18px rgba(123,92,255,.5);
+  }
+  .logo span { color: var(--accent); }
+
+  .nav-links {
+    display: flex; align-items: center; gap: 32px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--muted); text-decoration: none; font-size: .92rem; font-weight: 500;
+    transition: color .2s;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-links a.active { color: var(--accent); }
+
+  .nav-right { display: flex; align-items: center; gap: 14px; }
+
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 22px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: .9rem;
+    cursor: pointer; text-decoration: none; border: none; transition: all .2s;
+  }
+  .btn-ghost {
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(0,229,255,.3); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    box-shadow: 0 0 24px rgba(123,92,255,.4);
+  }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(123,92,255,.6); }
+  .btn-outline {
+    background: transparent; color: var(--accent);
+    border: 1.5px solid var(--accent); gap: 10px;
+  }
+  .btn-outline:hover { background: rgba(0,229,255,.08); }
+
+  /* ── Auth Container ── */
+  .auth-container {
+    position: relative;
+    z-index: 10;
+    max-width: 420px;
+    margin: 140px auto 60px;
+    padding: 40px;
+    background: rgba(13, 22, 48, 0.7);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  }
+
+  .auth-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .auth-header h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: 2.2rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .auth-header p {
+    color: var(--muted);
+    font-size: 0.95rem;
+  }
+
+  .form-group {
+    margin-bottom: 24px;
+  }
+
+  .form-label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 14px 18px;
+    background: rgba(17, 29, 58, 0.6);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1rem;
+    transition: all 0.2s;
+  }
+
+  .form-input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--glow);
+  }
+
+  .form-input::placeholder {
+    color: rgba(125, 143, 179, 0.5);
+  }
+
+  .btn-block {
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  .auth-footer {
+    text-align: center;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .auth-footer a {
+    color: var(--accent);
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .auth-footer a:hover {
+    text-decoration: underline;
+  }
+
+  .error-message {
+    color: #ff4d8d;
+    font-size: 0.85rem;
+    margin-top: 6px;
+    display: none;
+  }
+
+  .back-home {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+
+  .back-home:hover {
+    color: var(--text);
+  }
+
+  .form-options {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 8px;
+  }
+
+  .forgot-password {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  .forgot-password:hover {
+    text-decoration: underline;
+  }
+
+  .input-hint {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+
+  @media (max-width: 768px) {
+    .auth-container {
+      margin: 120px 20px 40px;
+      padding: 30px 24px;
+    }
+  }
+</style>
+</head>
+<body>
+  <!-- Background blobs -->
+  <div class="blob blob-1"></div>
+  <div class="blob blob-2"></div>
+  <div class="blob blob-3"></div>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="index.html" class="logo">
+      <div class="logo-icon">DF</div>
+      Decentra<span>Force</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="index.html#courses">Courses</a></li>
+      <li><a href="#">NanoDegree</a></li>
+      <li><a href="#">বাংলায় শিখি</a></li>
+      <li><a href="#">Explore</a></li>
+    </ul>
+    <div class="nav-right">
+      <a href="register.html" class="btn btn-primary" style="font-weight: 700; padding: 10px 24px;">Create Account</a>
+    </div>
+  </nav>
+
+  <!-- Auth Container -->
+  <div class="auth-container">
+    <a href="index.html" class="back-home">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M10 4L6 8L10 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      Back to Home
+    </a>
+    
+    <div class="auth-header">
+      <h1>Welcome Back</h1>
+      <p>Sign in to your account with your email and password</p>
+    </div>
+
+    <form id="loginForm">
+      <div class="form-group">
+        <label for="email" class="form-label">Email Address</label>
+        <input type="email" id="email" class="form-input" placeholder="you@example.com" required>
+        <div class="error-message" id="emailError">Please enter a valid email address</div>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Password</label>
+        <input type="password" id="password" class="form-input" placeholder="Enter your password" required>
+        <div class="error-message" id="passwordError">Please enter your password</div>
+        <div class="form-options">
+          <a href="#" id="forgotPassword" class="forgot-password">Forgot Password?</a>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary btn-block">
+        Sign In
+      </button>
+    </form>
+
+    <div class="auth-footer">
+      <p>Don't have an account? <a href="register.html">Create account</a></p>
+    </div>
+  </div>
+
+  <script>
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    const forgotPasswordLink = document.getElementById('forgotPassword');
+
+    // Form submission
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value;
+      
+      // Basic validation
+      let isValid = true;
+      
+      if (!email) {
+        emailError.textContent = 'Please enter your email address';
+        emailError.style.display = 'block';
+        isValid = false;
+      } else {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          emailError.textContent = 'Please enter a valid email address';
+          emailError.style.display = 'block';
+          isValid = false;
+        } else {
+          emailError.style.display = 'none';
+        }
+      }
+      
+      if (!password) {
+        passwordError.textContent = 'Please enter your password';
+        passwordError.style.display = 'block';
+        isValid = false;
+      } else {
+        passwordError.style.display = 'none';
+      }
+      
+      if (!isValid) return;
+      
+      // Make API call for login
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Logging in...';
+      submitBtn.disabled = true;
+      
+      const requestBody = { email, password };
+      
+      fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody),
+        credentials: 'include' // Important for cookies
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Show success message
+          alert('Login successful! Welcome back.');
+          // Redirect to home page
+          window.location.href = 'index.html';
+        } else {
+          // Show error message
+          alert('Error: ' + data.error);
+          submitBtn.textContent = originalText;
+          submitBtn.disabled = false;
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Network error. Please try again.');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      });
+    });
+
+    // Forgot password functionality
+    forgotPasswordLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      const email = emailInput.value.trim();
+      if (!email) {
+        alert('Please enter your email address to reset your password');
+        emailInput.focus();
+        return;
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert('Please enter a valid email address');
+        emailInput.focus();
+        return;
+      }
+      
+      // Show loading message
+      const originalText = forgotPasswordLink.textContent;
+      forgotPasswordLink.textContent = 'Sending reset code...';
+      forgotPasswordLink.style.pointerEvents = 'none';
+      
+      // Send password reset request
+      fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          alert('A 6-digit PIN has been sent to your email. Please check your inbox.');
+          // In a real implementation, you would redirect to a PIN verification page
+          // For now, we'll just show an alert
+        } else {
+          alert('Error: ' + data.error);
+        }
+        forgotPasswordLink.textContent = originalText;
+        forgotPasswordLink.style.pointerEvents = 'auto';
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        alert('Network error. Please try again.');
+        forgotPasswordLink.textContent = originalText;
+        forgotPasswordLink.style.pointerEvents = 'auto';
+      });
+    });
+
+    // Real-time validation
+    emailInput.addEventListener('input', function() {
+      const email = emailInput.value.trim();
+      if (email === '') {
+        emailError.style.display = 'none';
+      }
+    });
+    
+    passwordInput.addEventListener('input', function() {
+      const password = passwordInput.value;
+      if (password === '') {
+        passwordError.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
