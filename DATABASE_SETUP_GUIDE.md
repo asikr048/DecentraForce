@@ -3,6 +3,23 @@
 ## Summary
 Your authentication system has been successfully pushed to GitHub. The system is configured to use **Vercel Postgres** (PostgreSQL) as the database. Here's what you need to do to set up the database:
 
+## Which Vercel Storage Option Should You Choose?
+
+When you click "Storage" on Vercel, you'll see multiple options. Here's what each one is for and which one you should choose:
+
+| Option | Purpose | Recommended for Authentication? |
+|--------|---------|--------------------------------|
+| **Vercel Postgres** | Serverless PostgreSQL database | ✅ **YES** - This is what your project is configured for |
+| **Neon** | Serverless Postgres with branching | ✅ Alternative option (also PostgreSQL) |
+| **Supabase** | Postgres backend with additional features | ✅ Alternative option (also PostgreSQL) |
+| **AWS** | Serverless PostgreSQL and NoSQL | ⚠️ Possible but more complex |
+| **Upstash** | Serverless Redis (key-value store) | ❌ Not suitable for user data storage |
+| **Redis** | Serverless Redis cache | ❌ For caching, not primary database |
+| **Edge Config** | Ultra-low latency configuration storage | ❌ Not a database |
+| **Blob** | Fast object storage for files | ❌ For file storage, not databases |
+
+**Your Choice: Vercel Postgres** - Your authentication system code (`lib/db.js`) is already configured to use the `@vercel/postgres` package, so this is the easiest and recommended option.
+
 ## 1. Vercel Postgres Setup
 
 ### Step-by-Step Instructions:

@@ -12,6 +12,7 @@
     "@vercel/postgres": "^0.9.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
+    "pg": "^8.20.0",
     "uuid": "^11.0.3"
   },
   "devDependencies": {
@@ -21,7 +22,12 @@
   "engines": {
     "node": ">=18.x"
   },
-  "keywords": ["web3", "education", "authentication", "vercel"],
+  "keywords": [
+    "web3",
+    "education",
+    "authentication",
+    "vercel"
+  ],
   "author": "DecentraForce Team",
   "license": "MIT"
 }
