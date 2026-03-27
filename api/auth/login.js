@@ -1,4 +1,7 @@
 import { query } from '../../lib/db.js';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import rateLimit from 'express-rate-limit';
 
 /**
  * User login API endpoint
@@ -19,11 +22,29 @@ import { query } from '../../lib/db.js';
  * It creates a session token and sets it as an HTTP-only cookie.
  */
 
+// Rate limiting configuration
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // limit each IP to 5 login attempts per windowMs
+  message: 'Too many login attempts, please try again later',
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 export default async function handler(req, res) {
+  // Apply rate limiting
+  await new Promise((resolve, reject) => {
+    loginLimiter(req, res, (result) => {
+      if (result instanceof Error) return reject(result);
+      return resolve(result);
+    });
+  });
+
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Origin', process.env.NODE_ENV === 'production' ? 'https://yourdomain.com' : '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
@@ -94,26 +115,17 @@ export default async function handler(req, res) {
     }
 
     // TODO: In a real implementation, you would verify the password hash
-    // For now, we'll simulate password verification
-    // In production, you would have a password_hash column and use bcrypt.compare()
-    // const passwordValid = await bcrypt.compare(password, user.password_hash);
-    // if (!passwordValid) {
-    //   return res.status(400).json({
-    //     success: false,
-    //     error: 'Invalid email or password'
-    //   });
-    // }
-    
-    // For demo purposes, accept any non-empty password
-    if (!password || password.length < 1) {
+    // Verify password with bcrypt
+    const passwordValid = await bcrypt.compare(password, user.password_hash);
+    if (!passwordValid) {
       return res.status(400).json({
         success: false,
         error: 'Invalid email or password'
       });
     }
 
-    // Generate a secure session token
-    const sessionToken = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${Math.random().toString(36).substr(2, 9)}`;
+    // Generate a secure session token using crypto
+    const sessionToken = crypto.randomBytes(32).toString('hex');
     const sessionExpires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000); // 30 days from now
     
     // Store session token in database
@@ -122,10 +134,9 @@ export default async function handler(req, res) {
       [sessionToken, sessionExpires, user.id]
     );
 
-    // Set HTTP-only cookie for automatic login on future visits
+    // Set HTTP-only secure cookies
     res.setHeader('Set-Cookie', [
-      `session_token=${sessionToken}; HttpOnly; Path=/; Max-Age=${30 * 24 * 60 * 60}; SameSite=Strict${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`,
-      `user_id=${user.id}; Path=/; Max-Age=${30 * 24 * 60 * 60}; SameSite=Strict${process.env.NODE_ENV === 'production' ? '; Secure' : ''}`
+      `session_token=${sessionToken}; HttpOnly; Path=/; Max-Age=${30 * 24 * 60 * 60}; SameSite=Strict; ${process.env.NODE_ENV === 'production' ? 'Secure; ' : ''}HttpOnly`
     ]);
 
     // Return success response

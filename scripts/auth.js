@@ -26,17 +26,30 @@ class AuthManager {
     try {
       const response = await fetch('/api/auth/verify', {
         method: 'GET',
-        credentials: 'include' // Important for cookies
+        credentials: 'include'
       });
       
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success && data.loggedIn) {
-          this.currentUser = data.user;
-          this.isLoggedIn = true;
-          console.log('User is logged in:', this.currentUser.username);
-          return true;
-        }
+      // Handle non-JSON responses
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`Invalid response: ${text}`);
+      }
+      
+      const data = await response.json();
+      
+      if (response.ok && data.success && data.loggedIn) {
+        this.currentUser = data.user;
+        this.isLoggedIn = true;
+        console.log('User is logged in:', this.currentUser.username);
+        return true;
+      }
+      
+      // Handle specific error cases
+      if (response.status === 401) {
+        console.log('Session expired or invalid');
+      } else {
+        console.error('Session verification failed:', data.error);
       }
     } catch (error) {
       console.error('Session check failed:', error);
@@ -51,20 +64,30 @@ class AuthManager {
    * Update UI elements based on login state
    */
   updateUI() {
-    // Find login/logout buttons and user display elements
-    const loginButtons = document.querySelectorAll('[data-auth="login"]');
-    const logoutButtons = document.querySelectorAll('[data-auth="logout"]');
-    const userDisplayElements = document.querySelectorAll('[data-auth="user"]');
-    const protectedElements = document.querySelectorAll('[data-auth="protected"]');
-    const registerButtons = document.querySelectorAll('[data-auth="register"]');
+    // Get all auth-related elements once
+    const authElements = {
+      login: document.querySelectorAll('[data-auth="login"]'),
+      logout: document.querySelectorAll('[data-auth="logout"]'),
+      user: document.querySelectorAll('[data-auth="user"]'),
+      protected: document.querySelectorAll('[data-auth="protected"]'),
+      register: document.querySelectorAll('[data-auth="register"]')
+    };
+
+    // Toggle visibility based on login state
+    const toggleVisibility = (elements, show) => {
+      elements.forEach(el => {
+        el.style.display = show ? 'block' : 'none';
+      });
+    };
 
     if (this.isLoggedIn) {
       // User is logged in
-      loginButtons.forEach(btn => btn.style.display = 'none');
-      logoutButtons.forEach(btn => btn.style.display = 'inline-block');
+      toggleVisibility(authElements.login, false);
+      toggleVisibility(authElements.logout, true);
+      toggleVisibility(authElements.register, false);
       
       // Update user display elements
-      userDisplayElements.forEach(el => {
+      authElements.user.forEach(el => {
         if (el.dataset.field === 'username') {
           el.textContent = this.currentUser.username;
         } else if (el.dataset.field === 'email') {
@@ -76,42 +99,36 @@ class AuthManager {
       });
 
       // Show protected elements
-      protectedElements.forEach(el => {
-        el.style.display = 'block';
-      });
-
-      // Hide register buttons
-      registerButtons.forEach(btn => btn.style.display = 'none');
+      toggleVisibility(authElements.protected, true);
     } else {
       // User is not logged in
-      loginButtons.forEach(btn => btn.style.display = 'inline-block');
-      logoutButtons.forEach(btn => btn.style.display = 'none');
+      toggleVisibility(authElements.login, true);
+      toggleVisibility(authElements.logout, false);
+      toggleVisibility(authElements.register, true);
       
       // Hide user display elements
-      userDisplayElements.forEach(el => {
-        el.style.display = 'none';
-      });
-
+      toggleVisibility(authElements.user, false);
+      
       // Hide protected elements
-      protectedElements.forEach(el => {
-        el.style.display = 'none';
-      });
-
-      // Show register buttons
-      registerButtons.forEach(btn => btn.style.display = 'inline-block');
+      toggleVisibility(authElements.protected, false);
     }
   }
 
   /**
    * Login with email or username
    */
-  async login(identifier, password = null) {
+  async login(identifier, password) {
     try {
+      // Validate inputs
+      if (!identifier || !password) {
+        return { success: false, error: 'Identifier and password are required' };
+      }
+      
       // Determine if identifier is email or username
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       const isEmail = emailRegex.test(identifier);
       
-      const requestBody = isEmail ? { email: identifier } : { username: identifier };
+      const requestBody = isEmail ? { email: identifier, password } : { username: identifier, password };
       
       const response = await fetch('/api/auth/login', {
         method: 'POST',
@@ -122,6 +139,13 @@ class AuthManager {
         credentials: 'include'
       });
       
+      // Handle non-JSON responses
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`Invalid response: ${text}`);
+      }
+      
       const data = await response.json();
       
       if (data.success) {
@@ -130,11 +154,14 @@ class AuthManager {
         this.updateUI();
         return { success: true, user: data.user };
       } else {
-        return { success: false, error: data.error };
+        return { success: false, error: data.error || 'Login failed' };
       }
     } catch (error) {
       console.error('Login error:', error);
-      return { success: false, error: 'Network error' };
+      return {
+        success: false,
+        error: error.message || 'Network error'
+      };
     }
   }
 
@@ -162,21 +189,45 @@ class AuthManager {
   /**
    * Register new user
    */
-  async register(username, email) {
+  async register(username, email, password) {
     try {
+      // Validate inputs
+      if (!username || !email || !password) {
+        return { success: false, error: 'All fields are required' };
+      }
+      
+      if (password.length < 8) {
+        return { success: false, error: 'Password must be at least 8 characters' };
+      }
+      
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ username, email })
+        body: JSON.stringify({ username, email, password })
       });
       
+      // Handle non-JSON responses
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`Invalid response: ${text}`);
+      }
+      
       const data = await response.json();
-      return data;
+      
+      if (data.success) {
+        return { success: true, user: data.user };
+      } else {
+        return { success: false, error: data.error || 'Registration failed' };
+      }
     } catch (error) {
       console.error('Registration error:', error);
-      return { success: false, error: 'Network error' };
+      return {
+        success: false,
+        error: error.message || 'Network error'
+      };
     }
   }
 

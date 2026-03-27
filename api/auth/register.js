@@ -1,6 +1,7 @@
 import { query, initDatabase } from '../../lib/db.js';
 import { v4 as uuidv4 } from 'uuid';
-import crypto from 'crypto';
+import bcrypt from 'bcrypt';
+import rateLimit from 'express-rate-limit';
 
 /**
  * User registration API endpoint
@@ -19,11 +20,28 @@ import crypto from 'crypto';
  * - 500: Server error
  */
 
+// Rate limiting configuration
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 3, // limit each IP to 3 registration attempts per windowMs
+  message: 'Too many registration attempts, please try again later',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
 export default async function handler(req, res) {
+  // Apply rate limiting
+  await new Promise((resolve, reject) => {
+    registerLimiter(req, res, (result) => {
+      if (result instanceof Error) return reject(result);
+      return resolve(result);
+    });
+  });
+
   // Set CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Origin', process.env.NODE_ENV === 'production' ? 'https://yourdomain.com' : '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
   res.setHeader(
     'Access-Control-Allow-Headers',
     'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
@@ -127,8 +145,9 @@ export default async function handler(req, res) {
     const verificationToken = uuidv4();
     const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours from now
 
-    // Hash the password (simple SHA-256 for demonstration, use bcrypt in production)
-    const passwordHash = crypto.createHash('sha256').update(password).digest('hex');
+    // Hash password with bcrypt
+    const saltRounds = 10;
+    const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Create new user
     const result = await query(
