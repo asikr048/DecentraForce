@@ -10,6 +10,7 @@ import crypto from 'crypto';
  * {
  *   "username": "johndoe",
  *   "email": "user@example.com"
+ * 
  * }
  *
  * Response:

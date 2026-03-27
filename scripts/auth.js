@@ -1,3 +1,4 @@
+
 /**
  * Authentication utilities for DecentraForce
  * This script handles automatic login, session verification, and user state management
@@ -55,6 +56,7 @@ class AuthManager {
     const logoutButtons = document.querySelectorAll('[data-auth="logout"]');
     const userDisplayElements = document.querySelectorAll('[data-auth="user"]');
     const protectedElements = document.querySelectorAll('[data-auth="protected"]');
+    const registerButtons = document.querySelectorAll('[data-auth="register"]');
 
     if (this.isLoggedIn) {
       // User is logged in
@@ -77,6 +79,9 @@ class AuthManager {
       protectedElements.forEach(el => {
         el.style.display = 'block';
       });
+
+      // Hide register buttons
+      registerButtons.forEach(btn => btn.style.display = 'none');
     } else {
       // User is not logged in
       loginButtons.forEach(btn => btn.style.display = 'inline-block');
@@ -91,6 +96,9 @@ class AuthManager {
       protectedElements.forEach(el => {
         el.style.display = 'none';
       });
+
+      // Show register buttons
+      registerButtons.forEach(btn => btn.style.display = 'inline-block');
     }
   }
 
