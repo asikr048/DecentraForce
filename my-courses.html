@@ -160,7 +160,7 @@
     border-bottom: 1px solid var(--border);
     display: flex; align-items: center; justify-content: space-between;
     padding: 0 32px;
-    position: sticky; top: 0; z-index: 40;
+    position: sticky; top: 0; z-index: 60;
   }
 
   .topbar-left {
@@ -524,11 +524,11 @@
       <div class="nav-divider"></div>
       <button class="nav-item" onclick="showPanel('courses'); setTab('nanodegree')">
         <div class="nav-icon">🎓</div>
-        NanoDegree
+        Ongoing
       </button>
       <button class="nav-item" onclick="showPanel('courses'); setTab('subscription')">
         <div class="nav-icon">💳</div>
-        Subscription
+        Purchased
       </button>
       <button class="nav-item" onclick="showPanel('courses'); setTab('free')">
         <div class="nav-icon">🎁</div>
@@ -583,21 +583,21 @@
 
         <!-- TABS -->
         <div class="tabs">
-          <button class="tab-btn active" onclick="setTab('nanodegree')" id="tab-nanodegree">NanoDegree Courses</button>
-          <button class="tab-btn" onclick="setTab('subscription')" id="tab-subscription">Subscription Courses</button>
+          <button class="tab-btn active" onclick="setTab('nanodegree')" id="tab-nanodegree">Ongoing Courses</button>
+          <button class="tab-btn" onclick="setTab('subscription')" id="tab-subscription">Purchased Courses</button>
           <button class="tab-btn" onclick="setTab('free')" id="tab-free">Free Courses</button>
         </div>
 
         <!-- TAB: NANODEGREE -->
         <div class="tab-panel active" id="panel-nanodegree">
-          <div class="section-label">Enrolled NanoDegree Programs</div>
+          <div class="section-label">Enrolled Ongoing Programs</div>
           <div class="courses-grid">
 
             <div class="course-card" style="animation-delay:.05s">
               <div class="card-thumbnail">
                 <div class="thumb-placeholder thumb-bg-1">⛓️</div>
                 <div class="thumb-glow"></div>
-                <span class="card-badge badge-nano">NanoDegree</span>
+                <span class="card-badge badge-nano">Ongoing</span>
               </div>
               <div class="card-body">
                 <div class="card-title">Fullstack Blockchain Development Course — Live Batch</div>
@@ -630,7 +630,7 @@
               <div class="card-thumbnail">
                 <div class="thumb-placeholder thumb-bg-2">📝</div>
                 <div class="thumb-glow"></div>
-                <span class="card-badge badge-nano">NanoDegree</span>
+                <span class="card-badge badge-nano">Ongoing</span>
               </div>
               <div class="card-body">
                 <div class="card-title">Smart Contract Security & Auditing — Advanced Track</div>
@@ -655,14 +655,14 @@
 
         <!-- TAB: SUBSCRIPTION -->
         <div class="tab-panel" id="panel-subscription">
-          <div class="section-label">Active Subscription Courses</div>
+          <div class="section-label">Active Purchased Courses</div>
           <div class="courses-grid">
 
             <div class="course-card" style="animation-delay:.05s">
               <div class="card-thumbnail">
                 <div class="thumb-placeholder thumb-bg-3">💰</div>
                 <div class="thumb-glow" style="background:radial-gradient(circle at 70% 30%, rgba(123,92,255,.15), transparent 65%)"></div>
-                <span class="card-badge badge-sub">Subscription</span>
+                <span class="card-badge badge-sub">Purchased</span>
               </div>
               <div class="card-body">
                 <div class="card-title">DeFi Protocols & Yield Strategy Mastery</div>
@@ -686,7 +686,7 @@
               <div class="card-thumbnail">
                 <div class="thumb-placeholder thumb-bg-5">🖼️</div>
                 <div class="thumb-glow" style="background:radial-gradient(circle at 70% 30%, rgba(255,77,141,.12), transparent 65%)"></div>
-                <span class="card-badge badge-sub">Subscription</span>
+                <span class="card-badge badge-sub">Purchased</span>
               </div>
               <div class="card-body">
                 <div class="card-title">NFT Creation, Minting & Marketplace Mastery</div>
@@ -710,7 +710,7 @@
               <div class="card-thumbnail">
                 <div class="thumb-placeholder thumb-bg-4">🌐</div>
                 <div class="thumb-glow" style="background:radial-gradient(circle at 70% 30%, rgba(0,229,153,.1), transparent 65%)"></div>
-                <span class="card-badge badge-sub">Subscription</span>
+                <span class="card-badge badge-sub">Purchased</span>
               </div>
               <div class="card-body">
                 <div class="card-title">Web3 Frontend Development with React & Ethers.js</div>
@@ -739,7 +739,7 @@
               <div class="card-thumbnail">
                 <div class="thumb-placeholder thumb-bg-2">🔐</div>
                 <div class="thumb-glow"></div>
-                <span class="card-badge badge-sub">Subscription</span>
+                <span class="card-badge badge-sub">Purchased</span>
               </div>
               <div class="card-body">
                 <div class="card-title">Zero-Knowledge Proofs & Privacy Protocols</div>
