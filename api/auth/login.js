@@ -94,7 +94,7 @@ export default async function handler(req, res) {
 
     // Find user by email
     const result = await query(
-      'SELECT id, username, email, created_at, verified, password_hash FROM users WHERE email = $1',
+      'SELECT id, username, email, created_at, verified, password_hash, is_admin FROM users WHERE email = $1',
       [email.toLowerCase().trim()]
     );
 
@@ -113,11 +113,8 @@ export default async function handler(req, res) {
       console.log(`User ${user.email} logged in but not verified`);
     }
     
-    // Check if user is admin
-    const isAdmin = (
-      user.email === process.env.ADMIN_EMAIL &&
-      password === process.env.ADMIN_PASSWORD
-    );
+    // Check if user is admin (set in DB via setup-admin.js)
+    const isAdmin = user.is_admin === true;
 
     // TODO: In a real implementation, you would verify the password hash
     // Verify password with bcrypt
@@ -158,7 +155,7 @@ export default async function handler(req, res) {
       },
       // For development, also return token in response (not in production)
       sessionToken: process.env.NODE_ENV === 'development' ? sessionToken : undefined,
-      redirectUrl: '/' // Redirect to home page after login
+      redirectUrl: isAdmin ? '/admin.html' : '/dashboard.html'
     });
 
   } catch (error) {

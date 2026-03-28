@@ -395,10 +395,8 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          // Show success message
-          alert('Login successful! Welcome back.');
-          // Redirect to home page
-          window.location.href = 'index.html';
+          // Redirect based on role (admin → admin.html, users → dashboard.html)
+          window.location.href = data.redirectUrl || 'dashboard.html';
         } else {
           // Show error message
           alert('Error: ' + data.error);

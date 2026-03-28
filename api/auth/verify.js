@@ -54,7 +54,7 @@ export default async function handler(req, res) {
 
     // Find user by session token
     const result = await query(
-      `SELECT id, username, email, created_at, verified, session_expires 
+      `SELECT id, username, email, created_at, verified, session_expires, is_admin 
        FROM users 
        WHERE session_token = $1 AND session_expires > NOW()`,
       [sessionToken]
@@ -80,7 +80,8 @@ export default async function handler(req, res) {
         username: user.username,
         email: user.email,
         createdAt: user.created_at,
-        verified: user.verified
+        verified: user.verified,
+        isAdmin: user.is_admin === true
       }
     });
 
