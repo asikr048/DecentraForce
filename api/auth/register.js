@@ -63,7 +63,6 @@ export default async function handler(req, res) {
 
   try {
     // ADD THIS LINE:
-    await initDatabase();
     const { username, email, password } = req.body;
 
     // Validate username
