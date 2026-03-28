@@ -9,7 +9,6 @@ export default async function handler(req, res) {
   if (req.method === 'OPTIONS') { res.status(200).end(); return; }
 
   try {
-    // Verify admin session
     const sessionToken = req.cookies?.session_token;
     if (!sessionToken) return res.status(401).json({ success: false, error: 'Unauthorized' });
 
@@ -20,8 +19,16 @@ export default async function handler(req, res) {
     if (adminCheck.rows.length === 0) return res.status(403).json({ success: false, error: 'Forbidden' });
 
     if (req.method === 'GET') {
+      // BULLETPROOF FIX: We use a SQL CASE statement to check the length of the image string.
+      // If it is over 2,000,000 characters (2MB), we return an empty string instead of crashing Vercel.
       const result = await query(`
-        SELECT c.*, COUNT(uc.user_id)::int AS enrolled_count
+        SELECT 
+          c.id, c.title, c.description, c.video_url, c.modules, c.is_active, c.created_at,
+          CASE 
+            WHEN length(c.thumbnail_url) > 2000000 THEN '' 
+            ELSE c.thumbnail_url 
+          END as thumbnail_url,
+          COUNT(uc.user_id)::int AS enrolled_count
         FROM courses c
         LEFT JOIN user_courses uc ON uc.course_id = c.id
         GROUP BY c.id
@@ -36,8 +43,8 @@ export default async function handler(req, res) {
 
       const result = await query(
         `INSERT INTO courses (title, description, thumbnail_url, video_url, modules, is_active)
-         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-        [title, description || '', thumbnail_url || '', video_url || '', modules || '[]', is_active !== false]
+         VALUES ($1, $2, $3, $4, $5::jsonb, $6) RETURNING *`,
+        [title, description || '', thumbnail_url || '', video_url || '', modules || '{}', is_active !== false]
       );
       return res.status(201).json({ success: true, course: result.rows[0] });
     }
@@ -47,7 +54,7 @@ export default async function handler(req, res) {
       if (!id) return res.status(400).json({ success: false, error: 'Course ID required' });
 
       const result = await query(
-        `UPDATE courses SET title=$1, description=$2, thumbnail_url=$3, video_url=$4, modules=$5, is_active=$6
+        `UPDATE courses SET title=$1, description=$2, thumbnail_url=$3, video_url=$4, modules=$5::jsonb, is_active=$6
          WHERE id=$7 RETURNING *`,
         [title, description, thumbnail_url, video_url, modules, is_active, id]
       );
@@ -68,11 +75,10 @@ export default async function handler(req, res) {
   }
 }
 
-// THIS IS CRITICAL: Increases the payload limit to allow Base64 Image strings
 export const config = {
   api: {
     bodyParser: {
-      sizeLimit: '10mb',
+      sizeLimit: '10mb', // Allows incoming compressed images
     },
   },
 };

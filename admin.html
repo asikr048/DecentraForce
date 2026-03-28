@@ -258,7 +258,7 @@
           </div>
 
           <div class="mb-6">
-            <label class="block text-sm text-white mb-2">Course Image</label>
+            <label class="block text-sm text-white mb-2">Course Thumbnail</label>
             <div class="flex flex-col gap-3">
               <div class="flex items-center admin-input p-1">
                 <label for="imageUploadInput" class="bg-surface2 border border-border text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-bg transition-colors cursor-pointer">
@@ -274,40 +274,46 @@
           </div>
 
           <div class="mb-6">
-            <label class="block text-sm text-white mb-2">Video/Playlist URL</label>
+            <label class="block text-sm text-white mb-2">Promo Video URL (Optional)</label>
             <input type="url" id="courseVideo" placeholder="https://youtube.com/..." class="admin-input">
           </div>
 
-          <div class="mb-6 flex items-center gap-3">
-            <input type="checkbox" id="courseActive" checked class="w-4 h-4 accent-gold">
-            <label class="text-sm font-medium text-white">Course is Active (Published)</label>
-          </div>
-
           <div class="mb-8">
-            <label class="block text-sm text-white mb-2">Detailed Course Content</label>
-            <div class="border border-border rounded-lg overflow-hidden">
-              <div class="bg-surface2 px-4 py-3 flex items-center gap-5 border-b border-border text-muted text-sm">
-                <button class="hover:text-white font-bold">B</button>
-                <button class="hover:text-white italic">I</button>
-                <button class="hover:text-white underline">U</button>
-                <button class="hover:text-white line-through">S</button>
-                <button class="hover:text-white font-mono">&lt;/&gt;</button>
-                <button class="hover:text-white">🖌️</button>
-                <div class="w-px h-4 bg-border"></div>
-                <button class="hover:text-white">≡</button>
-                <button class="hover:text-white">⋎</button>
-                <div class="w-px h-4 bg-border"></div>
-                <button class="hover:text-white">≣</button>
-                <button class="hover:text-white">⋮</button>
-                <button class="hover:text-white">▶</button>
-                <button class="hover:text-white">🔗</button>
-                <button class="hover:text-white">🖼️</button>
-              </div>
-              <textarea id="courseContent" class="w-full bg-bg text-text p-4 h-48 outline-none resize-y placeholder-muted" placeholder="Detailed Course Content..."></textarea>
+            <div class="flex items-center justify-between mb-3">
+              <label class="block text-sm text-white font-bold">Course Curriculum Builder</label>
+              <button type="button" onclick="addModuleUI()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                Add Module
+              </button>
+            </div>
+            <div class="p-5 border border-border rounded-xl bg-bg" id="curriculumBuilder">
+              <p class="text-muted text-sm text-center py-4 empty-curriculum-msg">No modules added yet. Click "Add Module" to start building your curriculum.</p>
             </div>
           </div>
 
-          <button onclick="saveCourse()" class="btn-gold w-full py-4 rounded-lg text-sm tracking-wider">
+          <div class="mb-8">
+            <label class="block text-sm text-white mb-2">Course Overview Details (Rich Text)</label>
+            <div class="border border-border rounded-lg overflow-hidden">
+              <div class="bg-surface2 px-4 py-3 flex items-center gap-5 border-b border-border text-muted text-sm">
+                <button type="button" class="hover:text-white font-bold">B</button>
+                <button type="button" class="hover:text-white italic">I</button>
+                <button type="button" class="hover:text-white underline">U</button>
+                <button type="button" class="hover:text-white line-through">S</button>
+                <button type="button" class="hover:text-white font-mono">&lt;/&gt;</button>
+                <div class="w-px h-4 bg-border"></div>
+                <button type="button" class="hover:text-white">≡</button>
+                <button type="button" class="hover:text-white">⋎</button>
+              </div>
+              <textarea id="courseContent" class="w-full bg-bg text-text p-4 h-40 outline-none resize-y placeholder-muted" placeholder="Write a detailed course overview..."></textarea>
+            </div>
+          </div>
+
+          <div class="mb-8 flex items-center gap-3 bg-surface2 p-4 rounded-lg border border-border">
+            <input type="checkbox" id="courseActive" checked class="w-5 h-5 accent-gold">
+            <label class="text-sm font-bold text-white">Publish Course Immediately</label>
+          </div>
+
+          <button type="button" onclick="saveCourse()" class="btn-gold w-full py-4 rounded-lg text-sm tracking-wider shadow-lg">
             ADD COURSE
           </button>
         </div>
@@ -464,8 +470,9 @@ async function loadCourses() {
     if (data.success) { allCourses = data.courses; renderCoursesGrid(); }
   } catch { showToast('Failed to load courses', 'error'); }
 }
+
 /* ────────────────────────────────────────────────────────
-   IMAGE UPLOAD LOGIC (With Canvas Compression!)
+   IMAGE COMPRESSION UPLOAD LOGIC
 ──────────────────────────────────────────────────────── */
 document.getElementById('imageUploadInput').addEventListener('change', function(e) {
   const file = e.target.files[0];
@@ -475,11 +482,9 @@ document.getElementById('imageUploadInput').addEventListener('change', function(
   reader.onload = function(event) {
     const img = new Image();
     img.onload = function() {
-      // 1. Create an invisible canvas to compress the image
+      // Compress the image before uploading to prevent Vercel limits
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      
-      // 2. Set maximum width to 800px to save massive amounts of space
       const maxWidth = 800;
       let width = img.width;
       let height = img.height;
@@ -491,16 +496,12 @@ document.getElementById('imageUploadInput').addEventListener('change', function(
       
       canvas.width = width;
       canvas.height = height;
-      
-      // 3. Draw the image and compress it to a highly optimized JPEG (70% quality)
       ctx.drawImage(img, 0, 0, width, height);
       const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
       
-      // 4. Save the tiny compressed string instead of the massive original file
       document.getElementById('courseThumbnail').value = compressedBase64;
       document.getElementById('imagePreview').src = compressedBase64;
       document.getElementById('imagePreviewContainer').classList.remove('hidden');
-      
       showToast('Image compressed & uploaded successfully!', 'success');
     };
     img.src = event.target.result;
@@ -508,7 +509,6 @@ document.getElementById('imageUploadInput').addEventListener('change', function(
   reader.readAsDataURL(file);
 });
 
-// Show preview if URL is pasted manually
 document.getElementById('courseThumbnail').addEventListener('input', function(e) {
   if(e.target.value) {
     document.getElementById('imagePreview').src = e.target.value;
@@ -519,7 +519,7 @@ document.getElementById('courseThumbnail').addEventListener('input', function(e)
 });
 
 /* ────────────────────────────────────────────────────────
-   OVERVIEW
+   OVERVIEW & USERS TABLES
 ──────────────────────────────────────────────────────── */
 function renderOverview() {
   document.getElementById('stat-users').textContent     = allUsers.length;
@@ -548,9 +548,6 @@ function renderOverview() {
       </table>`;
 }
 
-/* ────────────────────────────────────────────────────────
-   USERS TABLE
-──────────────────────────────────────────────────────── */
 function renderUsersTable(list = allUsers) {
   const tbody = document.getElementById('usersTableBody');
   const empty = document.getElementById('usersEmpty');
@@ -584,13 +581,9 @@ function filterUsers() {
   ));
 }
 
-/* ────────────────────────────────────────────────────────
-   GRANT ACCESS MODAL
-──────────────────────────────────────────────────────── */
 function openGrantModal(user) {
   grantTargetUser = user;
   document.getElementById('grantModalUser').textContent = `${user.username} (${user.email})`;
-
   const grantedIds = new Set((user.courses || []).map(c => c.course_id));
   document.getElementById('grantCourseList').innerHTML = allCourses.length === 0
     ? '<p class="text-muted text-sm text-center py-4">No courses created yet.</p>'
@@ -602,7 +595,6 @@ function openGrantModal(user) {
           <p class="text-xs text-muted mt-1">${esc(c.description?.slice(0,60) || '')}</p>
         </div>
       </label>`).join('');
-
   document.getElementById('grantModal').classList.add('open');
 }
 
@@ -640,7 +632,7 @@ async function saveAccess() {
 }
 
 /* ────────────────────────────────────────────────────────
-   COURSES GRID (Matches Uploaded Screenshot UI)
+   COURSES GRID
 ──────────────────────────────────────────────────────── */
 function renderCoursesGrid() {
   const grid  = document.getElementById('coursesGrid');
@@ -649,12 +641,10 @@ function renderCoursesGrid() {
   empty.classList.add('hidden');
   
   grid.innerHTML = allCourses.map(c => {
-    
-    // Parse the JSON modules to get our stats
     let stats = { lectures: 0, exercises: 0, assignments: 0 };
     try { 
-      const parsed = JSON.parse(c.modules);
-      if (typeof parsed === 'object') stats = parsed;
+      const parsed = typeof c.modules === 'string' ? JSON.parse(c.modules) : c.modules;
+      if (typeof parsed === 'object' && parsed !== null) stats = parsed;
     } catch(e) {}
 
     return `
@@ -684,7 +674,7 @@ function renderCoursesGrid() {
         </div>
 
         <div class="flex gap-3">
-          <button onclick='openEditCourse(${JSON.stringify(c)})' class="flex-1 bg-surface2 border border-border text-white py-2 rounded-lg text-sm font-bold hover:bg-border transition-colors">EDIT</button>
+          <button onclick="openEditCourse(${c.id})" class="flex-1 bg-surface2 border border-border text-white py-2 rounded-lg text-sm font-bold hover:bg-border transition-colors">EDIT</button>
           <button onclick="deleteCourse(${c.id})" class="flex-1 bg-[rgba(255,77,141,0.1)] border border-[rgba(255,77,141,0.3)] text-accent3 py-2 rounded-lg text-sm font-bold hover:bg-[rgba(255,77,141,0.2)] transition-colors">DELETE</button>
         </div>
       </div>
@@ -693,7 +683,49 @@ function renderCoursesGrid() {
 }
 
 /* ────────────────────────────────────────────────────────
-   ADD / EDIT COURSE FORM
+   CURRICULUM BUILDER UI LOGIC
+──────────────────────────────────────────────────────── */
+const builderContainer = document.getElementById('curriculumBuilder');
+
+function addModuleUI(title = '') {
+  const emptyMsg = document.querySelector('.empty-curriculum-msg');
+  if(emptyMsg) emptyMsg.remove();
+
+  const moduleHtml = `
+    <div class="bg-surface2 border border-border rounded-lg p-5 mb-4 module-block">
+      <div class="flex justify-between items-center mb-4">
+        <input type="text" placeholder="Module Title (e.g., Module 1: WEB & Part 1 - HTML)" class="admin-input font-bold text-lg w-full mr-4 module-title" value="${esc(title)}">
+        <button type="button" onclick="this.closest('.module-block').remove()" class="text-accent3 hover:text-red-400 font-bold px-3 py-1 bg-[rgba(255,77,141,0.1)] rounded transition-colors">✕</button>
+      </div>
+      <div class="lectures-container space-y-3 pl-4 border-l-2 border-border mb-4">
+        </div>
+      <button type="button" onclick="addLectureUI(this.previousElementSibling)" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+        + Add Sub-Lecture
+      </button>
+    </div>
+  `;
+  builderContainer.insertAdjacentHTML('beforeend', moduleHtml);
+  return builderContainer.lastElementChild;
+}
+
+function addLectureUI(container, title = '', url = '', duration = '') {
+  const lectureHtml = `
+    <div class="lecture-block flex items-start gap-3 bg-bg p-3 rounded-md border border-border">
+      <div class="flex-1 space-y-3">
+        <input type="text" placeholder="Lecture Title (e.g., M 6.1 - Font-Style in CSS)" class="admin-input text-sm lecture-title" value="${esc(title)}">
+        <div class="flex gap-3">
+          <input type="url" placeholder="YouTube Unlisted Link (e.g., https://youtu.be/...)" class="admin-input text-sm flex-1 lecture-url" value="${esc(url)}">
+          <input type="text" placeholder="Duration (e.g., 06:00 min)" class="admin-input text-sm w-1/3 lecture-duration" value="${esc(duration)}">
+        </div>
+      </div>
+      <button type="button" onclick="this.closest('.lecture-block').remove()" class="text-muted hover:text-accent3 mt-2 transition-colors">✕</button>
+    </div>
+  `;
+  container.insertAdjacentHTML('beforeend', lectureHtml);
+}
+
+/* ────────────────────────────────────────────────────────
+   ADD / EDIT COURSE SUBMISSION
 ──────────────────────────────────────────────────────── */
 function openAddCourse() {
   document.getElementById('courseFormTitle').textContent = 'Add New Course';
@@ -712,11 +744,16 @@ function openAddCourse() {
   document.getElementById('imagePreviewContainer').classList.add('hidden');
   document.getElementById('imagePreview').src = '';
   
+  builderContainer.innerHTML = '<p class="text-muted text-sm text-center py-4 empty-curriculum-msg">No modules added yet. Click "Add Module" to start building your curriculum.</p>';
+  
   showTab('add-course');
   document.querySelector('#tab-add-course .btn-gold').textContent = "ADD COURSE";
 }
 
-function openEditCourse(course) {
+function openEditCourse(id) {
+  const course = allCourses.find(c => c.id === id);
+  if (!course) return;
+
   document.getElementById('courseFormTitle').textContent = 'Edit Course';
   document.getElementById('courseId').value         = course.id;
   document.getElementById('courseTitle').value      = course.title || '';
@@ -731,11 +768,10 @@ function openEditCourse(course) {
     document.getElementById('imagePreviewContainer').classList.add('hidden');
   }
   
-  // Parse the JSON modules to populate the new fields
-  let modulesObj = { content: '', lectures: '', exercises: '', assignments: '' };
+  let modulesObj = { content: '', lectures: '', exercises: '', assignments: '', curriculum: [] };
   try { 
-    const parsed = JSON.parse(course.modules);
-    if (typeof parsed === 'object') modulesObj = parsed;
+    const parsed = typeof course.modules === 'string' ? JSON.parse(course.modules) : course.modules;
+    if (typeof parsed === 'object' && parsed !== null) modulesObj = parsed;
     else modulesObj.content = parsed;
   } catch(e) { 
     modulesObj.content = course.modules || ''; 
@@ -745,8 +781,21 @@ function openEditCourse(course) {
   document.getElementById('courseLectures').value   = modulesObj.lectures || '';
   document.getElementById('courseExercises').value  = modulesObj.exercises || '';
   document.getElementById('courseAssignments').value = modulesObj.assignments || '';
-  
   document.getElementById('courseActive').checked   = course.is_active;
+
+  // Build Curriculum UI
+  builderContainer.innerHTML = '';
+  if(!modulesObj.curriculum || modulesObj.curriculum.length === 0) {
+    builderContainer.innerHTML = '<p class="text-muted text-sm text-center py-4 empty-curriculum-msg">No modules added yet. Click "Add Module" to start building your curriculum.</p>';
+  } else {
+    modulesObj.curriculum.forEach(mod => {
+      const modEl = addModuleUI(mod.moduleTitle);
+      const lecContainer = modEl.querySelector('.lectures-container');
+      mod.lectures.forEach(lec => {
+        addLectureUI(lecContainer, lec.title, lec.url, lec.duration);
+      });
+    });
+  }
   
   showTab('add-course');
   document.querySelector('#tab-add-course .btn-gold').textContent = "SAVE CHANGES";
@@ -757,12 +806,35 @@ async function saveCourse() {
   const title = document.getElementById('courseTitle').value.trim();
   if (!title) { showToast('Course Title is required', 'error'); return; }
 
-  // Bundle content and new stats into a single JSON object for the database
+  // Scrape Curriculum Builder UI to generate JSON array
+  const curriculum = [];
+  document.querySelectorAll('.module-block').forEach(modEl => {
+    const moduleTitle = modEl.querySelector('.module-title').value.trim();
+    const lectures = [];
+    
+    modEl.querySelectorAll('.lecture-block').forEach(lecEl => {
+      const lecTitle = lecEl.querySelector('.lecture-title').value.trim();
+      const lecUrl = lecEl.querySelector('.lecture-url').value.trim();
+      const lecDuration = lecEl.querySelector('.lecture-duration').value.trim();
+      
+      // Only push if it has some content
+      if(lecTitle || lecUrl) {
+        lectures.push({ title: lecTitle, url: lecUrl, duration: lecDuration });
+      }
+    });
+    
+    // Only push module if it has a title or lectures
+    if(moduleTitle || lectures.length > 0) {
+      curriculum.push({ moduleTitle, lectures });
+    }
+  });
+
   const modulesData = {
     content: document.getElementById('courseContent').value,
     lectures: document.getElementById('courseLectures').value || 0,
     exercises: document.getElementById('courseExercises').value || 0,
-    assignments: document.getElementById('courseAssignments').value || 0
+    assignments: document.getElementById('courseAssignments').value || 0,
+    curriculum: curriculum // 🌟 Saved safely inside JSONB
   };
 
   const body = {
@@ -794,7 +866,7 @@ async function saveCourse() {
     showToast(id ? 'Course updated!' : 'Course created!', 'success');
     await loadCourses();
     renderOverview();
-    showTab('courses'); // Go back to course list
+    showTab('courses');
   } else {
     showToast(data.error || 'Failed to save course', 'error');
   }
@@ -818,18 +890,15 @@ async function deleteCourse(id) {
 }
 
 /* ────────────────────────────────────────────────────────
-   PROFILE — CHANGE EMAIL (EmailJS verification)
+   PROFILE — CHANGE EMAIL & PASSWORD
 ──────────────────────────────────────────────────────── */
 async function sendEmailVerification() {
   const newEmail = document.getElementById('newEmailInput').value.trim();
   if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
     showToast('Please enter a valid email address', 'error'); return;
   }
-
-  // Generate 6-digit code
   pendingEmailCode = String(Math.floor(100000 + Math.random() * 900000));
   pendingNewEmail  = newEmail;
-
   const btn = document.getElementById('sendCodeBtn');
   btn.textContent = 'Sending...';
   btn.disabled = true;
@@ -841,13 +910,11 @@ async function sendEmailVerification() {
       verification_code: pendingEmailCode,
       message:         `Your DecentraForce admin email verification code is: ${pendingEmailCode}`
     });
-
     document.getElementById('newEmailPreview').textContent = newEmail;
     document.getElementById('emailStep1').classList.add('hidden');
     document.getElementById('emailStep2').classList.remove('hidden');
     showToast('Verification code sent!', 'success');
   } catch (err) {
-    console.error('EmailJS error:', err);
     showToast('Failed to send code. Check EmailJS config.', 'error');
     btn.textContent = 'Send Verification Code';
     btn.disabled = false;
@@ -858,26 +925,20 @@ async function sendEmailVerification() {
 
 async function verifyAndUpdateEmail() {
   const entered = document.getElementById('verificationCodeInput').value.trim();
-  if (entered !== pendingEmailCode) {
-    showToast('Incorrect verification code', 'error'); return;
-  }
-
+  if (entered !== pendingEmailCode) { showToast('Incorrect verification code', 'error'); return; }
   const res  = await fetch('/api/admin/update-profile', {
     method: 'POST', credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'email', newEmail: pendingNewEmail })
   });
   const data = await res.json();
-
   if (data.success) {
     adminEmail = pendingNewEmail;
     document.getElementById('adminEmailDisplay').textContent = adminEmail;
     document.getElementById('currentEmailDisplay').textContent = adminEmail;
     showToast('Email updated successfully!', 'success');
     resetEmailStep();
-  } else {
-    showToast(data.error || 'Failed to update email', 'error');
-  }
+  } else { showToast(data.error || 'Failed to update email', 'error'); }
 }
 
 function resetEmailStep() {
@@ -891,23 +952,14 @@ function resetEmailStep() {
   pendingNewEmail  = null;
 }
 
-/* ────────────────────────────────────────────────────────
-   PROFILE — CHANGE PASSWORD
-──────────────────────────────────────────────────────── */
 async function changePassword() {
   const current  = document.getElementById('currentPasswordInput').value;
   const next     = document.getElementById('newPasswordInput').value;
   const confirm  = document.getElementById('confirmPasswordInput').value;
 
-  if (!current || !next || !confirm) {
-    showToast('All password fields are required', 'error'); return;
-  }
-  if (next !== confirm) {
-    showToast('New passwords do not match', 'error'); return;
-  }
-  if (next.length < 8) {
-    showToast('New password must be at least 8 characters', 'error'); return;
-  }
+  if (!current || !next || !confirm) { showToast('All password fields are required', 'error'); return; }
+  if (next !== confirm) { showToast('New passwords do not match', 'error'); return; }
+  if (next.length < 8) { showToast('New password must be at least 8 characters', 'error'); return; }
 
   const res  = await fetch('/api/admin/update-profile', {
     method: 'POST', credentials: 'include',
@@ -915,20 +967,14 @@ async function changePassword() {
     body: JSON.stringify({ type: 'password', currentPassword: current, newPassword: next })
   });
   const data = await res.json();
-
   if (data.success) {
     showToast('Password updated!', 'success');
     document.getElementById('currentPasswordInput').value = '';
     document.getElementById('newPasswordInput').value = '';
     document.getElementById('confirmPasswordInput').value = '';
-  } else {
-    showToast(data.error || 'Failed to update password', 'error');
-  }
+  } else { showToast(data.error || 'Failed to update password', 'error'); }
 }
 
-/* ────────────────────────────────────────────────────────
-   HELPERS
-──────────────────────────────────────────────────────── */
 function showToast(msg, type = 'success') {
   const el = document.getElementById('toast');
   el.textContent = msg;
