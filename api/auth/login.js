@@ -94,7 +94,7 @@ export default async function handler(req, res) {
 
     // Find user by email
     const result = await query(
-      'SELECT id, username, email, created_at, verified FROM users WHERE email = $1',
+      'SELECT id, username, email, created_at, verified, password_hash FROM users WHERE email = $1',
       [email.toLowerCase().trim()]
     );
 
