@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Courses — DecentraForce</title>
+<script src="scripts/auth.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -524,7 +525,7 @@
       <div class="nav-divider"></div>
       <button class="nav-item" onclick="showPanel('courses'); setTab('nanodegree')">
         <div class="nav-icon">🎓</div>
-        Ongoing
+        Available
       </button>
       <button class="nav-item" onclick="showPanel('courses'); setTab('subscription')">
         <div class="nav-icon">💳</div>
@@ -583,7 +584,7 @@
 
         <!-- TABS -->
         <div class="tabs">
-          <button class="tab-btn active" onclick="setTab('nanodegree')" id="tab-nanodegree">Ongoing Courses</button>
+          <button class="tab-btn active" onclick="setTab('nanodegree')" id="tab-nanodegree">Available Courses</button>
           <button class="tab-btn" onclick="setTab('subscription')" id="tab-subscription">Purchased Courses</button>
           <button class="tab-btn" onclick="setTab('free')" id="tab-free">Free Courses</button>
         </div>
@@ -597,7 +598,7 @@
               <div class="card-thumbnail">
                 <div class="thumb-placeholder thumb-bg-1">⛓️</div>
                 <div class="thumb-glow"></div>
-                <span class="card-badge badge-nano">Ongoing</span>
+                <span class="card-badge badge-nano">Available</span>
               </div>
               <div class="card-body">
                 <div class="card-title">Fullstack Blockchain Development Course — Live Batch</div>
@@ -630,7 +631,7 @@
               <div class="card-thumbnail">
                 <div class="thumb-placeholder thumb-bg-2">📝</div>
                 <div class="thumb-glow"></div>
-                <span class="card-badge badge-nano">Ongoing</span>
+                <span class="card-badge badge-nano">Available</span>
               </div>
               <div class="card-body">
                 <div class="card-title">Smart Contract Security & Auditing — Advanced Track</div>
@@ -912,6 +913,81 @@
     document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
     const labels = { courses: 'My Courses', profile: 'Profile', rewards: 'Rewards' };
     document.getElementById('breadcrumb-label').textContent = labels[name] || 'My Courses';
+    
+    // If admin is logged in, enable editing
+    if (window.auth?.getUser()?.isAdmin) {
+      enableAdminEditing();
+    }
+  }
+  
+  // Enable admin editing features
+  function enableAdminEditing() {
+    // Make all text content editable
+    document.querySelectorAll('h1, h2, h3, h4, h5, p, span, div').forEach(el => {
+      el.contentEditable = true;
+    });
+    
+    // Add edit buttons to course cards
+    document.querySelectorAll('.course-card').forEach(card => {
+      if (!card.querySelector('.edit-btn')) {
+        const editBtn = document.createElement('button');
+        editBtn.className = 'edit-btn';
+        editBtn.innerHTML = '✏️ Edit';
+        editBtn.style.position = 'absolute';
+        editBtn.style.top = '10px';
+        editBtn.style.right = '10px';
+        editBtn.style.zIndex = '10';
+        editBtn.style.background = 'rgba(0,0,0,0.7)';
+        editBtn.style.color = 'white';
+        editBtn.style.border = 'none';
+        editBtn.style.borderRadius = '4px';
+        editBtn.style.padding = '4px 8px';
+        editBtn.style.cursor = 'pointer';
+        card.appendChild(editBtn);
+      }
+    });
+    
+    // Add new course button
+    if (!document.getElementById('add-course-btn')) {
+      const addBtn = document.createElement('button');
+      addBtn.id = 'add-course-btn';
+      addBtn.innerHTML = '+ Add New Course';
+      addBtn.style.background = 'linear-gradient(135deg, var(--accent2), var(--accent))';
+      addBtn.style.color = 'white';
+      addBtn.style.border = 'none';
+      addBtn.style.borderRadius = '8px';
+      addBtn.style.padding = '10px 20px';
+      addBtn.style.margin = '20px 0';
+      addBtn.style.cursor = 'pointer';
+      addBtn.onclick = addNewCourse;
+      document.querySelector('.page-header').appendChild(addBtn);
+    }
+  }
+  
+  // Add new course function
+  function addNewCourse() {
+    const coursesGrid = document.querySelector('.courses-grid');
+    const newCourse = document.createElement('div');
+    newCourse.className = 'course-card';
+    newCourse.innerHTML = `
+      <div class="card-thumbnail">
+        <div class="thumb-placeholder thumb-bg-1">🆕</div>
+        <div class="thumb-glow"></div>
+        <span class="card-badge badge-nano">New</span>
+      </div>
+      <div class="card-body">
+        <div class="card-title" contenteditable="true">New Course Title</div>
+        <div class="card-stats">
+          <div class="stat-pill">📦 0 Lectures</div>
+          <div class="stat-pill">⚡ 0 Exercises</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-rating"><span class="stars">★★★★★</span> 0.0</div>
+        <a href="#" class="continue-btn">▶ Start</a>
+      </div>
+    `;
+    coursesGrid.appendChild(newCourse);
   }
 
   // ── Tab switching ──

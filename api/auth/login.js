@@ -108,11 +108,16 @@ export default async function handler(req, res) {
 
     const user = result.rows[0];
 
-    // Check if user is verified (optional - you might want to allow login without verification)
+    // Check if user is verified
     if (!user.verified) {
-      // Allow login but show verification warning
       console.log(`User ${user.email} logged in but not verified`);
     }
+    
+    // Check if user is admin
+    const isAdmin = (
+      user.email === process.env.ADMIN_EMAIL &&
+      password === process.env.ADMIN_PASSWORD
+    );
 
     // TODO: In a real implementation, you would verify the password hash
     // Verify password with bcrypt
@@ -148,7 +153,8 @@ export default async function handler(req, res) {
         username: user.username,
         email: user.email,
         createdAt: user.created_at,
-        verified: user.verified
+        verified: user.verified,
+        isAdmin: isAdmin
       },
       // For development, also return token in response (not in production)
       sessionToken: process.env.NODE_ENV === 'development' ? sessionToken : undefined,
