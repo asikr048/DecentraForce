@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="/assets/favicon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Courses — DecentraForce</title>
@@ -252,6 +253,18 @@
   .card-footer { padding: 12px 20px; border-top: 1px solid var(--border2); display: flex; align-items: center; justify-content: space-between; background: rgba(0,0,0,.15); }
   .continue-btn { display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #fff; border: none; padding: 8px 16px; border-radius: 8px; font-size: .8rem; font-weight: 600; cursor: pointer; transition: all .2s; text-decoration: none; box-shadow: 0 0 16px rgba(123,92,255,.3); }
 
+  /* Button styles for modal */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 22px; border-radius: 8px;
+    font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: .9rem;
+    cursor: pointer; text-decoration: none; border: none; transition: all .2s;
+  }
+  .btn-ghost {
+    background: transparent; color: var(--muted); border: 1px solid var(--border);
+  }
+  .btn-ghost:hover { color: var(--text); border-color: rgba(0,229,255,.3); }
+
   /* ─── PROFILE PANEL & FORMS ─── */
   .profile-layout { display: flex; gap: 32px; flex-wrap: wrap; align-items: flex-start; }
   .profile-panel {
@@ -306,6 +319,336 @@
     .courses-grid { grid-template-columns: 1fr; }
     .topbar { padding: 0 16px; }
     .student-id-badge { display: none; }
+  }
+
+  /* ══════════ CHECKOUT MODAL ══════════ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+    animation: modalFadeIn 0.3s ease-out;
+  }
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--text);
+  }
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 1.2rem;
+    transition: all 0.2s;
+  }
+  .modal-close:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .modal-body {
+    padding: 28px;
+  }
+  .modal-course-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .modal-course-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .modal-price {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+  }
+  .modal-actions .btn {
+    flex: 1;
+    padding: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .btn-success {
+    background: linear-gradient(135deg, #00e599, #00e5ff);
+    color: #fff;
+    border: none;
+  }
+  .btn-success:hover {
+    transform: translateY(-2px);
+  }
+
+  /* Enhanced Checkout Modal Styles */
+  .course-info-section {
+    margin-bottom: 24px;
+  }
+  
+  .price-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 12px;
+    padding: 16px;
+    background: rgba(0, 229, 255, 0.05);
+    border: 1px solid rgba(0, 229, 255, 0.1);
+    border-radius: 12px;
+  }
+  
+  .original-price {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.1rem;
+    color: var(--muted);
+    text-decoration: line-through;
+  }
+  
+  .final-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+  
+  .final-price-label {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  
+  .final-price-amount {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--accent);
+  }
+  
+  .coupon-section {
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+  
+  .coupon-section label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+  
+  .coupon-input-group {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .coupon-input-group input {
+    flex: 1;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+  }
+  
+  .coupon-input-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  
+  .btn-coupon {
+    padding: 12px 20px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  
+  .btn-coupon:hover {
+    background: var(--surface3);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+  
+  .coupon-message {
+    margin-top: 8px;
+    font-size: 0.85rem;
+    min-height: 20px;
+  }
+  
+  .coupon-message.success {
+    color: #00e599;
+  }
+  
+  .coupon-message.error {
+    color: #ff4d8d;
+  }
+  
+  .payment-error {
+    background: rgba(255, 77, 141, 0.1);
+    border: 1px solid rgba(255, 77, 141, 0.3);
+    color: #ff4d8d;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  
+  .payment-instructions {
+    margin-bottom: 24px;
+    padding: 20px;
+    background: rgba(123, 92, 255, 0.05);
+    border: 1px solid rgba(123, 92, 255, 0.1);
+    border-radius: 12px;
+  }
+  
+  .payment-instructions h5 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  
+  .instructions-content p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 8px;
+  }
+  
+  .payment-methods {
+    display: flex;
+    gap: 8px;
+    margin: 12px 0;
+    flex-wrap: wrap;
+  }
+  
+  .payment-method-tag {
+    padding: 6px 12px;
+    background: rgba(123, 92, 255, 0.1);
+    border: 1px solid rgba(123, 92, 255, 0.2);
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent2);
+  }
+  
+  .instruction-note {
+    font-size: 0.85rem;
+    color: var(--accent);
+    margin-top: 12px;
+    font-style: italic;
+  }
+  
+  .payment-details-form {
+    margin-bottom: 28px;
+  }
+  
+  .payment-details-form h5 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--text);
+    margin-bottom: 16px;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group label {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  
+  .form-group select,
+  .form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+  }
+  
+  .form-group select:focus,
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+  
+  .form-group select option {
+    background: var(--surface);
+    color: var(--text);
+  }
+  
+  /* Glassmorphism enhancement */
+  .modal {
+    background: rgba(13, 22, 48, 0.85);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 229, 255, 0.15);
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6),
+                0 0 0 1px rgba(0, 229, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  
+  .modal-overlay {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(12px);
   }
 </style>
 </head>
@@ -422,85 +765,26 @@
         </div>
 
         <div class="tab-panel active" id="panel-nanodegree">
-          <div class="section-label">Enrolled Ongoing Programs</div>
-          <div class="courses-grid">
-            <div class="course-card" style="animation-delay:.05s">
-              <div class="card-thumbnail">
-                <div class="thumb-placeholder thumb-bg-1">⛓️</div>
-                <div class="thumb-glow"></div>
-                <span class="card-badge badge-nano">Available</span>
-              </div>
-              <div class="card-body">
-                <div class="card-title">Fullstack Blockchain Development Course — Live Batch</div>
-                <div class="card-stats">
-                  <div class="stat-pill">📦 300 Lecture</div>
-                  <div class="stat-pill">⚡ 30 Exercise</div>
-                  <div class="stat-pill">📋 15 Assignment</div>
-                </div>
-                <div class="card-progress">
-                  <div class="progress-label"><span>Progress</span><span>34%</span></div>
-                  <div class="progress-track"><div class="progress-fill" style="width:34%"></div></div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <div class="card-rating"><span class="stars">★★★★★</span> 4.9</div>
-                <a href="#" class="continue-btn">▶ Continue</a>
-              </div>
-            </div>
+          <div class="section-label">Available Courses</div>
+          <div class="courses-grid" id="available-courses">
+            <!-- Dynamic courses will be loaded here -->
+            <div class="loading-courses">Loading courses...</div>
           </div>
         </div>
 
         <div class="tab-panel" id="panel-subscription">
-          <div class="section-label">Active Purchased Courses</div>
-          <div class="courses-grid">
-            <div class="course-card" style="animation-delay:.05s">
-              <div class="card-thumbnail">
-                <div class="thumb-placeholder thumb-bg-3">💰</div>
-                <div class="thumb-glow" style="background:radial-gradient(circle at 70% 30%, rgba(123,92,255,.15), transparent 65%)"></div>
-                <span class="card-badge badge-sub">Purchased</span>
-              </div>
-              <div class="card-body">
-                <div class="card-title">DeFi Protocols & Yield Strategy Mastery</div>
-                <div class="card-stats">
-                  <div class="stat-pill">📦 240 Lecture</div>
-                  <div class="stat-pill">⚡ 25 Exercise</div>
-                </div>
-                <div class="card-progress">
-                  <div class="progress-label"><span>Progress</span><span>67%</span></div>
-                  <div class="progress-track"><div class="progress-fill" style="width:67%"></div></div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <div class="card-rating"><span class="stars">★★★★★</span> 4.9</div>
-                <a href="#" class="continue-btn">▶ Continue</a>
-              </div>
-            </div>
+          <div class="section-label">Purchased Courses</div>
+          <div class="courses-grid" id="purchased-courses">
+            <!-- Dynamic purchased courses will be loaded here -->
+            <div class="loading-courses">Loading purchased courses...</div>
           </div>
         </div>
 
         <div class="tab-panel" id="panel-free">
           <div class="section-label">Free Courses</div>
-          <div class="courses-grid">
-            <div class="course-card" style="animation-delay:.05s">
-              <div class="card-thumbnail">
-                <div class="thumb-placeholder thumb-bg-1">🧱</div>
-                <div class="thumb-glow"></div>
-                <span class="card-badge badge-free">Free</span>
-              </div>
-              <div class="card-body">
-                <div class="card-title">Blockchain Fundamentals & Web3 Intro — বাংলায় শিখি</div>
-                <div class="card-progress">
-                  <div class="progress-label"><span>Progress</span><span>85%</span></div>
-                  <div class="progress-track">
-                    <div class="progress-fill" style="width:85%;background:linear-gradient(90deg,#00e599,#00e5ff)"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="card-footer">
-                <div class="card-rating"><span class="stars">★★★★★</span> 4.9</div>
-                <a href="#" class="continue-btn" style="background:linear-gradient(135deg,#00e599,#00e5ff)">▶ Continue</a>
-              </div>
-            </div>
+          <div class="courses-grid" id="free-courses">
+            <!-- Dynamic free courses will be loaded here -->
+            <div class="loading-courses">Loading free courses...</div>
           </div>
         </div>
       </div>
@@ -570,12 +854,17 @@
   </main>
 </div>
 
-<script>
+<script type="module">
+  import { getCourses, refreshCourses, getCacheStatus } from './scripts/course-cache.js';
+  
   let currentUser = null;
+  let allCourses = [];
+  // Global storage for selected course in checkout
+  window.selectedCourse = null;
 
   /* ────────────────────────────────────────────────────────
      INITIALIZATION & USER DATA
-  ──────────────────────────────────────────────────────── */
+   ──────────────────────────────────────────────────────── */
   async function initApp() {
     try {
       const res = await fetch('/api/auth/verify', { credentials: 'include' });
@@ -583,6 +872,9 @@
       
       if (data.success && data.user) {
         currentUser = data.user;
+        
+        // Load courses after authentication
+        loadAllCourses();
         
         // Populate Dropdown
         document.getElementById('dropName').textContent = currentUser.username;
@@ -707,6 +999,444 @@
       setTab(tab);
     }
   });
+
+  /* ────────────────────────────────────────────────────────
+     COURSE LOADING & DISPLAY
+   ──────────────────────────────────────────────────────── */
+  async function loadAllCourses() {
+    try {
+      allCourses = await getCourses();
+      renderCourses();
+    } catch (error) {
+      console.error('Failed to load courses:', error);
+      showToast('Failed to load courses. Using cached data if available.', 'error');
+    }
+  }
+
+  function renderCourses() {
+    if (!allCourses || allCourses.length === 0) {
+      document.getElementById('available-courses').innerHTML =
+        '<div class="empty-state">No courses available yet.</div>';
+      document.getElementById('purchased-courses').innerHTML =
+        '<div class="empty-state">No purchased courses.</div>';
+      document.getElementById('free-courses').innerHTML =
+        '<div class="empty-state">No free courses available.</div>';
+      return;
+    }
+
+    // Filter courses by type (simplified logic)
+    const availableCourses = allCourses.filter(c => c.price > 0);
+    const freeCourses = allCourses.filter(c => c.price === 0);
+    const purchasedCourses = []; // In a real app, this would come from user data
+
+    renderCourseGrid('available-courses', availableCourses, 'Available');
+    renderCourseGrid('purchased-courses', purchasedCourses, 'Purchased');
+    renderCourseGrid('free-courses', freeCourses, 'Free');
+  }
+
+  function renderCourseGrid(containerId, courses, type) {
+    const container = document.getElementById(containerId);
+    
+    if (courses.length === 0) {
+      container.innerHTML = `<div class="empty-state">No ${type.toLowerCase()} courses.</div>`;
+      return;
+    }
+
+    container.innerHTML = courses.map(course => `
+      <div class="course-card" style="animation-delay:.05s">
+        <div class="card-thumbnail">
+          <div class="thumb-placeholder thumb-bg-${Math.floor(Math.random() * 3) + 1}">
+            ${getEmojiForCourse(course.title)}
+          </div>
+          <div class="thumb-glow"></div>
+          <span class="card-badge badge-${type === 'Free' ? 'free' : type === 'Purchased' ? 'sub' : 'nano'}">
+            ${type === 'Free' ? 'Free' : type === 'Purchased' ? 'Purchased' : 'Available'}
+          </span>
+        </div>
+        <div class="card-body">
+          <div class="card-title">${escapeHtml(course.title)}</div>
+          <div class="card-stats">
+            <div class="stat-pill">📦 ${getModuleCount(course)} Lecture</div>
+            ${course.price > 0 ? `<div class="stat-pill">💰 $${course.price}</div>` : ''}
+            ${course.whatsapp ? `<div class="stat-pill">💬 WhatsApp Group</div>` : ''}
+          </div>
+          <div class="card-progress">
+            <div class="progress-label"><span>Progress</span><span>0%</span></div>
+            <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="card-rating"><span class="stars">★★★★★</span> 4.9</div>
+          ${getCourseButton(course, type)}
+        </div>
+      </div>
+    `).join('');
+
+    // Attach event listeners to Buy Now buttons
+    if (type === 'Available') {
+      container.querySelectorAll('.buy-now-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const courseId = this.dataset.courseId;
+          const course = courses.find(c => c.id == courseId);
+          if (course) openCheckoutModal(course);
+        });
+      });
+    }
+  }
+
+  function getCourseButton(course, type) {
+    // WhatsApp group link takes priority
+    if (course.whatsapp) {
+      return `<a href="${escapeHtml(course.whatsapp)}" target="_blank" class="continue-btn">Join Group</a>`;
+    }
+    
+    // Determine button based on course type
+    if (type === 'Purchased') {
+      return `<a href="video-course.html?courseId=${course.id}" class="continue-btn">▶ Continue</a>`;
+    } else if (type === 'Free') {
+      return `<a href="video-course.html?courseId=${course.id}" class="continue-btn">🎓 Enroll Now</a>`;
+    } else { // Available (paid courses)
+      return `<button class="continue-btn buy-now-btn" data-course-id="${course.id}" style="cursor:pointer">Buy Now</button>`;
+    }
+  }
+
+  function getEmojiForCourse(title) {
+    if (title.toLowerCase().includes('blockchain')) return '⛓️';
+    if (title.toLowerCase().includes('defi')) return '💰';
+    if (title.toLowerCase().includes('web3')) return '🌐';
+    if (title.toLowerCase().includes('solidity')) return '📝';
+    return '📚';
+  }
+
+  function getModuleCount(course) {
+    try {
+      if (course.modules && typeof course.modules === 'string') {
+        const parsed = JSON.parse(course.modules);
+        if (Array.isArray(parsed)) return parsed.length;
+      } else if (Array.isArray(course.modules)) {
+        return course.modules.length;
+      }
+    } catch (e) {}
+    return 0;
+  }
+
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+
+  function showToast(message, type = 'info') {
+    // Simple toast implementation
+    const toast = document.createElement('div');
+    toast.className = `toast toast-${type}`;
+    toast.textContent = message;
+    toast.style.cssText = `
+      position: fixed; top: 20px; right: 20px; padding: 12px 20px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 8px; z-index: 1000; color: var(--text);
+      box-shadow: 0 4px 20px rgba(0,0,0,.3);
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  // Checkout Modal Functions
+  function openCheckoutModal(course) {
+    const modal = document.getElementById('checkoutModal');
+    const title = document.getElementById('modalCourseTitle');
+    const originalPrice = document.getElementById('modalOriginalPrice');
+    const finalPrice = document.getElementById('modalFinalPrice');
+
+    if (title) title.textContent = course.title || 'Untitled Course';
+    
+    const price = course.price || 0;
+    const originalPriceValue = price > 0 ? price : 99; // Default original price
+    const finalPriceValue = price > 0 ? price : 99;
+    
+    if (originalPrice) originalPrice.textContent = `$${originalPriceValue}`;
+    if (finalPrice) finalPrice.textContent = `$${finalPriceValue}`;
+    
+    // Reset coupon and form fields
+    document.getElementById('couponInput').value = '';
+    document.getElementById('couponMessage').textContent = '';
+    document.getElementById('couponMessage').className = 'coupon-message';
+    document.getElementById('paymentMethod').value = '';
+    document.getElementById('senderNumber').value = '';
+    document.getElementById('transactionId').value = '';
+    
+    // Store current course price for coupon calculations
+    modal.dataset.originalPrice = originalPriceValue;
+    modal.dataset.currentPrice = finalPriceValue;
+    modal.dataset.courseId = course.id || '';
+
+    // Store selected course globally for later use
+    window.selectedCourse = course;
+
+    modal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeCheckoutModal() {
+    const modal = document.getElementById('checkoutModal');
+    modal.classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  // Global openCheckout function (alias for openCheckoutModal)
+  window.openCheckout = function(course) {
+    openCheckoutModal(course);
+  };
+
+  // Helper function to get coupons from localStorage
+  function getCouponsFromStorage() {
+    try {
+      const stored = localStorage.getItem('coupons');
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  // Apply coupon logic
+  function applyCoupon() {
+    const couponInput = document.getElementById('couponInput');
+    const couponMessage = document.getElementById('couponMessage');
+    const finalPriceElement = document.getElementById('modalFinalPrice');
+    const modal = document.getElementById('checkoutModal');
+    
+    const couponCode = couponInput.value.trim().toUpperCase();
+    const originalPrice = parseFloat(modal.dataset.originalPrice || 99);
+    
+    if (!couponCode) {
+      couponMessage.textContent = 'Please enter a coupon code';
+      couponMessage.className = 'coupon-message error';
+      return;
+    }
+    
+    // Get coupons from localStorage
+    const coupons = getCouponsFromStorage();
+    
+    // Find matching coupon
+    const matchedCoupon = coupons.find(c => c.code === couponCode);
+    
+    if (matchedCoupon) {
+      const discountPercent = matchedCoupon.discount;
+      const discountRate = discountPercent / 100;
+      const discountAmount = originalPrice * discountRate;
+      const finalPrice = originalPrice - discountAmount;
+      
+      // Update final price
+      finalPriceElement.textContent = `$${finalPrice.toFixed(2)}`;
+      modal.dataset.currentPrice = finalPrice;
+      
+      // Show success message
+      couponMessage.textContent = `Coupon applied! You saved $${discountAmount.toFixed(2)} (${discountPercent}% off)`;
+      couponMessage.className = 'coupon-message success';
+      
+      // Store applied coupon info for later use
+      modal.dataset.appliedCoupon = couponCode;
+      modal.dataset.appliedDiscount = discountPercent;
+    } else {
+      couponMessage.textContent = 'Invalid coupon code. Please try again.';
+      couponMessage.className = 'coupon-message error';
+    }
+  }
+
+  // Confirm payment - validates and redirects to WhatsApp
+  function confirmPayment() {
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    const senderNumber = document.getElementById('senderNumber').value.trim();
+    const transactionId = document.getElementById('transactionId').value.trim();
+    const modal = document.getElementById('checkoutModal');
+    const courseTitle = document.getElementById('modalCourseTitle').textContent;
+    const finalPrice = modal.dataset.currentPrice || modal.dataset.originalPrice;
+    
+    // Validation
+    if (!paymentMethod) {
+      showError('Please select a payment method');
+      return;
+    }
+    
+    if (!senderNumber) {
+      showError('Please enter your mobile number');
+      return;
+    }
+    
+    if (!transactionId) {
+      showError('Please enter the transaction ID');
+      return;
+    }
+    
+    // Validate sender number format (basic validation)
+    const phoneRegex = /^[0-9+]{10,15}$/;
+    if (!phoneRegex.test(senderNumber)) {
+      showError('Please enter a valid mobile number (10-15 digits, can start with +)');
+      return;
+    }
+    
+    // Validate transaction ID format (basic validation)
+    if (transactionId.length < 8) {
+      showError('Transaction ID must be at least 8 characters');
+      return;
+    }
+    
+    // In a real app, you would send this data to your backend
+    const paymentData = {
+      courseId: modal.dataset.courseId,
+      courseTitle: courseTitle,
+      amount: finalPrice,
+      paymentMethod: paymentMethod,
+      senderNumber: senderNumber,
+      transactionId: transactionId,
+      timestamp: new Date().toISOString()
+    };
+    
+    console.log('Payment submitted:', paymentData);
+    
+    // Check if selected course has WhatsApp link
+    if (window.selectedCourse && window.selectedCourse.whatsapp) {
+      // Redirect to WhatsApp
+      window.location.href = window.selectedCourse.whatsapp;
+    } else {
+      // Fallback: Show success message and close modal
+      alert(`Payment details submitted successfully!\n\nCourse: ${courseTitle}\nAmount: $${finalPrice}\nPayment Method: ${paymentMethod}\nTransaction ID: ${transactionId}\n\nOur team will verify your payment and grant course access within 24 hours.`);
+      
+      // Close modal
+      closeCheckoutModal();
+      
+      showToast('Payment submitted successfully! Course access will be granted after verification.', 'success');
+    }
+  }
+  
+  // Helper function to show error messages
+  function showError(message) {
+    // Create or update error display
+    let errorEl = document.getElementById('paymentError');
+    if (!errorEl) {
+      errorEl = document.createElement('div');
+      errorEl.id = 'paymentError';
+      errorEl.className = 'payment-error';
+      const form = document.querySelector('.payment-details-form');
+      if (form) {
+        form.insertBefore(errorEl, form.firstChild);
+      }
+    }
+    
+    errorEl.textContent = message;
+    errorEl.style.display = 'block';
+    
+    // Scroll to error
+    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    // Auto-hide after 5 seconds
+    setTimeout(() => {
+      errorEl.style.display = 'none';
+    }, 5000);
+  }
+
+  // Initialize modal event listeners when DOM is loaded
+  document.addEventListener('DOMContentLoaded', () => {
+    const modalClose = document.getElementById('modalClose');
+    const modalOverlay = document.getElementById('checkoutModal');
+    const cancelBtn = document.getElementById('modalCancel');
+    const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const confirmBtn = document.getElementById('modalConfirm');
+
+    if (modalClose) modalClose.addEventListener('click', closeCheckoutModal);
+    if (modalOverlay) modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeCheckoutModal();
+    });
+    if (cancelBtn) cancelBtn.addEventListener('click', closeCheckoutModal);
+    
+    if (applyCouponBtn) applyCouponBtn.addEventListener('click', applyCoupon);
+    
+    // Allow pressing Enter in coupon input to apply
+    const couponInput = document.getElementById('couponInput');
+    if (couponInput) {
+      couponInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') applyCoupon();
+      });
+    }
+    
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', confirmPayment);
+    }
+  });
 </script>
+
+<!-- Checkout Modal -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Complete Your Purchase</h3>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="course-info-section">
+        <h4 class="modal-course-title" id="modalCourseTitle">Course Title</h4>
+        <div class="price-section">
+          <div class="original-price" id="modalOriginalPrice">$99</div>
+          <div class="final-price">
+            <span class="final-price-label">Final Price:</span>
+            <span class="final-price-amount" id="modalFinalPrice">$99</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="coupon-section">
+        <label for="couponInput">Apply Coupon Code</label>
+        <div class="coupon-input-group">
+          <input type="text" id="couponInput" placeholder="Enter coupon code">
+          <button class="btn-coupon" id="applyCouponBtn">Apply</button>
+        </div>
+        <div class="coupon-message" id="couponMessage"></div>
+      </div>
+
+      <div class="payment-instructions">
+        <h5>Payment Instructions</h5>
+        <div class="instructions-content">
+          <p>Send Money to <strong>+8801302201431</strong> via:</p>
+          <div class="payment-methods">
+            <span class="payment-method-tag">bKash</span>
+            <span class="payment-method-tag">Nagad</span>
+            <span class="payment-method-tag">Rocket</span>
+            <span class="payment-method-tag">Upay</span>
+          </div>
+          <p class="instruction-note">After payment, fill in the details below to verify your transaction.</p>
+        </div>
+      </div>
+
+      <div class="payment-details-form">
+        <h5>Payment Details</h5>
+        <div class="form-group">
+          <label for="paymentMethod">Payment Method *</label>
+          <select id="paymentMethod" required>
+            <option value="">Select payment method</option>
+            <option value="bkash">bKash</option>
+            <option value="nagad">Nagad</option>
+            <option value="rocket">Rocket</option>
+            <option value="upay">Upay</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="senderNumber">Sender Mobile Number *</label>
+          <input type="tel" id="senderNumber" placeholder="+8801XXXXXXXXX" required>
+        </div>
+        <div class="form-group">
+          <label for="transactionId">Transaction ID *</label>
+          <input type="text" id="transactionId" placeholder="Enter transaction ID" required>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="modalCancel">Cancel</button>
+        <button class="btn btn-success" id="modalConfirm">Submit Payment Details</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<link rel="icon" type="image/png" href="/assets/favicon.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DecentraForce — Your Web3 Career University</title>
@@ -539,6 +540,109 @@
     .cta-section { padding: 40px 24px; }
     .cta-btns { flex-direction: column; align-items: center; }
   }
+
+  /* ══════════ CHECKOUT MODAL ══════════ */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 20px;
+  }
+  .modal-overlay.open {
+    display: flex;
+  }
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 480px;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
+    animation: modalFadeIn 0.3s ease-out;
+  }
+  @keyframes modalFadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .modal-header {
+    padding: 24px 28px 20px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .modal-header h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    color: var(--text);
+  }
+  .modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 1.2rem;
+    transition: all 0.2s;
+  }
+  .modal-close:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+  .modal-body {
+    padding: 28px;
+  }
+  .modal-course-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .modal-course-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .modal-price {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2rem;
+    color: var(--accent);
+    margin-bottom: 24px;
+    text-align: center;
+  }
+  .modal-actions {
+    display: flex;
+    gap: 12px;
+  }
+  .modal-actions .btn {
+    flex: 1;
+    padding: 14px;
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+  .btn-success {
+    background: linear-gradient(135deg, #00e599, #00e5ff);
+    color: #fff;
+    border: none;
+  }
+  .btn-success:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 229, 153, 0.4);
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="scripts/three-scene.js" defer></script>
@@ -970,6 +1074,139 @@
       }
     }, 100);
   });
+
+  // Course rendering and checkout modal functionality
+  document.addEventListener('DOMContentLoaded', () => {
+    // Fetch courses from localStorage
+    function getCoursesFromStorage() {
+      try {
+        const cached = localStorage.getItem('courses');
+        if (!cached) return [];
+        return JSON.parse(cached);
+      } catch (error) {
+        console.error('Error reading courses from localStorage:', error);
+        return [];
+      }
+    }
+
+    // Render course cards
+    function renderCourses(courses) {
+      const container = document.querySelector('.courses-grid');
+      if (!container) return;
+
+      // Clear existing static cards
+      container.innerHTML = '';
+
+      if (courses.length === 0) {
+        container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No courses available. Check back soon!</div>';
+        return;
+      }
+
+      // Banner classes and emojis for variety
+      const banners = ['banner-1', 'banner-2', 'banner-3', 'banner-4'];
+      const emojis = ['⛓️', '📝', '🖼️', '💰', '🚀', '🔗', '⚡', '🎓'];
+      const badges = ['🔥 Bestseller', '⚡ New', '🎨 Popular', '📈 Trending', '⭐ Featured'];
+
+      courses.forEach((course, index) => {
+        const bannerClass = banners[index % banners.length];
+        const emoji = emojis[index % emojis.length];
+        const badge = badges[index % badges.length];
+        const price = course.price ? `৳${course.price}` : '৳2,500';
+        const originalPrice = course.price ? `৳${Math.round(course.price * 1.5)}` : '৳4,500';
+
+        const card = document.createElement('div');
+        card.className = 'course-card';
+        card.dataset.courseId = course.id;
+        card.innerHTML = `
+          <div class="card-banner ${bannerClass}">
+            <span style="z-index:2;position:relative">${emoji}</span>
+            <span class="banner-badge">${badge}</span>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="tag tag-blue">${course.modules ? course.modules.split(',')[0] || 'Blockchain' : 'Blockchain'}</span>
+              <span class="tag tag-purple">${index % 3 === 0 ? 'Beginner' : index % 3 === 1 ? 'Intermediate' : 'Advanced'}</span>
+            </div>
+            <h3>${course.title || 'Untitled Course'}</h3>
+            <p>${course.description || 'Learn essential skills in this comprehensive course.'}</p>
+            <div class="card-footer">
+              <button class="btn btn-primary buy-now-btn" style="padding:8px 16px;font-size:0.85rem;" data-course-id="${course.id}">
+                Buy Now
+              </button>
+              <div class="price"><span>${originalPrice}</span>${price}</div>
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Attach event listeners to Buy Now buttons
+      document.querySelectorAll('.buy-now-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const courseId = this.dataset.courseId;
+          const course = courses.find(c => c.id == courseId);
+          if (course) openCheckoutModal(course);
+        });
+      });
+    }
+
+    // Modal functions
+    function openCheckoutModal(course) {
+      const modal = document.getElementById('checkoutModal');
+      const title = document.getElementById('modalCourseTitle');
+      const desc = document.getElementById('modalCourseDesc');
+      const price = document.getElementById('modalCoursePrice');
+
+      if (title) title.textContent = course.title || 'Untitled Course';
+      if (desc) desc.textContent = course.description || 'Learn essential skills in this comprehensive course.';
+      if (price) price.textContent = course.price ? `৳${course.price}` : '৳2,500';
+
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCheckoutModal() {
+      const modal = document.getElementById('checkoutModal');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    // Attach modal close handlers
+    const modalClose = document.getElementById('modalClose');
+    const modalOverlay = document.getElementById('checkoutModal');
+    const cancelBtn = document.getElementById('modalCancel');
+
+    if (modalClose) modalClose.addEventListener('click', closeCheckoutModal);
+    if (modalOverlay) modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeCheckoutModal();
+    });
+    if (cancelBtn) cancelBtn.addEventListener('click', closeCheckoutModal);
+
+    // Initialize courses
+    const courses = getCoursesFromStorage();
+    renderCourses(courses);
+  });
 </script>
+
+<!-- Checkout Modal -->
+<div class="modal-overlay" id="checkoutModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>Checkout</h3>
+      <button class="modal-close" id="modalClose">&times;</button>
+    </div>
+    <div class="modal-body">
+      <h4 class="modal-course-title" id="modalCourseTitle">Course Title</h4>
+      <p class="modal-course-desc" id="modalCourseDesc">Course description will appear here.</p>
+      <div class="modal-price" id="modalCoursePrice">৳2,500</div>
+      <div class="modal-actions">
+        <button class="btn btn-ghost" id="modalCancel">Cancel</button>
+        <button class="btn btn-success" id="modalConfirm">Proceed to Payment</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>

@@ -38,25 +38,29 @@ export default async function handler(req, res) {
     }
 
     if (req.method === 'POST') {
-      const { title, description, thumbnail_url, video_url, modules, is_active } = req.body;
+      const { title, description, thumbnail_url, video_url, price, whatsapp, modules, is_active } = req.body;
       if (!title) return res.status(400).json({ success: false, error: 'Title required' });
+      if (price === undefined || price === null) return res.status(400).json({ success: false, error: 'Price required' });
+      if (!whatsapp) return res.status(400).json({ success: false, error: 'WhatsApp group link required' });
 
       const result = await query(
-        `INSERT INTO courses (title, description, thumbnail_url, video_url, modules, is_active)
-         VALUES ($1, $2, $3, $4, $5::jsonb, $6) RETURNING *`,
-        [title, description || '', thumbnail_url || '', video_url || '', modules || '{}', is_active !== false]
+        `INSERT INTO courses (title, description, thumbnail_url, video_url, price, whatsapp, modules, is_active)
+         VALUES ($1, $2, $3, $4, $5, $6, $7::jsonb, $8) RETURNING *`,
+        [title, description || '', thumbnail_url || '', video_url || '', price, whatsapp, modules || '{}', is_active !== false]
       );
       return res.status(201).json({ success: true, course: result.rows[0] });
     }
 
     if (req.method === 'PUT') {
-      const { id, title, description, thumbnail_url, video_url, modules, is_active } = req.body;
+      const { id, title, description, thumbnail_url, video_url, price, whatsapp, modules, is_active } = req.body;
       if (!id) return res.status(400).json({ success: false, error: 'Course ID required' });
+      if (price === undefined || price === null) return res.status(400).json({ success: false, error: 'Price required' });
+      if (!whatsapp) return res.status(400).json({ success: false, error: 'WhatsApp group link required' });
 
       const result = await query(
-        `UPDATE courses SET title=$1, description=$2, thumbnail_url=$3, video_url=$4, modules=$5::jsonb, is_active=$6
-         WHERE id=$7 RETURNING *`,
-        [title, description, thumbnail_url, video_url, modules, is_active, id]
+        `UPDATE courses SET title=$1, description=$2, thumbnail_url=$3, video_url=$4, price=$5, whatsapp=$6, modules=$7::jsonb, is_active=$8
+         WHERE id=$9 RETURNING *`,
+        [title, description, thumbnail_url, video_url, price, whatsapp, modules, is_active, id]
       );
       return res.status(200).json({ success: true, course: result.rows[0] });
     }
