@@ -3,275 +3,368 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Panel — NonAcademy</title>
+<title>Admin Panel — DecentraForce</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<!-- EmailJS for email verification -->
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <script>
   // ⚠️ Replace these with your EmailJS credentials
-  const EMAILJS_SERVICE_ID  = 'service_wn7dn1f';   // e.g. 'service_abc123'
-  const EMAILJS_TEMPLATE_ID = 'template_2067o6n';  // e.g. 'template_xyz789'
-  const EMAILJS_PUBLIC_KEY  = 'TxlilKkHJZDum1C5v';   // e.g. 'abc123XYZ'
+  const EMAILJS_SERVICE_ID  = 'service_wn7dn1f';
+  const EMAILJS_TEMPLATE_ID = 'template_2067o6n';
+  const EMAILJS_PUBLIC_KEY  = 'TxlilKkHJZDum1C5v';
 
   (function() { emailjs.init(EMAILJS_PUBLIC_KEY); })();
+
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          bg: '#050a18',
+          surface: '#0d1630',
+          surface2: '#111d3a',
+          accent: '#00e5ff',
+          accent2: '#7b5cff',
+          accent3: '#ff4d8d',
+          text: '#e8eeff',
+          muted: '#7d8fb3',
+          border: 'rgba(0, 229, 255, 0.12)',
+          gold: '#d4af37',
+        }
+      }
+    }
+  }
 </script>
 <style>
-  .tab-btn.active { background: #2563eb; color: #fff; }
-  .tab-btn { transition: all .15s; }
-  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:50; align-items:center; justify-content:center; }
-  .modal-overlay.open { display:flex; }
-  .toast { position:fixed; bottom:24px; right:24px; padding:12px 20px; border-radius:8px; font-weight:600; z-index:200; opacity:0; transform:translateY(10px); transition:all .3s; }
-  .toast.show { opacity:1; transform:translateY(0); }
-  .toast.success { background:#10b981; color:#fff; }
-  .toast.error   { background:#ef4444; color:#fff; }
-  input[type="text"], input[type="email"], input[type="password"], input[type="url"], textarea, select {
-    width:100%; padding:10px 14px; border:1px solid #d1d5db; border-radius:8px;
-    font-size:.95rem; outline:none; transition:border-color .2s;
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #050a18;
+    color: #e8eeff;
+    overflow-x: hidden;
   }
-  input:focus, textarea:focus, select:focus { border-color:#2563eb; box-shadow:0 0 0 3px rgba(37,99,235,.12); }
-  .badge { display:inline-block; padding:2px 8px; border-radius:9999px; font-size:.75rem; font-weight:600; }
-  .badge-green { background:#d1fae5; color:#065f46; }
-  .badge-gray  { background:#f3f4f6; color:#374151; }
-  .badge-blue  { background:#dbeafe; color:#1e40af; }
+
+  /* Admin Nav Tabs */
+  .tab-btn { transition: all .2s; border-left: 3px solid transparent; }
+  .tab-btn.active { 
+    background: rgba(0, 229, 255, 0.08); 
+    color: #00e5ff; 
+    border-left: 3px solid #00e5ff;
+  }
+  .tab-btn:hover:not(.active) { background: #111d3a; color: #fff; }
+
+  /* Forms & Inputs */
+  .admin-input {
+    width: 100%; padding: 12px 16px; 
+    background: #050a18; border: 1px solid rgba(0, 229, 255, 0.12); 
+    border-radius: 8px; color: #e8eeff; font-size: 0.95rem; 
+    outline: none; transition: border-color .2s;
+  }
+  .admin-input:focus { border-color: #d4af37; box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1); }
+  .admin-input::placeholder { color: #7d8fb3; opacity: 0.6; }
+
+  /* Buttons */
+  .btn-gold {
+    background: linear-gradient(180deg, #f3e5ab 0%, #d4af37 100%);
+    color: #050a18;
+    font-weight: 700;
+    transition: all 0.2s;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
+  }
+  .btn-gold:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
+  }
+
+  /* Modals & Toasts */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter: blur(4px); z-index:50; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .toast { position:fixed; bottom:24px; right:24px; padding:14px 24px; border-radius:8px; font-weight:600; z-index:200; opacity:0; transform:translateY(10px); transition:all .3s; }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast.success { background:#00e599; color:#050a18; }
+  .toast.error   { background:#ff4d8d; color:#fff; }
+
+  /* Badges */
+  .badge { display:inline-block; padding:4px 10px; border-radius:9999px; font-size:.75rem; font-weight:600; }
+  .badge-green { background:rgba(0, 229, 153, 0.15); color:#00e599; border: 1px solid rgba(0, 229, 153, 0.3); }
+  .badge-gray  { background:rgba(125, 143, 179, 0.1); color:#7d8fb3; border: 1px solid rgba(125, 143, 179, 0.3); }
+  .badge-blue  { background:rgba(0, 229, 255, 0.15); color:#00e5ff; border: 1px solid rgba(0, 229, 255, 0.3); }
+
+  /* Custom Scrollbar */
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-track { background: #050a18; }
+  ::-webkit-scrollbar-thumb { background: #111d3a; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #7d8fb3; }
 </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body>
 
-<!-- ── Sidebar ── -->
 <div class="flex min-h-screen">
-  <aside class="w-64 bg-white shadow-md fixed h-full flex flex-col">
-    <!-- Logo -->
-    <div class="p-6 border-b">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold text-sm">N</div>
+  <aside class="w-64 bg-surface border-r border-border fixed h-full flex flex-col z-20">
+    <div class="p-6 border-b border-border">
+      <a href="index.html" class="flex items-center gap-3 decoration-none">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent2 to-accent flex items-center justify-center text-white font-bold text-sm shadow-[0_0_15px_rgba(123,92,255,0.5)]">DF</div>
         <div>
-          <p class="font-bold text-blue-600 leading-tight">NonAcademy</p>
-          <p class="text-xs text-gray-400">Admin Panel</p>
+          <p class="font-bold text-white leading-tight tracking-wide" style="font-family: 'Syne', sans-serif;">Decentra<span class="text-accent">Force</span></p>
         </div>
-      </div>
+      </a>
     </div>
 
-    <!-- Nav -->
-    <nav class="flex-1 p-4 space-y-1">
-      <button onclick="showTab('overview')" class="tab-btn active w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 font-medium" data-tab="overview">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-        Overview
+    <nav class="flex-1 py-6 space-y-2">
+      <button onclick="showTab('overview')" class="tab-btn active w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="overview">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+        DASHBOARD
       </button>
-      <button onclick="showTab('users')" class="tab-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 font-medium" data-tab="users">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-        Users
+      <button onclick="showTab('courses')" class="tab-btn w-full text-left flex items-center justify-between px-6 py-3 text-muted font-medium" data-tab="courses">
+        <div class="flex items-center gap-4">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          MANAGE COURSES
+        </div>
       </button>
-      <button onclick="showTab('courses')" class="tab-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 font-medium" data-tab="courses">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-        Courses
+      <button onclick="showTab('users')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="users">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
+        USERS
       </button>
-      <button onclick="showTab('profile')" class="tab-btn w-full text-left flex items-center gap-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-blue-50 font-medium" data-tab="profile">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
-        Profile
+      <button onclick="openAddCourse()" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="add-course">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        ADD NEW COURSE
+      </button>
+      <button onclick="showTab('profile')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="profile">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+        SETTINGS
       </button>
     </nav>
-
-    <!-- Admin info + Logout -->
-    <div class="p-4 border-t">
-      <div class="flex items-center gap-3 mb-3">
-        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
-          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-        </div>
-        <div>
-          <p class="text-sm font-medium text-gray-800" id="adminEmailDisplay">Admin</p>
-          <p class="text-xs text-gray-400">Administrator</p>
-        </div>
-      </div>
-      <button onclick="logout()" class="w-full text-left flex items-center gap-2 px-3 py-2 rounded-lg text-red-600 hover:bg-red-50 font-medium text-sm">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-        Logout
-      </button>
-    </div>
   </aside>
 
-  <!-- ── Main content ── -->
-  <main class="ml-64 flex-1 p-8">
-
-    <!-- ══ OVERVIEW TAB ══ -->
-    <div id="tab-overview">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">Overview</h1>
-      <div class="grid grid-cols-3 gap-6 mb-8">
-        <div class="bg-white rounded-xl p-6 shadow-sm border">
-          <p class="text-sm text-gray-500 mb-1">Total Users</p>
-          <p class="text-3xl font-bold text-blue-600" id="stat-users">—</p>
+  <main class="ml-64 flex-1 flex flex-col h-screen overflow-y-auto bg-bg">
+    
+    <header class="flex justify-end items-center px-8 py-5 border-b border-border bg-surface sticky top-0 z-10">
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-full bg-accent2 flex items-center justify-center text-white font-bold">A</div>
+          <span class="text-sm font-medium text-white" id="adminEmailDisplay">admin</span>
         </div>
-        <div class="bg-white rounded-xl p-6 shadow-sm border">
-          <p class="text-sm text-gray-500 mb-1">Total Courses</p>
-          <p class="text-3xl font-bold text-green-600" id="stat-courses">—</p>
-        </div>
-        <div class="bg-white rounded-xl p-6 shadow-sm border">
-          <p class="text-sm text-gray-500 mb-1">Enrollments</p>
-          <p class="text-3xl font-bold text-purple-600" id="stat-enrollments">—</p>
-        </div>
-      </div>
-
-      <!-- Recent Users -->
-      <div class="bg-white rounded-xl shadow-sm border p-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">Recent Registrations</h2>
-        <div id="recent-users-table"></div>
-      </div>
-    </div>
-
-    <!-- ══ USERS TAB ══ -->
-    <div id="tab-users" class="hidden">
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">User Accounts</h1>
-        <input type="text" id="userSearch" placeholder="Search by email or username…" class="w-64" oninput="filterUsers()" style="width:260px">
-      </div>
-
-      <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
-        <table class="w-full text-sm">
-          <thead class="bg-gray-50 text-gray-600">
-            <tr>
-              <th class="px-4 py-3 text-left font-semibold">User</th>
-              <th class="px-4 py-3 text-left font-semibold">Email</th>
-              <th class="px-4 py-3 text-left font-semibold">Joined</th>
-              <th class="px-4 py-3 text-left font-semibold">Status</th>
-              <th class="px-4 py-3 text-left font-semibold">Courses</th>
-              <th class="px-4 py-3 text-left font-semibold">Actions</th>
-            </tr>
-          </thead>
-          <tbody id="usersTableBody" class="divide-y divide-gray-100"></tbody>
-        </table>
-        <div id="usersEmpty" class="hidden text-center py-12 text-gray-400">No users found.</div>
-      </div>
-    </div>
-
-    <!-- ══ COURSES TAB ══ -->
-    <div id="tab-courses" class="hidden">
-      <div class="flex items-center justify-between mb-6">
-        <h1 class="text-2xl font-bold text-gray-800">Courses</h1>
-        <button onclick="openCourseModal()" class="bg-blue-600 text-white px-5 py-2.5 rounded-lg font-semibold hover:bg-blue-700 flex items-center gap-2">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-          Add Course
+        <button onclick="logout()" class="flex items-center gap-2 text-muted hover:text-accent transition-colors text-sm font-medium">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          Logout
         </button>
       </div>
+    </header>
 
-      <div id="coursesGrid" class="grid grid-cols-2 gap-6"></div>
-      <div id="coursesEmpty" class="hidden bg-white rounded-xl shadow-sm border p-12 text-center text-gray-400">
-        <p class="text-lg font-medium mb-2">No courses yet</p>
-        <p class="text-sm">Click "Add Course" to create your first course.</p>
-      </div>
-    </div>
+    <div class="p-8 max-w-6xl mx-auto w-full">
 
-    <!-- ══ PROFILE TAB ══ -->
-    <div id="tab-profile" class="hidden">
-      <h1 class="text-2xl font-bold text-gray-800 mb-6">Admin Profile</h1>
-
-      <div class="grid grid-cols-2 gap-6">
-        <!-- Change Email -->
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-          <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-            Change Email
-          </h2>
-
-          <div id="emailStep1">
-            <p class="text-sm text-gray-500 mb-4">Current: <span id="currentEmailDisplay" class="font-medium text-gray-700"></span></p>
-            <label class="block text-sm font-medium text-gray-700 mb-1">New Email Address</label>
-            <input type="email" id="newEmailInput" placeholder="new@example.com" class="mb-4">
-            <button onclick="sendEmailVerification()" id="sendCodeBtn" class="bg-blue-600 text-white w-full py-2.5 rounded-lg font-semibold hover:bg-blue-700">
-              Send Verification Code
-            </button>
+      <div id="tab-overview">
+        <h1 class="text-2xl font-bold text-white mb-8" style="font-family: 'Syne', sans-serif;">Overview</h1>
+        <div class="grid grid-cols-3 gap-6 mb-8">
+          <div class="bg-surface rounded-xl p-6 border border-border shadow-lg">
+            <p class="text-sm text-muted mb-2 font-medium">Total Users</p>
+            <p class="text-4xl font-bold text-accent" id="stat-users">—</p>
           </div>
-
-          <div id="emailStep2" class="hidden">
-            <p class="text-sm text-gray-600 mb-4">A 6-digit code was sent to <strong id="newEmailPreview"></strong>. Enter it below:</p>
-            <label class="block text-sm font-medium text-gray-700 mb-1">Verification Code</label>
-            <input type="text" id="verificationCodeInput" placeholder="123456" maxlength="6" class="mb-4 text-center text-xl tracking-widest font-bold">
-            <button onclick="verifyAndUpdateEmail()" class="bg-green-600 text-white w-full py-2.5 rounded-lg font-semibold hover:bg-green-700 mb-2">
-              Confirm Email Change
-            </button>
-            <button onclick="resetEmailStep()" class="text-gray-500 text-sm w-full text-center hover:text-gray-700">← Back</button>
+          <div class="bg-surface rounded-xl p-6 border border-border shadow-lg">
+            <p class="text-sm text-muted mb-2 font-medium">Total Courses</p>
+            <p class="text-4xl font-bold text-accent2" id="stat-courses">—</p>
+          </div>
+          <div class="bg-surface rounded-xl p-6 border border-border shadow-lg">
+            <p class="text-sm text-muted mb-2 font-medium">Enrollments</p>
+            <p class="text-4xl font-bold text-accent3" id="stat-enrollments">—</p>
           </div>
         </div>
 
-        <!-- Change Password -->
-        <div class="bg-white rounded-xl shadow-sm border p-6">
-          <h2 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <svg class="w-5 h-5 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-            Change Password
-          </h2>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Current Password</label>
-          <input type="password" id="currentPasswordInput" placeholder="••••••••" class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">New Password</label>
-          <input type="password" id="newPasswordInput" placeholder="••••••••" class="mb-4">
-          <label class="block text-sm font-medium text-gray-700 mb-1">Confirm New Password</label>
-          <input type="password" id="confirmPasswordInput" placeholder="••••••••" class="mb-4">
-          <button onclick="changePassword()" class="bg-blue-600 text-white w-full py-2.5 rounded-lg font-semibold hover:bg-blue-700">
-            Update Password
+        <div class="bg-surface rounded-xl border border-border shadow-lg p-6">
+          <h2 class="text-lg font-semibold text-white mb-6">Recent Registrations</h2>
+          <div id="recent-users-table"></div>
+        </div>
+      </div>
+
+      <div id="tab-users" class="hidden">
+        <div class="flex items-center justify-between mb-8">
+          <h1 class="text-2xl font-bold text-white" style="font-family: 'Syne', sans-serif;">User Accounts</h1>
+          <input type="text" id="userSearch" placeholder="Search users..." class="admin-input w-72" oninput="filterUsers()">
+        </div>
+
+        <div class="bg-surface rounded-xl border border-border overflow-hidden shadow-lg">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-surface2 text-muted border-b border-border">
+              <tr>
+                <th class="px-6 py-4 font-semibold">User</th>
+                <th class="px-6 py-4 font-semibold">Email</th>
+                <th class="px-6 py-4 font-semibold">Joined</th>
+                <th class="px-6 py-4 font-semibold">Status</th>
+                <th class="px-6 py-4 font-semibold">Courses</th>
+                <th class="px-6 py-4 font-semibold">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="usersTableBody" class="divide-y divide-border"></tbody>
+          </table>
+          <div id="usersEmpty" class="hidden text-center py-16 text-muted">No users found.</div>
+        </div>
+      </div>
+
+      <div id="tab-courses" class="hidden">
+        <div class="flex items-center justify-between mb-8">
+          <h1 class="text-2xl font-bold text-white" style="font-family: 'Syne', sans-serif;">Manage Courses</h1>
+          <button onclick="openAddCourse()" class="bg-gradient-to-r from-accent2 to-accent text-white px-6 py-2.5 rounded-lg font-bold hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            Add Course
+          </button>
+        </div>
+
+        <div id="coursesGrid" class="grid grid-cols-2 gap-8"></div>
+        <div id="coursesEmpty" class="hidden bg-surface rounded-xl border border-border p-16 text-center text-muted">
+          <p class="text-lg font-medium mb-2">No courses yet</p>
+          <p class="text-sm">Click "Add Course" to create your first course.</p>
+        </div>
+      </div>
+
+      <div id="tab-add-course" class="hidden">
+        <div class="bg-surface border border-border rounded-2xl p-8 max-w-4xl mx-auto shadow-2xl">
+          <h2 class="text-2xl font-bold mb-8" style="color: var(--gold); font-family: 'Syne', sans-serif;" id="courseFormTitle">Add New Course</h2>
+          
+          <input type="hidden" id="courseId">
+
+          <div class="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm text-white mb-2">Course Title</label>
+              <input type="text" id="courseTitle" placeholder="e.g., Full Stack Blockchain Development" class="admin-input">
+            </div>
+            <div>
+              <label class="block text-sm text-white mb-2">Category (Optional)</label>
+              <input type="text" id="courseCategory" placeholder="e.g., Tech/Crypto" class="admin-input">
+            </div>
+            
+            <div>
+              <label class="block text-sm text-white mb-2">Short Description</label>
+              <input type="text" id="courseDesc" placeholder="e.g., Short Description" class="admin-input">
+            </div>
+            <div>
+              <label class="block text-sm text-white mb-2">Duration (weeks)</label>
+              <input type="number" id="courseDuration" placeholder="1" class="admin-input">
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm text-white mb-2">Course Image (URL)</label>
+            <div class="flex items-center admin-input p-1">
+              <button class="bg-surface2 border border-border text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-bg transition-colors">Choose File</button>
+              <input type="text" id="courseThumbnail" placeholder=" Or paste image URL here..." class="bg-transparent border-none text-white outline-none ml-3 w-full text-sm">
+            </div>
+          </div>
+
+          <div class="mb-6">
+            <label class="block text-sm text-white mb-2">Video/Playlist URL</label>
+            <input type="url" id="courseVideo" placeholder="https://youtube.com/..." class="admin-input">
+          </div>
+
+          <div class="mb-6 flex items-center gap-3">
+            <input type="checkbox" id="courseActive" checked class="w-4 h-4 accent-gold">
+            <label class="text-sm font-medium text-white">Course is Active (Published)</label>
+          </div>
+
+          <div class="mb-8">
+            <label class="block text-sm text-white mb-2">Detailed Course Content</label>
+            <div class="border border-border rounded-lg overflow-hidden">
+              <div class="bg-surface2 px-4 py-3 flex items-center gap-5 border-b border-border text-muted text-sm">
+                <button class="hover:text-white font-bold">B</button>
+                <button class="hover:text-white italic">I</button>
+                <button class="hover:text-white underline">U</button>
+                <button class="hover:text-white line-through">S</button>
+                <button class="hover:text-white font-mono">&lt;/&gt;</button>
+                <button class="hover:text-white">🖌️</button>
+                <div class="w-px h-4 bg-border"></div>
+                <button class="hover:text-white">≡</button>
+                <button class="hover:text-white">⋎</button>
+                <div class="w-px h-4 bg-border"></div>
+                <button class="hover:text-white">≣</button>
+                <button class="hover:text-white">⋮</button>
+                <button class="hover:text-white">▶</button>
+                <button class="hover:text-white">🔗</button>
+                <button class="hover:text-white">🖼️</button>
+              </div>
+              <textarea id="courseContent" class="w-full bg-bg text-text p-4 h-48 outline-none resize-y placeholder-muted" placeholder="Detailed Course Content..."></textarea>
+            </div>
+          </div>
+
+          <button onclick="saveCourse()" class="btn-gold w-full py-4 rounded-lg text-sm tracking-wider">
+            ADD COURSE
           </button>
         </div>
       </div>
-    </div>
 
+      <div id="tab-profile" class="hidden">
+        <h1 class="text-2xl font-bold text-white mb-8" style="font-family: 'Syne', sans-serif;">Admin Profile</h1>
+
+        <div class="grid grid-cols-2 gap-8">
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+              Change Email
+            </h2>
+
+            <div id="emailStep1">
+              <p class="text-sm text-muted mb-6">Current: <span id="currentEmailDisplay" class="font-medium text-white"></span></p>
+              <label class="block text-sm font-medium text-white mb-2">New Email Address</label>
+              <input type="email" id="newEmailInput" placeholder="new@example.com" class="admin-input mb-6">
+              <button onclick="sendEmailVerification()" id="sendCodeBtn" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
+                Send Verification Code
+              </button>
+            </div>
+
+            <div id="emailStep2" class="hidden">
+              <p class="text-sm text-muted mb-6">A 6-digit code was sent to <strong id="newEmailPreview" class="text-white"></strong>.</p>
+              <label class="block text-sm font-medium text-white mb-2">Verification Code</label>
+              <input type="text" id="verificationCodeInput" placeholder="123456" maxlength="6" class="admin-input mb-6 text-center text-xl tracking-widest font-bold">
+              <button onclick="verifyAndUpdateEmail()" class="bg-green-500 text-bg w-full py-3 rounded-lg font-bold hover:bg-green-400 mb-4 transition-colors">
+                Confirm Email Change
+              </button>
+              <button onclick="resetEmailStep()" class="text-muted text-sm w-full text-center hover:text-white transition-colors">← Back</button>
+            </div>
+          </div>
+
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              Change Password
+            </h2>
+            <label class="block text-sm font-medium text-white mb-2">Current Password</label>
+            <input type="password" id="currentPasswordInput" placeholder="••••••••" class="admin-input mb-4">
+            
+            <label class="block text-sm font-medium text-white mb-2">New Password</label>
+            <input type="password" id="newPasswordInput" placeholder="••••••••" class="admin-input mb-4">
+            
+            <label class="block text-sm font-medium text-white mb-2">Confirm New Password</label>
+            <input type="password" id="confirmPasswordInput" placeholder="••••••••" class="admin-input mb-8">
+            
+            <button onclick="changePassword()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
+              Update Password
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </div>
   </main>
 </div>
 
-<!-- ══ GRANT ACCESS MODAL ══ -->
 <div class="modal-overlay" id="grantModal">
-  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-md mx-4">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-bold text-gray-800">Manage Course Access</h3>
-      <button onclick="closeGrantModal()" class="text-gray-400 hover:text-gray-600">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+  <div class="bg-surface rounded-xl shadow-2xl p-8 border border-border w-full max-w-md mx-4 relative">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold text-white" style="font-family: 'Syne', sans-serif;">Manage Course Access</h3>
+      <button onclick="closeGrantModal()" class="text-muted hover:text-white transition-colors">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
       </button>
     </div>
-    <p class="text-sm text-gray-500 mb-1">User:</p>
-    <p class="font-semibold text-gray-800 mb-4" id="grantModalUser"></p>
-    <p class="text-sm text-gray-600 mb-3">Select courses to grant access:</p>
-    <div id="grantCourseList" class="space-y-2 max-h-64 overflow-y-auto mb-4"></div>
-    <button onclick="saveAccess()" class="bg-blue-600 text-white w-full py-2.5 rounded-lg font-semibold hover:bg-blue-700">
+    <p class="text-sm text-muted mb-1">Granting access to:</p>
+    <p class="font-semibold text-accent mb-6" id="grantModalUser"></p>
+    <p class="text-sm text-white mb-3">Select courses:</p>
+    
+    <div id="grantCourseList" class="space-y-3 max-h-64 overflow-y-auto mb-6 pr-2"></div>
+    
+    <button onclick="saveAccess()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(123,92,255,0.4)] transition-all">
       Save Changes
     </button>
   </div>
 </div>
 
-<!-- ══ ADD/EDIT COURSE MODAL ══ -->
-<div class="modal-overlay" id="courseModal">
-  <div class="bg-white rounded-xl shadow-2xl p-6 w-full max-w-lg mx-4">
-    <div class="flex items-center justify-between mb-4">
-      <h3 class="text-lg font-bold text-gray-800" id="courseModalTitle">Add Course</h3>
-      <button onclick="closeCourseModal()" class="text-gray-400 hover:text-gray-600">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-    </div>
-    <input type="hidden" id="courseModalId">
-    <div class="space-y-4">
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Course Title *</label>
-        <input type="text" id="courseTitle" placeholder="e.g. Full-Stack Web Development">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-        <textarea id="courseDesc" rows="3" placeholder="What students will learn…" style="width:100%;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;resize:vertical;outline:none;" onfocus="this.style.borderColor='#2563eb'" onblur="this.style.borderColor='#d1d5db'"></textarea>
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Thumbnail URL</label>
-        <input type="url" id="courseThumbnail" placeholder="https://…">
-      </div>
-      <div>
-        <label class="block text-sm font-medium text-gray-700 mb-1">Video / Playlist URL</label>
-        <input type="url" id="courseVideo" placeholder="https://youtube.com/…">
-      </div>
-      <div class="flex items-center gap-3">
-        <input type="checkbox" id="courseActive" checked class="w-4 h-4 accent-blue-600">
-        <label for="courseActive" class="text-sm font-medium text-gray-700">Active (visible to users)</label>
-      </div>
-    </div>
-    <div class="flex gap-3 mt-6">
-      <button onclick="closeCourseModal()" class="flex-1 border border-gray-300 text-gray-700 py-2.5 rounded-lg font-semibold hover:bg-gray-50">Cancel</button>
-      <button onclick="saveCourse()" class="flex-1 bg-blue-600 text-white py-2.5 rounded-lg font-semibold hover:bg-blue-700">Save Course</button>
-    </div>
-  </div>
-</div>
-
-<!-- ══ TOAST ══ -->
 <div class="toast" id="toast"></div>
 
 <script>
@@ -280,7 +373,7 @@
 ──────────────────────────────────────────────────────── */
 let allUsers   = [];
 let allCourses = [];
-let grantTargetUser = null; // user currently being edited in grant modal
+let grantTargetUser = null; 
 let pendingEmailCode = null;
 let pendingNewEmail  = null;
 let adminEmail = '';
@@ -322,15 +415,12 @@ async function logout() {
    TAB NAVIGATION
 ──────────────────────────────────────────────────────── */
 function showTab(name) {
-  ['overview','users','courses','profile'].forEach(t => {
-    document.getElementById(`tab-${t}`).classList.add('hidden');
-    document.querySelector(`[data-tab="${t}"]`).classList.remove('active','bg-blue-600','text-white');
-    document.querySelector(`[data-tab="${t}"]`).classList.add('text-gray-700');
+  ['overview','users','courses','add-course','profile'].forEach(t => {
+    document.getElementById(`tab-${t}`)?.classList.add('hidden');
+    document.querySelector(`[data-tab="${t}"]`)?.classList.remove('active');
   });
-  document.getElementById(`tab-${name}`).classList.remove('hidden');
-  const btn = document.querySelector(`[data-tab="${name}"]`);
-  btn.classList.add('active');
-  btn.classList.remove('text-gray-700');
+  document.getElementById(`tab-${name}`)?.classList.remove('hidden');
+  document.querySelector(`[data-tab="${name}"]`)?.classList.add('active');
 }
 
 /* ────────────────────────────────────────────────────────
@@ -363,20 +453,20 @@ function renderOverview() {
 
   const recent = [...allUsers].slice(0, 5);
   document.getElementById('recent-users-table').innerHTML = recent.length === 0
-    ? '<p class="text-gray-400 text-sm">No users yet.</p>'
-    : `<table class="w-full text-sm">
-        <thead class="bg-gray-50 text-gray-500"><tr>
-          <th class="px-3 py-2 text-left">Username</th>
-          <th class="px-3 py-2 text-left">Email</th>
-          <th class="px-3 py-2 text-left">Joined</th>
-          <th class="px-3 py-2 text-left">Courses</th>
+    ? '<p class="text-muted text-sm text-center py-4">No users yet.</p>'
+    : `<table class="w-full text-sm text-left">
+        <thead class="text-muted border-b border-border"><tr>
+          <th class="px-4 py-3 font-medium">Username</th>
+          <th class="px-4 py-3 font-medium">Email</th>
+          <th class="px-4 py-3 font-medium">Joined</th>
+          <th class="px-4 py-3 font-medium">Courses</th>
         </tr></thead>
-        <tbody class="divide-y divide-gray-100">
+        <tbody class="divide-y divide-border">
           ${recent.map(u => `<tr>
-            <td class="px-3 py-2 font-medium">${esc(u.username)}</td>
-            <td class="px-3 py-2 text-gray-500">${esc(u.email)}</td>
-            <td class="px-3 py-2 text-gray-500">${fmtDate(u.created_at)}</td>
-            <td class="px-3 py-2"><span class="badge badge-blue">${u.courses?.length || 0}</span></td>
+            <td class="px-4 py-3 font-medium text-white">${esc(u.username)}</td>
+            <td class="px-4 py-3 text-muted">${esc(u.email)}</td>
+            <td class="px-4 py-3 text-muted">${fmtDate(u.created_at)}</td>
+            <td class="px-4 py-3"><span class="badge badge-blue">${u.courses?.length || 0}</span></td>
           </tr>`).join('')}
         </tbody>
       </table>`;
@@ -391,21 +481,21 @@ function renderUsersTable(list = allUsers) {
   if (list.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
   tbody.innerHTML = list.map(u => `
-    <tr class="hover:bg-gray-50">
-      <td class="px-4 py-3 font-medium">${esc(u.username)}</td>
-      <td class="px-4 py-3 text-gray-600">${esc(u.email)}</td>
-      <td class="px-4 py-3 text-gray-500">${fmtDate(u.created_at)}</td>
-      <td class="px-4 py-3">${u.verified
+    <tr class="hover:bg-surface2 transition-colors">
+      <td class="px-6 py-4 font-medium text-white">${esc(u.username)}</td>
+      <td class="px-6 py-4 text-muted">${esc(u.email)}</td>
+      <td class="px-6 py-4 text-muted">${fmtDate(u.created_at)}</td>
+      <td class="px-6 py-4">${u.verified
         ? '<span class="badge badge-green">Verified</span>'
         : '<span class="badge badge-gray">Unverified</span>'}</td>
-      <td class="px-4 py-3">
-        ${(u.courses || []).map(c => `<span class="badge badge-blue mr-1">${esc(c.title)}</span>`).join('')}
-        ${u.courses?.length === 0 ? '<span class="text-gray-400 text-xs">None</span>' : ''}
+      <td class="px-6 py-4">
+        ${(u.courses || []).map(c => `<span class="badge badge-blue mr-2 mb-1">${esc(c.title)}</span>`).join('')}
+        ${u.courses?.length === 0 ? '<span class="text-muted text-xs">None</span>' : ''}
       </td>
-      <td class="px-4 py-3">
+      <td class="px-6 py-4">
         <button onclick='openGrantModal(${JSON.stringify(u)})'
-          class="bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-blue-100">
-          Manage Access
+          class="border border-accent text-accent px-4 py-2 rounded-lg text-xs font-bold hover:bg-[rgba(0,229,255,0.1)] transition-colors">
+          MANAGE ACCESS
         </button>
       </td>
     </tr>`).join('');
@@ -427,13 +517,13 @@ function openGrantModal(user) {
 
   const grantedIds = new Set((user.courses || []).map(c => c.course_id));
   document.getElementById('grantCourseList').innerHTML = allCourses.length === 0
-    ? '<p class="text-gray-400 text-sm text-center py-4">No courses created yet.</p>'
+    ? '<p class="text-muted text-sm text-center py-4">No courses created yet.</p>'
     : allCourses.map(c => `
-      <label class="flex items-center gap-3 p-3 rounded-lg border hover:bg-blue-50 cursor-pointer ${grantedIds.has(c.id) ? 'bg-blue-50 border-blue-200' : 'border-gray-200'}">
-        <input type="checkbox" data-course-id="${c.id}" ${grantedIds.has(c.id) ? 'checked' : ''} class="w-4 h-4 accent-blue-600">
+      <label class="flex items-center gap-4 p-4 rounded-xl border transition-colors cursor-pointer ${grantedIds.has(c.id) ? 'bg-[rgba(0,229,255,0.05)] border-accent' : 'bg-bg border-border hover:border-muted'}">
+        <input type="checkbox" data-course-id="${c.id}" ${grantedIds.has(c.id) ? 'checked' : ''} class="w-5 h-5 accent-accent">
         <div>
-          <p class="font-medium text-sm text-gray-800">${esc(c.title)}</p>
-          <p class="text-xs text-gray-400">${esc(c.description?.slice(0,60) || '')}</p>
+          <p class="font-bold text-sm text-white">${esc(c.title)}</p>
+          <p class="text-xs text-muted mt-1">${esc(c.description?.slice(0,60) || '')}</p>
         </div>
       </label>`).join('');
 
@@ -482,78 +572,112 @@ function renderCoursesGrid() {
   if (allCourses.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
   grid.innerHTML = allCourses.map(c => `
-    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+    <div class="bg-surface rounded-xl shadow-lg border border-border overflow-hidden transition-transform hover:-translate-y-1 hover:border-[rgba(0,229,255,0.3)]">
       ${c.thumbnail_url
-        ? `<img src="${esc(c.thumbnail_url)}" class="w-full h-36 object-cover" alt="" onerror="this.style.display='none'">`
-        : `<div class="w-full h-36 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-             <span class="text-white font-bold text-lg">${esc(c.title.charAt(0))}</span>
+        ? `<img src="${esc(c.thumbnail_url)}" class="w-full h-40 object-cover" alt="" onerror="this.style.display='none'">`
+        : `<div class="w-full h-40 bg-gradient-to-br from-surface2 to-bg flex items-center justify-center border-b border-border">
+             <span class="text-accent2 font-bold text-3xl opacity-50">${esc(c.title.charAt(0))}</span>
            </div>`}
-      <div class="p-4">
-        <div class="flex items-start justify-between gap-2 mb-1">
-          <h3 class="font-bold text-gray-800">${esc(c.title)}</h3>
+      <div class="p-6">
+        <div class="flex items-start justify-between gap-3 mb-2">
+          <h3 class="font-bold text-white text-lg leading-tight" style="font-family:'Syne',sans-serif">${esc(c.title)}</h3>
           <span class="badge ${c.is_active ? 'badge-green' : 'badge-gray'} shrink-0">${c.is_active ? 'Active' : 'Draft'}</span>
         </div>
-        <p class="text-sm text-gray-500 mb-3 line-clamp-2">${esc(c.description || 'No description')}</p>
-        <div class="flex items-center justify-between text-xs text-gray-400 mb-3">
-          <span>${c.enrolled_count || 0} enrolled</span>
-          <span>${fmtDate(c.created_at)}</span>
+        <p class="text-sm text-muted mb-5 line-clamp-2">${esc(c.description || 'No description provided.')}</p>
+        <div class="flex items-center justify-between text-xs font-bold text-muted uppercase tracking-wider mb-5">
+          <span>👥 ${c.enrolled_count || 0} enrolled</span>
+          <span>📅 ${fmtDate(c.created_at)}</span>
         </div>
-        <div class="flex gap-2">
-          <button onclick='openCourseModal(${JSON.stringify(c)})' class="flex-1 border border-gray-200 text-gray-700 py-1.5 rounded-lg text-sm font-medium hover:bg-gray-50">Edit</button>
-          <button onclick="deleteCourse(${c.id})" class="flex-1 border border-red-200 text-red-600 py-1.5 rounded-lg text-sm font-medium hover:bg-red-50">Delete</button>
+        <div class="flex gap-3">
+          <button onclick='openEditCourse(${JSON.stringify(c)})' class="flex-1 bg-surface2 border border-border text-white py-2 rounded-lg text-sm font-bold hover:bg-border transition-colors">EDIT</button>
+          <button onclick="deleteCourse(${c.id})" class="flex-1 bg-[rgba(255,77,141,0.1)] border border-[rgba(255,77,141,0.3)] text-accent3 py-2 rounded-lg text-sm font-bold hover:bg-[rgba(255,77,141,0.2)] transition-colors">DELETE</button>
         </div>
       </div>
     </div>`).join('');
 }
 
 /* ────────────────────────────────────────────────────────
-   COURSE MODAL
+   ADD / EDIT COURSE FORM (Replaces Modal)
 ──────────────────────────────────────────────────────── */
-function openCourseModal(course = null) {
-  document.getElementById('courseModalTitle').textContent = course ? 'Edit Course' : 'Add Course';
-  document.getElementById('courseModalId').value       = course?.id || '';
-  document.getElementById('courseTitle').value         = course?.title || '';
-  document.getElementById('courseDesc').value          = course?.description || '';
-  document.getElementById('courseThumbnail').value     = course?.thumbnail_url || '';
-  document.getElementById('courseVideo').value         = course?.video_url || '';
-  document.getElementById('courseActive').checked      = course ? course.is_active : true;
-  document.getElementById('courseModal').classList.add('open');
+function openAddCourse() {
+  document.getElementById('courseFormTitle').textContent = 'Add New Course';
+  document.getElementById('courseId').value         = '';
+  document.getElementById('courseTitle').value      = '';
+  document.getElementById('courseDesc').value       = '';
+  document.getElementById('courseCategory').value   = '';
+  document.getElementById('courseDuration').value   = '';
+  document.getElementById('courseThumbnail').value  = '';
+  document.getElementById('courseVideo').value      = '';
+  document.getElementById('courseContent').value    = '';
+  document.getElementById('courseActive').checked   = true;
+  
+  showTab('add-course');
+  // Update button text
+  document.querySelector('#tab-add-course .btn-gold').textContent = "ADD COURSE";
 }
 
-function closeCourseModal() { document.getElementById('courseModal').classList.remove('open'); }
+function openEditCourse(course) {
+  document.getElementById('courseFormTitle').textContent = 'Edit Course';
+  document.getElementById('courseId').value         = course.id;
+  document.getElementById('courseTitle').value      = course.title || '';
+  document.getElementById('courseDesc').value       = course.description || '';
+  document.getElementById('courseThumbnail').value  = course.thumbnail_url || '';
+  document.getElementById('courseVideo').value      = course.video_url || '';
+  
+  // The DB schema stores rich content in 'modules', map it to courseContent
+  let contentStr = '';
+  try { contentStr = JSON.parse(course.modules); } 
+  catch(e) { contentStr = course.modules || ''; }
+  document.getElementById('courseContent').value    = typeof contentStr === 'string' ? contentStr : JSON.stringify(contentStr);
+  
+  document.getElementById('courseActive').checked   = course.is_active;
+  
+  showTab('add-course');
+  document.querySelector('#tab-add-course .btn-gold').textContent = "SAVE CHANGES";
+}
 
 async function saveCourse() {
-  const id    = document.getElementById('courseModalId').value;
+  const id    = document.getElementById('courseId').value;
   const title = document.getElementById('courseTitle').value.trim();
-  if (!title) { showToast('Title is required', 'error'); return; }
+  if (!title) { showToast('Course Title is required', 'error'); return; }
 
   const body = {
     title,
     description:   document.getElementById('courseDesc').value,
     thumbnail_url: document.getElementById('courseThumbnail').value,
     video_url:     document.getElementById('courseVideo').value,
+    modules:       document.getElementById('courseContent').value, // Mapping detailed content to 'modules'
     is_active:     document.getElementById('courseActive').checked,
   };
   if (id) body.id = parseInt(id);
+
+  const btn = document.querySelector('#tab-add-course .btn-gold');
+  const originalText = btn.textContent;
+  btn.textContent = "SAVING...";
+  btn.disabled = true;
 
   const res  = await fetch('/api/admin/courses', {
     method: id ? 'PUT' : 'POST', credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body)
   });
+  
+  btn.textContent = originalText;
+  btn.disabled = false;
+  
   const data = await res.json();
   if (data.success) {
     showToast(id ? 'Course updated!' : 'Course created!', 'success');
-    closeCourseModal();
     await loadCourses();
     renderOverview();
+    showTab('courses'); // Go back to course list
   } else {
     showToast(data.error || 'Failed to save course', 'error');
   }
 }
 
 async function deleteCourse(id) {
-  if (!confirm('Delete this course? This will also remove all user access.')) return;
+  if (!confirm('Are you sure you want to delete this course? This will remove access for all enrolled users.')) return;
   const res  = await fetch('/api/admin/courses', {
     method: 'DELETE', credentials: 'include',
     headers: { 'Content-Type': 'application/json' },
@@ -561,11 +685,11 @@ async function deleteCourse(id) {
   });
   const data = await res.json();
   if (data.success) {
-    showToast('Course deleted', 'success');
+    showToast('Course deleted successfully', 'success');
     await loadCourses();
     renderOverview();
   } else {
-    showToast(data.error || 'Delete failed', 'error');
+    showToast(data.error || 'Failed to delete course', 'error');
   }
 }
 
@@ -583,7 +707,7 @@ async function sendEmailVerification() {
   pendingNewEmail  = newEmail;
 
   const btn = document.getElementById('sendCodeBtn');
-  btn.textContent = 'Sending…';
+  btn.textContent = 'Sending...';
   btn.disabled = true;
 
   try {
@@ -591,7 +715,7 @@ async function sendEmailVerification() {
       to_email:        newEmail,
       to_name:         'Admin',
       verification_code: pendingEmailCode,
-      message:         `Your NonAcademy admin email verification code is: ${pendingEmailCode}`
+      message:         `Your DecentraForce admin email verification code is: ${pendingEmailCode}`
     });
 
     document.getElementById('newEmailPreview').textContent = newEmail;
@@ -627,8 +751,6 @@ async function verifyAndUpdateEmail() {
     document.getElementById('currentEmailDisplay').textContent = adminEmail;
     showToast('Email updated successfully!', 'success');
     resetEmailStep();
-    pendingEmailCode = null;
-    pendingNewEmail  = null;
   } else {
     showToast(data.error || 'Failed to update email', 'error');
   }
