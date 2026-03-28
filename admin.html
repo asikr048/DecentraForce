@@ -4,31 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Panel — DecentraForce</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1630'/><rect width='100' height='100' rx='20' fill='url(%23g)' opacity='0.2'/><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%237b5cff'/><stop offset='100%' stop-color='%2300e5ff'/></linearGradient></defs><text x='50' y='68' font-family='Arial, sans-serif' font-size='54' font-weight='900' fill='%2300e5ff' text-anchor='middle'>DF</text></svg>">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <script>
-  // ⚠️ Replace these with your EmailJS credentials if needed
-  const EMAILJS_SERVICE_ID  = 'service_wn7dn1f';
-  const EMAILJS_TEMPLATE_ID = 'template_2067o6n';
-  const EMAILJS_PUBLIC_KEY  = 'TxlilKkHJZDum1C5v';
-
-  (function() { emailjs.init(EMAILJS_PUBLIC_KEY); })();
-
   tailwind.config = {
     theme: {
       extend: {
         colors: {
-          bg: '#050a18',
-          surface: '#0d1630',
-          surface2: '#111d3a',
-          accent: '#00e5ff',
-          accent2: '#7b5cff',
-          accent3: '#ff4d8d',
-          text: '#e8eeff',
-          muted: '#7d8fb3',
-          border: 'rgba(0, 229, 255, 0.12)',
-          gold: '#d4af37',
+          bg: '#050a18', surface: '#0d1630', surface2: '#111d3a',
+          accent: '#00e5ff', accent2: '#7b5cff', accent3: '#ff4d8d',
+          text: '#e8eeff', muted: '#7d8fb3', border: 'rgba(0, 229, 255, 0.12)', gold: '#d4af37',
         }
       }
     }
@@ -36,61 +23,25 @@
 </script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background-color: #050a18;
-    color: #e8eeff;
-    overflow-x: hidden;
-  }
-
-  /* Admin Nav Tabs */
+  body { font-family: 'DM Sans', sans-serif; background-color: #050a18; color: #e8eeff; overflow-x: hidden; }
   .tab-btn { transition: all .2s; border-left: 3px solid transparent; }
-  .tab-btn.active { 
-    background: rgba(0, 229, 255, 0.08); 
-    color: #00e5ff; 
-    border-left: 3px solid #00e5ff;
-  }
+  .tab-btn.active { background: rgba(0, 229, 255, 0.08); color: #00e5ff; border-left: 3px solid #00e5ff; }
   .tab-btn:hover:not(.active) { background: #111d3a; color: #fff; }
-
-  /* Forms & Inputs */
-  .admin-input {
-    width: 100%; padding: 12px 16px; 
-    background: #050a18; border: 1px solid rgba(0, 229, 255, 0.12); 
-    border-radius: 8px; color: #e8eeff; font-size: 0.95rem; 
-    outline: none; transition: border-color .2s;
-  }
+  .admin-input { width: 100%; padding: 12px 16px; background: #050a18; border: 1px solid rgba(0, 229, 255, 0.12); border-radius: 8px; color: #e8eeff; font-size: 0.95rem; outline: none; transition: border-color .2s; }
   .admin-input:focus { border-color: #d4af37; box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1); }
   .admin-input::placeholder { color: #7d8fb3; opacity: 0.6; }
-
-  /* Buttons */
-  .btn-gold {
-    background: linear-gradient(180deg, #f3e5ab 0%, #d4af37 100%);
-    color: #050a18;
-    font-weight: 700;
-    transition: all 0.2s;
-    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2);
-  }
-  .btn-gold:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3);
-  }
-
-  /* Modals & Toasts */
+  .btn-gold { background: linear-gradient(180deg, #f3e5ab 0%, #d4af37 100%); color: #050a18; font-weight: 700; transition: all 0.2s; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.2); }
+  .btn-gold:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(212, 175, 55, 0.3); }
   .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); backdrop-filter: blur(4px); z-index:50; align-items:center; justify-content:center; }
   .modal-overlay.open { display:flex; }
   .toast { position:fixed; bottom:24px; right:24px; padding:14px 24px; border-radius:8px; font-weight:600; z-index:200; opacity:0; transform:translateY(10px); transition:all .3s; }
   .toast.show { opacity:1; transform:translateY(0); }
   .toast.success { background:#00e599; color:#050a18; }
   .toast.error   { background:#ff4d8d; color:#fff; }
-
-  /* Badges */
   .badge { display:inline-block; padding:4px 10px; border-radius:9999px; font-size:.75rem; font-weight:600; }
   .badge-green { background:rgba(0, 229, 153, 0.15); color:#00e599; border: 1px solid rgba(0, 229, 153, 0.3); }
   .badge-gray  { background:rgba(125, 143, 179, 0.1); color:#7d8fb3; border: 1px solid rgba(125, 143, 179, 0.3); }
   .badge-blue  { background:rgba(0, 229, 255, 0.15); color:#00e5ff; border: 1px solid rgba(0, 229, 255, 0.3); }
-
-  /* Custom Scrollbar */
   ::-webkit-scrollbar { width: 8px; }
   ::-webkit-scrollbar-track { background: #050a18; }
   ::-webkit-scrollbar-thumb { background: #111d3a; border-radius: 4px; }
@@ -115,29 +66,26 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
         DASHBOARD
       </button>
-      <button onclick="showTab('courses')" class="tab-btn w-full text-left flex items-center justify-between px-6 py-3 text-muted font-medium" data-tab="courses">
-        <div class="flex items-center gap-4">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
-          MANAGE COURSES
-        </div>
+      <button onclick="showTab('courses')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="courses">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+        MANAGE COURSES
       </button>
       <button onclick="showTab('users')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="users">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         USERS
       </button>
+      <button onclick="showTab('coupons')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="coupons">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/></svg>
+        COUPONS
+      </button>
       <button onclick="openAddCourse()" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="add-course">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
         ADD NEW COURSE
-      </button>
-      <button onclick="showTab('profile')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="profile">
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-        SETTINGS
       </button>
     </nav>
   </aside>
 
   <main class="ml-64 flex-1 flex flex-col h-screen overflow-y-auto bg-bg">
-    
     <header class="flex justify-end items-center px-8 py-5 border-b border-border bg-surface sticky top-0 z-10">
       <div class="flex items-center gap-6">
         <div class="flex items-center gap-3">
@@ -169,11 +117,6 @@
             <p class="text-4xl font-bold text-accent3" id="stat-enrollments">—</p>
           </div>
         </div>
-
-        <div class="bg-surface rounded-xl border border-border shadow-lg p-6">
-          <h2 class="text-lg font-semibold text-white mb-6">Recent Registrations</h2>
-          <div id="recent-users-table"></div>
-        </div>
       </div>
 
       <div id="tab-users" class="hidden">
@@ -181,7 +124,6 @@
           <h1 class="text-2xl font-bold text-white" style="font-family: 'Syne', sans-serif;">User Accounts</h1>
           <input type="text" id="userSearch" placeholder="Search users..." class="admin-input w-72" oninput="filterUsers()">
         </div>
-
         <div class="bg-surface rounded-xl border border-border overflow-hidden shadow-lg">
           <table class="w-full text-sm text-left">
             <thead class="bg-surface2 text-muted border-b border-border">
@@ -189,14 +131,46 @@
                 <th class="px-6 py-4 font-semibold">User</th>
                 <th class="px-6 py-4 font-semibold">Email</th>
                 <th class="px-6 py-4 font-semibold">Joined</th>
-                <th class="px-6 py-4 font-semibold">Status</th>
                 <th class="px-6 py-4 font-semibold">Courses</th>
                 <th class="px-6 py-4 font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody id="usersTableBody" class="divide-y divide-border"></tbody>
           </table>
-          <div id="usersEmpty" class="hidden text-center py-16 text-muted">No users found.</div>
+        </div>
+      </div>
+
+      <div id="tab-coupons" class="hidden">
+        <div class="flex items-center justify-between mb-8">
+          <h1 class="text-2xl font-bold text-white" style="font-family: 'Syne', sans-serif;">Manage Coupons</h1>
+        </div>
+        
+        <div class="bg-surface border border-border rounded-xl p-6 mb-8 shadow-lg flex gap-4 items-end">
+          <div class="flex-1">
+            <label class="block text-sm text-white mb-2">Coupon Code (e.g., EID50)</label>
+            <input type="text" id="newCouponCode" class="admin-input uppercase" placeholder="Enter Code">
+          </div>
+          <div class="flex-1">
+            <label class="block text-sm text-white mb-2">Discount Percentage (%)</label>
+            <input type="number" id="newCouponDiscount" class="admin-input" placeholder="e.g., 50" min="1" max="100">
+          </div>
+          <button onclick="createCoupon()" class="bg-gradient-to-r from-accent2 to-accent text-white px-8 py-3 rounded-lg font-bold hover:shadow-[0_0_20px_rgba(0,229,255,0.4)] transition-all">
+            + Create Coupon
+          </button>
+        </div>
+
+        <div class="bg-surface rounded-xl border border-border overflow-hidden shadow-lg">
+          <table class="w-full text-sm text-left">
+            <thead class="bg-surface2 text-muted border-b border-border">
+              <tr>
+                <th class="px-6 py-4 font-semibold">Code</th>
+                <th class="px-6 py-4 font-semibold">Discount</th>
+                <th class="px-6 py-4 font-semibold">Created Date</th>
+                <th class="px-6 py-4 font-semibold">Action</th>
+              </tr>
+            </thead>
+            <tbody id="couponsTableBody" class="divide-y divide-border"></tbody>
+          </table>
         </div>
       </div>
 
@@ -208,12 +182,7 @@
             Add Course
           </button>
         </div>
-
         <div id="coursesGrid" class="grid grid-cols-2 gap-8"></div>
-        <div id="coursesEmpty" class="hidden bg-surface rounded-xl border border-border p-16 text-center text-muted">
-          <p class="text-lg font-medium mb-2">No courses yet</p>
-          <p class="text-sm">Click "Add Course" to create your first course.</p>
-        </div>
       </div>
 
       <div id="tab-add-course" class="hidden">
@@ -228,17 +197,16 @@
               <input type="text" id="courseTitle" placeholder="e.g., Fullstack Blockchain Development" class="admin-input">
             </div>
             <div>
-              <label class="block text-sm text-white mb-2">Category (Optional)</label>
-              <input type="text" id="courseCategory" placeholder="e.g., Tech/Crypto" class="admin-input">
-            </div>
-            
-            <div>
               <label class="block text-sm text-white mb-2">Short Description</label>
               <input type="text" id="courseDesc" placeholder="Brief summary of the course..." class="admin-input">
             </div>
             <div>
-              <label class="block text-sm text-white mb-2">Duration (weeks)</label>
-              <input type="number" id="courseDuration" placeholder="1" class="admin-input">
+              <label class="block text-sm text-white mb-2">Course Price (৳)</label>
+              <input type="number" id="coursePrice" placeholder="e.g., 4500" class="admin-input">
+            </div>
+            <div>
+              <label class="block text-sm text-white mb-2">WhatsApp Group Link</label>
+              <input type="url" id="courseWaLink" placeholder="https://chat.whatsapp.com/..." class="admin-input">
             </div>
           </div>
 
@@ -261,9 +229,7 @@
             <label class="block text-sm text-white mb-2">Course Thumbnail</label>
             <div class="flex flex-col gap-3">
               <div class="flex items-center admin-input p-1">
-                <label for="imageUploadInput" class="bg-surface2 border border-border text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-bg transition-colors cursor-pointer">
-                  Upload Image
-                </label>
+                <label for="imageUploadInput" class="bg-surface2 border border-border text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-bg transition-colors cursor-pointer">Upload Image</label>
                 <input type="file" id="imageUploadInput" accept="image/*" class="hidden">
                 <input type="text" id="courseThumbnail" placeholder=" Or paste image URL here..." class="bg-transparent border-none text-white outline-none ml-3 w-full text-sm">
               </div>
@@ -273,38 +239,15 @@
             </div>
           </div>
 
-          <div class="mb-6">
-            <label class="block text-sm text-white mb-2">Promo Video URL (Optional)</label>
-            <input type="url" id="courseVideo" placeholder="https://youtube.com/..." class="admin-input">
-          </div>
-
           <div class="mb-8">
             <div class="flex items-center justify-between mb-3">
               <label class="block text-sm text-white font-bold">Course Curriculum Builder</label>
               <button type="button" onclick="addModuleUI()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                Add Module
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg> Add Module
               </button>
             </div>
             <div class="p-5 border border-border rounded-xl bg-bg" id="curriculumBuilder">
-              <p class="text-muted text-sm text-center py-4 empty-curriculum-msg">No modules added yet. Click "Add Module" to start building your curriculum.</p>
-            </div>
-          </div>
-
-          <div class="mb-8">
-            <label class="block text-sm text-white mb-2">Course Overview Details (Rich Text)</label>
-            <div class="border border-border rounded-lg overflow-hidden">
-              <div class="bg-surface2 px-4 py-3 flex items-center gap-5 border-b border-border text-muted text-sm">
-                <button type="button" class="hover:text-white font-bold">B</button>
-                <button type="button" class="hover:text-white italic">I</button>
-                <button type="button" class="hover:text-white underline">U</button>
-                <button type="button" class="hover:text-white line-through">S</button>
-                <button type="button" class="hover:text-white font-mono">&lt;/&gt;</button>
-                <div class="w-px h-4 bg-border"></div>
-                <button type="button" class="hover:text-white">≡</button>
-                <button type="button" class="hover:text-white">⋎</button>
-              </div>
-              <textarea id="courseContent" class="w-full bg-bg text-text p-4 h-40 outline-none resize-y placeholder-muted" placeholder="Write a detailed course overview..."></textarea>
+              <p class="text-muted text-sm text-center py-4 empty-curriculum-msg">No modules added yet. Click "Add Module" to start building.</p>
             </div>
           </div>
 
@@ -319,132 +262,23 @@
         </div>
       </div>
 
-      <div id="tab-profile" class="hidden">
-        <h1 class="text-2xl font-bold text-white mb-8" style="font-family: 'Syne', sans-serif;">Admin Profile</h1>
-
-        <div class="grid grid-cols-2 gap-8">
-          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
-            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
-              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
-              Change Email
-            </h2>
-
-            <div id="emailStep1">
-              <p class="text-sm text-muted mb-6">Current: <span id="currentEmailDisplay" class="font-medium text-white"></span></p>
-              <label class="block text-sm font-medium text-white mb-2">New Email Address</label>
-              <input type="email" id="newEmailInput" placeholder="new@example.com" class="admin-input mb-6">
-              <button onclick="sendEmailVerification()" id="sendCodeBtn" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
-                Send Verification Code
-              </button>
-            </div>
-
-            <div id="emailStep2" class="hidden">
-              <p class="text-sm text-muted mb-6">A 6-digit code was sent to <strong id="newEmailPreview" class="text-white"></strong>.</p>
-              <label class="block text-sm font-medium text-white mb-2">Verification Code</label>
-              <input type="text" id="verificationCodeInput" placeholder="123456" maxlength="6" class="admin-input mb-6 text-center text-xl tracking-widest font-bold">
-              <button onclick="verifyAndUpdateEmail()" class="bg-green-500 text-bg w-full py-3 rounded-lg font-bold hover:bg-green-400 mb-4 transition-colors">
-                Confirm Email Change
-              </button>
-              <button onclick="resetEmailStep()" class="text-muted text-sm w-full text-center hover:text-white transition-colors">← Back</button>
-            </div>
-          </div>
-
-          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
-            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
-              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-              Change Password
-            </h2>
-            <label class="block text-sm font-medium text-white mb-2">Current Password</label>
-            <input type="password" id="currentPasswordInput" placeholder="••••••••" class="admin-input mb-4">
-            
-            <label class="block text-sm font-medium text-white mb-2">New Password</label>
-            <input type="password" id="newPasswordInput" placeholder="••••••••" class="admin-input mb-4">
-            
-            <label class="block text-sm font-medium text-white mb-2">Confirm New Password</label>
-            <input type="password" id="confirmPasswordInput" placeholder="••••••••" class="admin-input mb-8">
-            
-            <button onclick="changePassword()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
-              Update Password
-            </button>
-          </div>
-        </div>
-      </div>
-
     </div>
   </main>
-</div>
-
-<div class="modal-overlay" id="grantModal">
-  <div class="bg-surface rounded-xl shadow-2xl p-8 border border-border w-full max-w-md mx-4 relative">
-    <div class="flex items-center justify-between mb-6">
-      <h3 class="text-xl font-bold text-white" style="font-family: 'Syne', sans-serif;">Manage Course Access</h3>
-      <button onclick="closeGrantModal()" class="text-muted hover:text-white transition-colors">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
-      </button>
-    </div>
-    <p class="text-sm text-muted mb-1">Granting access to:</p>
-    <p class="font-semibold text-accent mb-6" id="grantModalUser"></p>
-    <p class="text-sm text-white mb-3">Select courses:</p>
-    
-    <div id="grantCourseList" class="space-y-3 max-h-64 overflow-y-auto mb-6 pr-2"></div>
-    
-    <button onclick="saveAccess()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(123,92,255,0.4)] transition-all">
-      Save Changes
-    </button>
-  </div>
 </div>
 
 <div class="toast" id="toast"></div>
 
 <script>
-/* ────────────────────────────────────────────────────────
-   STATE
-──────────────────────────────────────────────────────── */
-let allUsers   = [];
-let allCourses = [];
-let grantTargetUser = null; 
-let pendingEmailCode = null;
-let pendingNewEmail  = null;
-let adminEmail = '';
+let allUsers = []; let allCourses = []; let allCoupons = [];
 
-/* ────────────────────────────────────────────────────────
-   INIT
-──────────────────────────────────────────────────────── */
 document.addEventListener('DOMContentLoaded', async () => {
-  const ok = await checkAdminAuth();
-  if (!ok) return;
-  await Promise.all([loadUsers(), loadCourses()]);
-  renderOverview();
+  await loadUsers(); await loadCourses(); await loadCoupons(); renderOverview();
 });
 
-async function checkAdminAuth() {
-  try {
-    const res  = await fetch('/api/auth/verify', { credentials: 'include' });
-    const data = await res.json();
-    if (!data.success || !data.loggedIn || !data.user?.isAdmin) {
-      window.location.href = 'login.html';
-      return false;
-    }
-    adminEmail = data.user.email;
-    document.getElementById('adminEmailDisplay').textContent = adminEmail;
-    document.getElementById('currentEmailDisplay').textContent = adminEmail;
-    return true;
-  } catch {
-    window.location.href = 'login.html';
-    return false;
-  }
-}
+async function logout() { await fetch('/api/auth/logout', { method: 'POST' }); window.location.href = 'login.html'; }
 
-async function logout() {
-  await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-  window.location.href = 'login.html';
-}
-
-/* ────────────────────────────────────────────────────────
-   TAB NAVIGATION
-──────────────────────────────────────────────────────── */
 function showTab(name) {
-  ['overview','users','courses','add-course','profile'].forEach(t => {
+  ['overview','users','courses','add-course','coupons'].forEach(t => {
     document.getElementById(`tab-${t}`)?.classList.add('hidden');
     document.querySelector(`[data-tab="${t}"]`)?.classList.remove('active');
   });
@@ -452,545 +286,219 @@ function showTab(name) {
   document.querySelector(`[data-tab="${name}"]`)?.classList.add('active');
 }
 
-/* ────────────────────────────────────────────────────────
-   LOAD DATA
-──────────────────────────────────────────────────────── */
 async function loadUsers() {
-  try {
-    const res  = await fetch('/api/admin/users', { credentials: 'include' });
-    const data = await res.json();
-    if (data.success) { allUsers = data.users; renderUsersTable(); }
-  } catch { showToast('Failed to load users', 'error'); }
+  const res = await fetch('/api/admin/users', { credentials: 'include' });
+  const data = await res.json(); if(data.success) { allUsers = data.users; renderUsersTable(); }
 }
-
 async function loadCourses() {
+  const res = await fetch('/api/admin/courses', { credentials: 'include' });
+  const data = await res.json(); if(data.success) { allCourses = data.courses; renderCoursesGrid(); }
+}
+async function loadCoupons() {
   try {
-    const res  = await fetch('/api/admin/courses', { credentials: 'include' });
-    const data = await res.json();
-    if (data.success) { allCourses = data.courses; renderCoursesGrid(); }
-  } catch { showToast('Failed to load courses', 'error'); }
+    const res = await fetch('/api/admin/coupons', { credentials: 'include' });
+    const data = await res.json(); 
+    if(data.success) { allCoupons = data.coupons; renderCouponsTable(); }
+  } catch(e) {}
 }
 
-/* ────────────────────────────────────────────────────────
-   IMAGE COMPRESSION UPLOAD LOGIC
-──────────────────────────────────────────────────────── */
-document.getElementById('imageUploadInput').addEventListener('change', function(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(event) {
-    const img = new Image();
-    img.onload = function() {
-      // Compress the image before uploading to prevent Vercel limits
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const maxWidth = 800;
-      let width = img.width;
-      let height = img.height;
-      
-      if (width > maxWidth) {
-        height = Math.round((height * maxWidth) / width);
-        width = maxWidth;
-      }
-      
-      canvas.width = width;
-      canvas.height = height;
-      ctx.drawImage(img, 0, 0, width, height);
-      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
-      
-      document.getElementById('courseThumbnail').value = compressedBase64;
-      document.getElementById('imagePreview').src = compressedBase64;
-      document.getElementById('imagePreviewContainer').classList.remove('hidden');
-      showToast('Image compressed & uploaded successfully!', 'success');
-    };
-    img.src = event.target.result;
-  };
-  reader.readAsDataURL(file);
-});
-
-document.getElementById('courseThumbnail').addEventListener('input', function(e) {
-  if(e.target.value) {
-    document.getElementById('imagePreview').src = e.target.value;
-    document.getElementById('imagePreviewContainer').classList.remove('hidden');
-  } else {
-    document.getElementById('imagePreviewContainer').classList.add('hidden');
-  }
-});
-
-/* ────────────────────────────────────────────────────────
-   OVERVIEW & USERS TABLES
-──────────────────────────────────────────────────────── */
 function renderOverview() {
-  document.getElementById('stat-users').textContent     = allUsers.length;
-  document.getElementById('stat-courses').textContent   = allCourses.length;
-  const enrollments = allUsers.reduce((s, u) => s + (u.courses?.length || 0), 0);
-  document.getElementById('stat-enrollments').textContent = enrollments;
-
-  const recent = [...allUsers].slice(0, 5);
-  document.getElementById('recent-users-table').innerHTML = recent.length === 0
-    ? '<p class="text-muted text-sm text-center py-4">No users yet.</p>'
-    : `<table class="w-full text-sm text-left">
-        <thead class="text-muted border-b border-border"><tr>
-          <th class="px-4 py-3 font-medium">Username</th>
-          <th class="px-4 py-3 font-medium">Email</th>
-          <th class="px-4 py-3 font-medium">Joined</th>
-          <th class="px-4 py-3 font-medium">Courses</th>
-        </tr></thead>
-        <tbody class="divide-y divide-border">
-          ${recent.map(u => `<tr>
-            <td class="px-4 py-3 font-medium text-white">${esc(u.username)}</td>
-            <td class="px-4 py-3 text-muted">${esc(u.email)}</td>
-            <td class="px-4 py-3 text-muted">${fmtDate(u.created_at)}</td>
-            <td class="px-4 py-3"><span class="badge badge-blue">${u.courses?.length || 0}</span></td>
-          </tr>`).join('')}
-        </tbody>
-      </table>`;
+  document.getElementById('stat-users').textContent = allUsers.length;
+  document.getElementById('stat-courses').textContent = allCourses.length;
 }
 
-function renderUsersTable(list = allUsers) {
+function renderUsersTable() {
   const tbody = document.getElementById('usersTableBody');
-  const empty = document.getElementById('usersEmpty');
-  if (list.length === 0) { tbody.innerHTML = ''; empty.classList.remove('hidden'); return; }
-  empty.classList.add('hidden');
-  tbody.innerHTML = list.map(u => `
+  tbody.innerHTML = allUsers.map(u => `
     <tr class="hover:bg-surface2 transition-colors">
       <td class="px-6 py-4 font-medium text-white">${esc(u.username)}</td>
       <td class="px-6 py-4 text-muted">${esc(u.email)}</td>
       <td class="px-6 py-4 text-muted">${fmtDate(u.created_at)}</td>
-      <td class="px-6 py-4">${u.verified
-        ? '<span class="badge badge-green">Verified</span>'
-        : '<span class="badge badge-gray">Unverified</span>'}</td>
-      <td class="px-6 py-4">
-        ${(u.courses || []).map(c => `<span class="badge badge-blue mr-2 mb-1">${esc(c.title)}</span>`).join('')}
-        ${u.courses?.length === 0 ? '<span class="text-muted text-xs">None</span>' : ''}
-      </td>
-      <td class="px-6 py-4">
-        <button onclick='openGrantModal(${JSON.stringify(u)})'
-          class="border border-accent text-accent px-4 py-2 rounded-lg text-xs font-bold hover:bg-[rgba(0,229,255,0.1)] transition-colors">
-          MANAGE ACCESS
-        </button>
-      </td>
+      <td class="px-6 py-4">${(u.courses || []).map(c => `<span class="badge badge-blue mr-2 mb-1">${esc(c.title)}</span>`).join('')}</td>
+      <td class="px-6 py-4"><button class="border border-accent text-accent px-4 py-2 rounded-lg text-xs font-bold">MANAGE</button></td>
     </tr>`).join('');
 }
 
-function filterUsers() {
-  const q = document.getElementById('userSearch').value.toLowerCase();
-  renderUsersTable(allUsers.filter(u =>
-    u.email.toLowerCase().includes(q) || u.username.toLowerCase().includes(q)
-  ));
+function renderCouponsTable() {
+  const tbody = document.getElementById('couponsTableBody');
+  tbody.innerHTML = allCoupons.map(c => `
+    <tr class="hover:bg-surface2 transition-colors">
+      <td class="px-6 py-4 font-bold text-accent">${esc(c.code)}</td>
+      <td class="px-6 py-4 text-white font-bold">${esc(c.discount_percent)}%</td>
+      <td class="px-6 py-4 text-muted">${fmtDate(c.created_at)}</td>
+      <td class="px-6 py-4"><button onclick="deleteCoupon(${c.id})" class="text-accent3 hover:text-red-400 font-bold">Delete</button></td>
+    </tr>`).join('');
 }
 
-function openGrantModal(user) {
-  grantTargetUser = user;
-  document.getElementById('grantModalUser').textContent = `${user.username} (${user.email})`;
-  const grantedIds = new Set((user.courses || []).map(c => c.course_id));
-  document.getElementById('grantCourseList').innerHTML = allCourses.length === 0
-    ? '<p class="text-muted text-sm text-center py-4">No courses created yet.</p>'
-    : allCourses.map(c => `
-      <label class="flex items-center gap-4 p-4 rounded-xl border transition-colors cursor-pointer ${grantedIds.has(c.id) ? 'bg-[rgba(0,229,255,0.05)] border-accent' : 'bg-bg border-border hover:border-muted'}">
-        <input type="checkbox" data-course-id="${c.id}" ${grantedIds.has(c.id) ? 'checked' : ''} class="w-5 h-5 accent-accent">
-        <div>
-          <p class="font-bold text-sm text-white">${esc(c.title)}</p>
-          <p class="text-xs text-muted mt-1">${esc(c.description?.slice(0,60) || '')}</p>
-        </div>
-      </label>`).join('');
-  document.getElementById('grantModal').classList.add('open');
-}
-
-function closeGrantModal() { document.getElementById('grantModal').classList.remove('open'); }
-
-async function saveAccess() {
-  if (!grantTargetUser) return;
-  const userId = grantTargetUser.id;
-  const grantedIds  = new Set((grantTargetUser.courses || []).map(c => c.course_id));
-  const checkboxes  = document.querySelectorAll('#grantCourseList input[type=checkbox]');
-
-  const promises = [];
-  checkboxes.forEach(cb => {
-    const courseId = parseInt(cb.dataset.courseId);
-    if (cb.checked && !grantedIds.has(courseId)) {
-      promises.push(fetch('/api/admin/grant-access', {
-        method: 'POST', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, course_id: courseId })
-      }));
-    } else if (!cb.checked && grantedIds.has(courseId)) {
-      promises.push(fetch('/api/admin/grant-access', {
-        method: 'DELETE', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ user_id: userId, course_id: courseId })
-      }));
-    }
+async function createCoupon() {
+  const code = document.getElementById('newCouponCode').value;
+  const discount = document.getElementById('newCouponDiscount').value;
+  if(!code || !discount) return showToast('Fill all fields', 'error');
+  const res = await fetch('/api/admin/coupons', {
+    method: 'POST', credentials: 'include', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({code, discount})
   });
-
-  await Promise.all(promises);
-  showToast('Access updated!', 'success');
-  closeGrantModal();
-  await loadUsers();
-  renderOverview();
+  if((await res.json()).success) { showToast('Coupon created', 'success'); await loadCoupons(); }
 }
 
-/* ────────────────────────────────────────────────────────
-   COURSES GRID
-──────────────────────────────────────────────────────── */
+async function deleteCoupon(id) {
+  if(!confirm('Delete coupon?')) return;
+  const res = await fetch('/api/admin/coupons', {
+    method: 'DELETE', credentials: 'include', headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({id})
+  });
+  if((await res.json()).success) { showToast('Deleted', 'success'); await loadCoupons(); }
+}
+
+document.getElementById('imageUploadInput').addEventListener('change', function(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas'); const ctx = canvas.getContext('2d');
+      const maxWidth = 800; let width = img.width; let height = img.height;
+      if (width > maxWidth) { height = Math.round((height * maxWidth) / width); width = maxWidth; }
+      canvas.width = width; canvas.height = height; ctx.drawImage(img, 0, 0, width, height);
+      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      document.getElementById('courseThumbnail').value = compressedBase64;
+      document.getElementById('imagePreview').src = compressedBase64;
+      document.getElementById('imagePreviewContainer').classList.remove('hidden');
+    }; img.src = event.target.result;
+  }; reader.readAsDataURL(file);
+});
+
 function renderCoursesGrid() {
-  const grid  = document.getElementById('coursesGrid');
-  const empty = document.getElementById('coursesEmpty');
-  if (allCourses.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
-  empty.classList.add('hidden');
-  
-  grid.innerHTML = allCourses.map(c => {
-    let stats = { lectures: 0, exercises: 0, assignments: 0 };
-    try { 
-      const parsed = typeof c.modules === 'string' ? JSON.parse(c.modules) : c.modules;
-      if (typeof parsed === 'object' && parsed !== null) stats = parsed;
-    } catch(e) {}
-
+  document.getElementById('coursesGrid').innerHTML = allCourses.map(c => {
+    let stats = { lectures: 0, exercises: 0, assignments: 0, price: 0 };
+    try { const p = typeof c.modules === 'string' ? JSON.parse(c.modules) : c.modules; if (p) stats = p; } catch(e) {}
     return `
-    <div class="bg-surface rounded-2xl shadow-lg border border-border overflow-hidden transition-transform hover:-translate-y-1 hover:border-accent flex flex-col">
-      ${c.thumbnail_url
-        ? `<img src="${esc(c.thumbnail_url)}" class="w-full h-48 object-cover" alt="" onerror="this.style.display='none'">`
-        : `<div class="w-full h-48 bg-gradient-to-br from-surface2 to-bg flex items-center justify-center border-b border-border">
-             <span class="text-accent2 font-bold text-3xl opacity-50">${esc(c.title.charAt(0))}</span>
-           </div>`}
-           
+    <div class="bg-surface rounded-2xl shadow-lg border border-border flex flex-col">
+      ${c.thumbnail_url ? `<img src="${esc(c.thumbnail_url)}" class="w-full h-48 object-cover">` : `<div class="w-full h-48 bg-surface2"></div>`}
       <div class="p-6 flex-1 flex flex-col">
-        <h3 class="font-bold text-white text-xl leading-tight mb-4" style="font-family:'Syne',sans-serif">${esc(c.title)}</h3>
-        
-        <div class="flex flex-wrap gap-3 mt-auto mb-6">
-          <div class="bg-surface2 text-muted px-3 py-1.5 rounded-md flex items-center gap-2 text-sm border border-border font-medium">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-            ${esc(stats.lectures || 0)} Lecture
-          </div>
-          <div class="bg-surface2 text-muted px-3 py-1.5 rounded-md flex items-center gap-2 text-sm border border-border font-medium">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-            ${esc(stats.exercises || 0)} Exercise
-          </div>
-          <div class="bg-surface2 text-muted px-3 py-1.5 rounded-md flex items-center gap-2 text-sm border border-border font-medium">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
-            ${esc(stats.assignments || 0)} Assignment
-          </div>
-        </div>
-
-        <div class="flex gap-3">
-          <button onclick="openEditCourse(${c.id})" class="flex-1 bg-surface2 border border-border text-white py-2 rounded-lg text-sm font-bold hover:bg-border transition-colors">EDIT</button>
-          <button onclick="deleteCourse(${c.id})" class="flex-1 bg-[rgba(255,77,141,0.1)] border border-[rgba(255,77,141,0.3)] text-accent3 py-2 rounded-lg text-sm font-bold hover:bg-[rgba(255,77,141,0.2)] transition-colors">DELETE</button>
+        <h3 class="font-bold text-white text-xl mb-2">${esc(c.title)}</h3>
+        <p class="text-accent font-bold mb-4">Price: ৳${stats.price || 'Free'}</p>
+        <div class="flex gap-3 mt-auto">
+          <button onclick="openEditCourse(${c.id})" class="flex-1 bg-surface2 text-white py-2 rounded-lg font-bold hover:bg-border">EDIT</button>
+          <button onclick="deleteCourse(${c.id})" class="flex-1 border border-accent3 text-accent3 py-2 rounded-lg font-bold">DELETE</button>
         </div>
       </div>
     </div>`
   }).join('');
 }
 
-/* ────────────────────────────────────────────────────────
-   CURRICULUM BUILDER UI LOGIC
-──────────────────────────────────────────────────────── */
 const builderContainer = document.getElementById('curriculumBuilder');
-
 function addModuleUI(title = '') {
-  const emptyMsg = document.querySelector('.empty-curriculum-msg');
-  if(emptyMsg) emptyMsg.remove();
-
-  const moduleHtml = `
-    <div class="bg-surface2 border border-border rounded-lg p-5 mb-4 module-block">
+  document.querySelector('.empty-curriculum-msg')?.remove();
+  const h = `<div class="bg-surface2 border border-border rounded-lg p-5 mb-4 module-block">
       <div class="flex justify-between items-center mb-4">
-        <input type="text" placeholder="Module Title (e.g., Module 1: WEB & Part 1 - HTML)" class="admin-input font-bold text-lg w-full mr-4 module-title" value="${esc(title)}">
-        <button type="button" onclick="this.closest('.module-block').remove()" class="text-accent3 hover:text-red-400 font-bold px-3 py-1 bg-[rgba(255,77,141,0.1)] rounded transition-colors">✕</button>
+        <input type="text" placeholder="Module Title" class="admin-input font-bold text-lg w-full mr-4 module-title" value="${esc(title)}">
+        <button type="button" onclick="this.closest('.module-block').remove()" class="text-accent3 font-bold">✕</button>
       </div>
-      <div class="lectures-container space-y-3 pl-4 border-l-2 border-border mb-4">
-        </div>
-      <button type="button" onclick="addLectureUI(this.previousElementSibling)" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
-        + Add Sub-Lecture
-      </button>
-    </div>
-  `;
-  builderContainer.insertAdjacentHTML('beforeend', moduleHtml);
+      <div class="lectures-container space-y-3 pl-4 border-l-2 border-border mb-4"></div>
+      <button type="button" onclick="addLectureUI(this.previousElementSibling)" class="text-accent text-sm font-bold">+ Add Lecture</button>
+    </div>`;
+  builderContainer.insertAdjacentHTML('beforeend', h);
   return builderContainer.lastElementChild;
 }
 
 function addLectureUI(container, title = '', url = '', duration = '') {
-  const lectureHtml = `
-    <div class="lecture-block flex items-start gap-3 bg-bg p-3 rounded-md border border-border">
+  const h = `<div class="lecture-block flex items-start gap-3 bg-bg p-3 rounded-md border border-border">
       <div class="flex-1 space-y-3">
-        <input type="text" placeholder="Lecture Title (e.g., M 6.1 - Font-Style in CSS)" class="admin-input text-sm lecture-title" value="${esc(title)}">
+        <input type="text" placeholder="Lecture Title" class="admin-input text-sm lecture-title" value="${esc(title)}">
         <div class="flex gap-3">
-          <input type="url" placeholder="YouTube Unlisted Link (e.g., https://youtu.be/...)" class="admin-input text-sm flex-1 lecture-url" value="${esc(url)}">
-          <input type="text" placeholder="Duration (e.g., 06:00 min)" class="admin-input text-sm w-1/3 lecture-duration" value="${esc(duration)}">
+          <input type="url" placeholder="YouTube URL" class="admin-input text-sm flex-1 lecture-url" value="${esc(url)}">
+          <input type="text" placeholder="Duration" class="admin-input text-sm w-1/3 lecture-duration" value="${esc(duration)}">
         </div>
       </div>
-      <button type="button" onclick="this.closest('.lecture-block').remove()" class="text-muted hover:text-accent3 mt-2 transition-colors">✕</button>
-    </div>
-  `;
-  container.insertAdjacentHTML('beforeend', lectureHtml);
+      <button type="button" onclick="this.closest('.lecture-block').remove()" class="text-muted hover:text-accent3 mt-2">✕</button>
+    </div>`;
+  container.insertAdjacentHTML('beforeend', h);
 }
 
-/* ────────────────────────────────────────────────────────
-   ADD / EDIT COURSE SUBMISSION
-──────────────────────────────────────────────────────── */
 function openAddCourse() {
   document.getElementById('courseFormTitle').textContent = 'Add New Course';
-  document.getElementById('courseId').value         = '';
-  document.getElementById('courseTitle').value      = '';
-  document.getElementById('courseDesc').value       = '';
-  document.getElementById('courseCategory').value   = '';
-  document.getElementById('courseLectures').value   = '';
-  document.getElementById('courseExercises').value  = '';
-  document.getElementById('courseAssignments').value = '';
-  document.getElementById('courseThumbnail').value  = '';
-  document.getElementById('courseVideo').value      = '';
-  document.getElementById('courseContent').value    = '';
-  document.getElementById('courseActive').checked   = true;
-  
+  document.getElementById('courseId').value = '';
+  document.querySelectorAll('.admin-input').forEach(i => i.value = '');
+  builderContainer.innerHTML = '<p class="text-muted text-sm text-center py-4 empty-curriculum-msg">Click "Add Module" to start.</p>';
   document.getElementById('imagePreviewContainer').classList.add('hidden');
-  document.getElementById('imagePreview').src = '';
-  
-  builderContainer.innerHTML = '<p class="text-muted text-sm text-center py-4 empty-curriculum-msg">No modules added yet. Click "Add Module" to start building your curriculum.</p>';
-  
   showTab('add-course');
-  document.querySelector('#tab-add-course .btn-gold').textContent = "ADD COURSE";
 }
 
 function openEditCourse(id) {
   const course = allCourses.find(c => c.id === id);
   if (!course) return;
-
   document.getElementById('courseFormTitle').textContent = 'Edit Course';
-  document.getElementById('courseId').value         = course.id;
-  document.getElementById('courseTitle').value      = course.title || '';
-  document.getElementById('courseDesc').value       = course.description || '';
-  document.getElementById('courseThumbnail').value  = course.thumbnail_url || '';
-  document.getElementById('courseVideo').value      = course.video_url || '';
+  document.getElementById('courseId').value = course.id;
+  document.getElementById('courseTitle').value = course.title || '';
+  document.getElementById('courseDesc').value = course.description || '';
+  document.getElementById('courseThumbnail').value = course.thumbnail_url || '';
   
-  if (course.thumbnail_url) {
-    document.getElementById('imagePreview').src = course.thumbnail_url;
-    document.getElementById('imagePreviewContainer').classList.remove('hidden');
-  } else {
-    document.getElementById('imagePreviewContainer').classList.add('hidden');
-  }
+  if(course.thumbnail_url) { document.getElementById('imagePreview').src = course.thumbnail_url; document.getElementById('imagePreviewContainer').classList.remove('hidden'); }
   
-  let modulesObj = { content: '', lectures: '', exercises: '', assignments: '', curriculum: [] };
-  try { 
-    const parsed = typeof course.modules === 'string' ? JSON.parse(course.modules) : course.modules;
-    if (typeof parsed === 'object' && parsed !== null) modulesObj = parsed;
-    else modulesObj.content = parsed;
-  } catch(e) { 
-    modulesObj.content = course.modules || ''; 
-  }
+  let mods = { lectures: '', exercises: '', assignments: '', price: '', whatsappLink: '', curriculum: [] };
+  try { const p = typeof course.modules === 'string' ? JSON.parse(course.modules) : course.modules; if(p) mods = p; } catch(e) {}
 
-  document.getElementById('courseContent').value    = modulesObj.content || '';
-  document.getElementById('courseLectures').value   = modulesObj.lectures || '';
-  document.getElementById('courseExercises').value  = modulesObj.exercises || '';
-  document.getElementById('courseAssignments').value = modulesObj.assignments || '';
-  document.getElementById('courseActive').checked   = course.is_active;
-
-  // Build Curriculum UI
+  document.getElementById('coursePrice').value = mods.price || '';
+  document.getElementById('courseWaLink').value = mods.whatsappLink || '';
+  document.getElementById('courseLectures').value = mods.lectures || '';
+  document.getElementById('courseExercises').value = mods.exercises || '';
+  document.getElementById('courseAssignments').value = mods.assignments || '';
+  
   builderContainer.innerHTML = '';
-  if(!modulesObj.curriculum || modulesObj.curriculum.length === 0) {
-    builderContainer.innerHTML = '<p class="text-muted text-sm text-center py-4 empty-curriculum-msg">No modules added yet. Click "Add Module" to start building your curriculum.</p>';
-  } else {
-    modulesObj.curriculum.forEach(mod => {
-      const modEl = addModuleUI(mod.moduleTitle);
-      const lecContainer = modEl.querySelector('.lectures-container');
-      mod.lectures.forEach(lec => {
-        addLectureUI(lecContainer, lec.title, lec.url, lec.duration);
-      });
-    });
-  }
-  
+  if(mods.curriculum) mods.curriculum.forEach(m => {
+    const modEl = addModuleUI(m.moduleTitle);
+    m.lectures.forEach(l => addLectureUI(modEl.querySelector('.lectures-container'), l.title, l.url, l.duration));
+  });
   showTab('add-course');
-  document.querySelector('#tab-add-course .btn-gold').textContent = "SAVE CHANGES";
 }
 
 async function saveCourse() {
-  const id    = document.getElementById('courseId').value;
-  const title = document.getElementById('courseTitle').value.trim();
-  if (!title) { showToast('Course Title is required', 'error'); return; }
+  const id = document.getElementById('courseId').value;
+  const title = document.getElementById('courseTitle').value;
+  if (!title) return showToast('Title required', 'error');
 
-  // Scrape Curriculum Builder UI to generate JSON array
   const curriculum = [];
   document.querySelectorAll('.module-block').forEach(modEl => {
     const moduleTitle = modEl.querySelector('.module-title').value.trim();
     const lectures = [];
-    
     modEl.querySelectorAll('.lecture-block').forEach(lecEl => {
-      const lecTitle = lecEl.querySelector('.lecture-title').value.trim();
-      const lecUrl = lecEl.querySelector('.lecture-url').value.trim();
-      const lecDuration = lecEl.querySelector('.lecture-duration').value.trim();
-      
-      // Only push if it has some content
-      if(lecTitle || lecUrl) {
-        lectures.push({ title: lecTitle, url: lecUrl, duration: lecDuration });
-      }
+      const title = lecEl.querySelector('.lecture-title').value.trim();
+      const url = lecEl.querySelector('.lecture-url').value.trim();
+      if(title || url) lectures.push({ title, url, duration: lecEl.querySelector('.lecture-duration').value.trim() });
     });
-    
-    // Only push module if it has a title or lectures
-    if(moduleTitle || lectures.length > 0) {
-      curriculum.push({ moduleTitle, lectures });
-    }
+    if(moduleTitle || lectures.length > 0) curriculum.push({ moduleTitle, lectures });
   });
 
   const modulesData = {
-    content: document.getElementById('courseContent').value,
+    price: document.getElementById('coursePrice').value || 0,
+    whatsappLink: document.getElementById('courseWaLink').value || '',
     lectures: document.getElementById('courseLectures').value || 0,
     exercises: document.getElementById('courseExercises').value || 0,
     assignments: document.getElementById('courseAssignments').value || 0,
-    curriculum: curriculum // 🌟 Saved safely inside JSONB
+    curriculum
   };
 
   const body = {
-    title,
-    description:   document.getElementById('courseDesc').value,
+    title, description: document.getElementById('courseDesc').value,
     thumbnail_url: document.getElementById('courseThumbnail').value,
-    video_url:     document.getElementById('courseVideo').value,
-    modules:       JSON.stringify(modulesData), 
-    is_active:     document.getElementById('courseActive').checked,
+    modules: JSON.stringify(modulesData), is_active: document.getElementById('courseActive').checked,
   };
   if (id) body.id = parseInt(id);
 
-  const btn = document.querySelector('#tab-add-course .btn-gold');
-  const originalText = btn.textContent;
-  btn.textContent = "SAVING...";
-  btn.disabled = true;
-
-  const res  = await fetch('/api/admin/courses', {
-    method: id ? 'PUT' : 'POST', credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body)
-  });
-  
-  btn.textContent = originalText;
-  btn.disabled = false;
-  
-  const data = await res.json();
-  if (data.success) {
-    showToast(id ? 'Course updated!' : 'Course created!', 'success');
-    await loadCourses();
-    renderOverview();
-    showTab('courses');
-  } else {
-    showToast(data.error || 'Failed to save course', 'error');
-  }
+  const res = await fetch('/api/admin/courses', { method: id ? 'PUT' : 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  if ((await res.json()).success) { showToast('Saved!', 'success'); await loadCourses(); showTab('courses'); }
 }
 
 async function deleteCourse(id) {
-  if (!confirm('Are you sure you want to delete this course? This will remove access for all enrolled users.')) return;
-  const res  = await fetch('/api/admin/courses', {
-    method: 'DELETE', credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ id })
-  });
-  const data = await res.json();
-  if (data.success) {
-    showToast('Course deleted successfully', 'success');
-    await loadCourses();
-    renderOverview();
-  } else {
-    showToast(data.error || 'Failed to delete course', 'error');
-  }
+  if (!confirm('Delete?')) return;
+  await fetch('/api/admin/courses', { method: 'DELETE', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+  await loadCourses();
 }
 
-/* ────────────────────────────────────────────────────────
-   PROFILE — CHANGE EMAIL & PASSWORD
-──────────────────────────────────────────────────────── */
-async function sendEmailVerification() {
-  const newEmail = document.getElementById('newEmailInput').value.trim();
-  if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
-    showToast('Please enter a valid email address', 'error'); return;
-  }
-  pendingEmailCode = String(Math.floor(100000 + Math.random() * 900000));
-  pendingNewEmail  = newEmail;
-  const btn = document.getElementById('sendCodeBtn');
-  btn.textContent = 'Sending...';
-  btn.disabled = true;
-
-  try {
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
-      to_email:        newEmail,
-      to_name:         'Admin',
-      verification_code: pendingEmailCode,
-      message:         `Your DecentraForce admin email verification code is: ${pendingEmailCode}`
-    });
-    document.getElementById('newEmailPreview').textContent = newEmail;
-    document.getElementById('emailStep1').classList.add('hidden');
-    document.getElementById('emailStep2').classList.remove('hidden');
-    showToast('Verification code sent!', 'success');
-  } catch (err) {
-    showToast('Failed to send code. Check EmailJS config.', 'error');
-    btn.textContent = 'Send Verification Code';
-    btn.disabled = false;
-    pendingEmailCode = null;
-    pendingNewEmail  = null;
-  }
-}
-
-async function verifyAndUpdateEmail() {
-  const entered = document.getElementById('verificationCodeInput').value.trim();
-  if (entered !== pendingEmailCode) { showToast('Incorrect verification code', 'error'); return; }
-  const res  = await fetch('/api/admin/update-profile', {
-    method: 'POST', credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'email', newEmail: pendingNewEmail })
-  });
-  const data = await res.json();
-  if (data.success) {
-    adminEmail = pendingNewEmail;
-    document.getElementById('adminEmailDisplay').textContent = adminEmail;
-    document.getElementById('currentEmailDisplay').textContent = adminEmail;
-    showToast('Email updated successfully!', 'success');
-    resetEmailStep();
-  } else { showToast(data.error || 'Failed to update email', 'error'); }
-}
-
-function resetEmailStep() {
-  document.getElementById('emailStep1').classList.remove('hidden');
-  document.getElementById('emailStep2').classList.add('hidden');
-  document.getElementById('newEmailInput').value = '';
-  document.getElementById('verificationCodeInput').value = '';
-  document.getElementById('sendCodeBtn').textContent = 'Send Verification Code';
-  document.getElementById('sendCodeBtn').disabled = false;
-  pendingEmailCode = null;
-  pendingNewEmail  = null;
-}
-
-async function changePassword() {
-  const current  = document.getElementById('currentPasswordInput').value;
-  const next     = document.getElementById('newPasswordInput').value;
-  const confirm  = document.getElementById('confirmPasswordInput').value;
-
-  if (!current || !next || !confirm) { showToast('All password fields are required', 'error'); return; }
-  if (next !== confirm) { showToast('New passwords do not match', 'error'); return; }
-  if (next.length < 8) { showToast('New password must be at least 8 characters', 'error'); return; }
-
-  const res  = await fetch('/api/admin/update-profile', {
-    method: 'POST', credentials: 'include',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'password', currentPassword: current, newPassword: next })
-  });
-  const data = await res.json();
-  if (data.success) {
-    showToast('Password updated!', 'success');
-    document.getElementById('currentPasswordInput').value = '';
-    document.getElementById('newPasswordInput').value = '';
-    document.getElementById('confirmPasswordInput').value = '';
-  } else { showToast(data.error || 'Failed to update password', 'error'); }
-}
-
-function showToast(msg, type = 'success') {
-  const el = document.getElementById('toast');
-  el.textContent = msg;
-  el.className   = `toast ${type} show`;
-  setTimeout(() => { el.classList.remove('show'); }, 3000);
-}
-
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function fmtDate(iso) {
-  if (!iso) return '—';
-  return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-}
+function showToast(msg, type = 'success') { const el = document.getElementById('toast'); el.textContent = msg; el.className = `toast ${type} show`; setTimeout(() => el.classList.remove('show'), 3000); }
+function esc(str) { return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(iso) { return iso ? new Date(iso).toLocaleDateString() : '—'; }
 </script>
 </body>
 </html>

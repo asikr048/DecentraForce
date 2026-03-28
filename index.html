@@ -4,972 +4,239 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DecentraForce — Your Web3 Career University</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%230d1630'/><rect width='100' height='100' rx='20' fill='url(%23g)' opacity='0.2'/><defs><linearGradient id='g' x1='0%' y1='0%' x2='100%' y2='100%'><stop offset='0%' stop-color='%237b5cff'/><stop offset='100%' stop-color='%2300e5ff'/></linearGradient></defs><text x='50' y='68' font-family='Arial, sans-serif' font-size='54' font-weight='900' fill='%2300e5ff' text-anchor='middle'>DF</text></svg>">
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  :root {
-    --bg: #050a18;
-    --bg2: #080f22;
-    --surface: #0d1630;
-    --surface2: #111d3a;
-    --accent: #00e5ff;
-    --accent2: #7b5cff;
-    --accent3: #ff4d8d;
-    --text: #e8eeff;
-    --muted: #7d8fb3;
-    --border: rgba(0, 229, 255, 0.12);
-    --glow: rgba(0, 229, 255, 0.15);
-  }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    overflow-x: hidden;
-    line-height: 1.6;
-  }
-
-  /* ── Noise overlay ── */
-  body::before {
-    content: '';
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
-    opacity: .45;
-  }
-
-  /* ── Grid background ── */
-  body::after {
-    content: '';
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image:
-      linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
-
-  /* ── Glow blobs ── */
-  .blob {
-    position: fixed; border-radius: 50%; filter: blur(120px); pointer-events: none; z-index: 0;
-  }
-  .blob-1 { width: 600px; height: 600px; background: rgba(123,92,255,.18); top: -200px; right: -100px; animation: drift1 12s ease-in-out infinite alternate; }
-  .blob-2 { width: 500px; height: 500px; background: rgba(0,229,255,.12); bottom: 100px; left: -150px; animation: drift2 15s ease-in-out infinite alternate; }
-  .blob-3 { width: 350px; height: 350px; background: rgba(255,77,141,.1); top: 50%; right: 10%; animation: drift1 10s ease-in-out infinite alternate-reverse; }
-
-  @keyframes drift1 { from { transform: translate(0,0) scale(1); } to { transform: translate(40px, 60px) scale(1.1); } }
-  @keyframes drift2 { from { transform: translate(0,0); } to { transform: translate(-30px, -50px) scale(1.05); } }
-
-  /* ══════════ NAV ══════════ */
-  nav {
-    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
-    display: flex; align-items: center; justify-content: space-between;
-    padding: 0 5%;
-    height: 70px;
-    background: rgba(5,10,24,.7);
-    backdrop-filter: blur(20px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .logo {
-    display: flex; align-items: center; gap: 10px;
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem;
-    color: var(--text); text-decoration: none; letter-spacing: -.5px;
-  }
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    border-radius: 8px;
-    display: grid; place-items: center;
-    font-size: .8rem; font-weight: 900;
-    color: #fff;
-    box-shadow: 0 0 18px rgba(123,92,255,.5);
-  }
-  .logo span { color: var(--accent); }
-
-  .nav-links {
-    display: flex; align-items: center; gap: 32px;
-    list-style: none;
-  }
-  .nav-links a {
-    color: var(--muted); text-decoration: none; font-size: .92rem; font-weight: 500;
-    transition: color .2s;
-    display: flex; align-items: center; gap: 4px;
-  }
+  :root { --bg: #050a18; --surface: #0d1630; --surface2: #111d3a; --accent: #00e5ff; --accent2: #7b5cff; --text: #e8eeff; --muted: #7d8fb3; --border: rgba(0, 229, 255, 0.12); }
+  body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.6; }
+  body::before { content: ''; position: fixed; inset: 0; z-index: -1; background-image: linear-gradient(rgba(0,229,255,.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0,229,255,.03) 1px, transparent 1px); background-size: 60px 60px; }
+  
+  nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 70px; background: rgba(5,10,24,.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+  .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--text); text-decoration: none; }
+  .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent2), var(--accent)); border-radius: 8px; display: grid; place-items: center; font-size: .8rem; font-weight: 900; color: #fff; }
+  .nav-links { display: flex; gap: 32px; list-style: none; }
+  .nav-links a { color: var(--muted); text-decoration: none; font-size: .92rem; font-weight: 500; transition: color .2s; }
   .nav-links a:hover { color: var(--text); }
-  .nav-links a.active { color: var(--accent); }
-
-  .nav-right { display: flex; align-items: center; gap: 14px; }
-
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-    padding: 10px 22px; border-radius: 8px;
-    font-family: 'DM Sans', sans-serif; font-weight: 500; font-size: .9rem;
-    cursor: pointer; text-decoration: none; border: none; transition: all .2s;
-  }
-  .btn-ghost {
-    background: transparent; color: var(--muted); border: 1px solid var(--border);
-  }
-  .btn-ghost:hover { color: var(--text); border-color: rgba(0,229,255,.3); }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    color: #fff;
-    box-shadow: 0 0 24px rgba(123,92,255,.4);
-  }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 0 32px rgba(123,92,255,.6); }
-  .btn-outline {
-    background: transparent; color: var(--accent);
-    border: 1.5px solid var(--accent); gap: 10px;
-  }
-  .btn-outline:hover { background: rgba(0,229,255,.08); }
-
-  /* ─── USER DROPDOWN & AVATAR ─── */
-  .avatar-wrapper { position: relative; display: flex; align-items: center; }
-  .avatar-btn {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    border: 2px solid var(--border); display: grid; place-items: center;
-    font-size: .85rem; font-weight: 800; color: #fff; cursor: pointer;
-    box-shadow: 0 0 16px rgba(123,92,255,.35); transition: transform 0.2s;
-  }
-  .avatar-btn:hover { transform: scale(1.05); }
-
-  .user-dropdown {
-    position: absolute; top: 120%; right: 0; width: 260px;
-    background: rgba(13, 22, 48, 0.95); backdrop-filter: blur(20px); 
-    border: 1px solid var(--border);
-    border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-    overflow: hidden; z-index: 100; opacity: 0; visibility: hidden;
-    transform: translateY(-10px); transition: all 0.2s ease;
-  }
-  .user-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
-  .dropdown-header { padding: 16px; border-bottom: 1px solid var(--border); background: var(--surface2); }
-  .dropdown-header h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--text); margin-bottom: 2px; }
-  .dropdown-header p { font-size: 0.78rem; color: var(--muted); }
-  .dropdown-body { padding: 16px; border-bottom: 1px solid var(--border); }
-  .dropdown-footer { padding: 8px; }
-  .dropdown-item {
-    display: flex; align-items: center; gap: 10px; width: 100%;
-    padding: 10px 12px; border-radius: 8px; border: none;
-    background: transparent; color: var(--text); font-size: 0.88rem;
-    font-weight: 500; cursor: pointer; transition: background 0.2s; text-align: left;
-    text-decoration: none;
-  }
-  .dropdown-item:hover { background: var(--surface2); color: var(--accent); }
-  .dropdown-item.logout { color: var(--accent3); margin-top: 4px; }
-  .dropdown-item.logout:hover { background: rgba(255,77,141,0.1); }
-
-  /* ══════════ HERO ══════════ */
-  .hero {
-    position: relative; z-index: 1;
-    min-height: 100vh;
-    display: flex; align-items: center;
-    padding: 120px 5% 80px;
-    overflow: hidden;
-  }
-
-  .hero-content {
-    flex: 1; max-width: 580px;
-    animation: fadeUp .9s cubic-bezier(.16,1,.3,1) both;
-  }
-
-  .eyebrow {
-    display: inline-flex; align-items: center; gap: 8px;
-    background: rgba(0,229,255,.08); border: 1px solid rgba(0,229,255,.2);
-    padding: 6px 14px; border-radius: 100px;
-    font-size: .8rem; font-weight: 600; color: var(--accent); letter-spacing: .08em;
-    text-transform: uppercase; margin-bottom: 24px;
-  }
-  .eyebrow::before {
-    content: ''; width: 6px; height: 6px; border-radius: 50%;
-    background: var(--accent); box-shadow: 0 0 8px var(--accent);
-    animation: pulse 1.5s ease infinite;
-  }
-  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.4} }
-
-  .hero h1 {
-    font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: clamp(2.6rem, 5.5vw, 4.2rem);
-    line-height: 1.1; letter-spacing: -.03em;
-    margin-bottom: 24px;
-  }
-
-  .hero h1 .line-accent {
-    position: relative; display: inline-block;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .hero h1 .line-accent::after {
-    content: '';
-    position: absolute; left: 0; bottom: -4px; right: 0; height: 3px;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    border-radius: 2px;
-    box-shadow: 0 0 14px var(--accent);
-  }
-
-  .hero p {
-    font-size: 1.05rem; color: var(--muted); line-height: 1.75;
-    max-width: 470px; margin-bottom: 36px; font-weight: 300;
-  }
-
-  .hero-btns { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
-
-  .hero-visual {
-    flex: 1; position: relative;
-    display: flex; align-items: center; justify-content: center;
-    min-height: 520px;
-    animation: fadeUp .9s .2s cubic-bezier(.16,1,.3,1) both;
-  }
-
-  /* 3D Container */
-  .three-container {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-    border-radius: 20px;
-    overflow: hidden;
-    pointer-events: none;
-  }
-
-  .loading-fallback {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(5, 10, 24, 0.7);
-    backdrop-filter: blur(4px);
-    border-radius: 20px;
-    z-index: 2;
-    color: var(--muted);
-    font-size: 0.9rem;
-    text-align: center;
-    padding: 20px;
-  }
-
-  /* Float cards */
-  .float-card {
-    position: absolute; background: var(--surface);
-    border: 1px solid var(--border);
-    backdrop-filter: blur(12px);
-    border-radius: 14px; padding: 14px 18px;
-    box-shadow: 0 16px 48px rgba(0,0,0,.5);
-    z-index: 10;
-  }
-  .fc-members { top: 30px; right: 0; min-width: 200px; animation: floatY 4s ease-in-out infinite; }
-  .fc-mentors { bottom: 40px; left: -20px; min-width: 190px; animation: floatY 4s 1.5s ease-in-out infinite; }
-
-  @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
-
-  .fc-row { display: flex; align-items: center; gap: 12px; }
-  .fc-icon {
-    width: 40px; height: 40px; border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    display: grid; place-items: center; font-size: 1rem; flex-shrink: 0;
-    box-shadow: 0 0 20px rgba(123,92,255,.4);
-  }
-  .fc-big { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.4rem; line-height: 1; }
-  .fc-small { font-size: .72rem; color: var(--muted); margin-top: 2px; }
-
-  .mentor-avatars { display: flex; margin-top: 10px; }
-  .mentor-avatars .av {
-    width: 32px; height: 32px; border-radius: 50%;
-    border: 2px solid var(--surface);
-    margin-left: -8px; overflow: hidden;
-    background: linear-gradient(135deg, var(--accent2), var(--accent3));
-    display: grid; place-items: center; font-size: .65rem; font-weight: 700; color: #fff;
-  }
-  .mentor-avatars .av:first-child { margin-left: 0; }
-
-  /* ══════════ STATS BAR ══════════ */
-  .stats-bar {
-    position: relative; z-index: 1;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 28px 5%;
-    display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;
-    animation: fadeUp .9s .3s cubic-bezier(.16,1,.3,1) both;
-  }
-
-  .stat-item { text-align: center; }
-  .stat-num {
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .stat-label { font-size: .8rem; color: var(--muted); font-weight: 400; margin-top: 2px; }
-
-  /* ══════════ COURSES ══════════ */
-  section { position: relative; z-index: 1; padding: 90px 5%; }
-
-  .section-header { text-align: center; margin-bottom: 56px; }
-  .section-tag {
-    display: inline-block;
-    background: rgba(123,92,255,.12); border: 1px solid rgba(123,92,255,.25);
-    color: var(--accent2); font-size: .75rem; font-weight: 600;
-    letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px;
-    border-radius: 100px; margin-bottom: 14px;
-  }
-  .section-header h2 {
-    font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    letter-spacing: -.03em; margin-bottom: 12px;
-  }
-  .section-header h2 em { font-style: normal; color: var(--accent); }
-  .section-header p { color: var(--muted); font-size: 1rem; max-width: 480px; margin: 0 auto; }
-
-  .courses-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
-  }
-
-  .course-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px; overflow: hidden;
-    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-    cursor: pointer;
-  }
-  .course-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(0,229,255,.15);
-    border-color: rgba(0,229,255,.2);
-  }
-
-  .card-banner {
-    height: 150px; position: relative; overflow: hidden;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 3rem;
-  }
-  .banner-1 { background: linear-gradient(135deg, #0d1a3a, #1a0d3a); }
-  .banner-2 { background: linear-gradient(135deg, #0d2a1a, #0d1a3a); }
-  .banner-3 { background: linear-gradient(135deg, #2a0d1a, #0d1a3a); }
-  .banner-4 { background: linear-gradient(135deg, #1a2a0d, #0d2a2a); }
-
-  .card-banner::after {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(circle at 70% 30%, rgba(0,229,255,.15), transparent 70%);
-  }
-  .banner-badge {
-    position: absolute; top: 12px; left: 12px;
-    background: rgba(0,0,0,.4); backdrop-filter: blur(8px);
-    border: 1px solid var(--border); border-radius: 6px;
-    padding: 3px 10px; font-size: .7rem; font-weight: 600; color: var(--accent);
-  }
-
-  .card-body { padding: 18px 20px 20px; }
-  .card-meta { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-  .tag {
-    font-size: .68rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
-    padding: 3px 10px; border-radius: 100px;
-  }
-  .tag-blue { background: rgba(0,229,255,.1); color: var(--accent); }
-  .tag-purple { background: rgba(123,92,255,.12); color: var(--accent2); }
-  .tag-pink { background: rgba(255,77,141,.1); color: var(--accent3); }
-  .tag-green { background: rgba(0,229,153,.1); color: #00e599; }
-
-  .card-body h3 {
-    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem;
-    margin-bottom: 8px; line-height: 1.3;
-  }
-  .card-body p { font-size: .85rem; color: var(--muted); line-height: 1.6; margin-bottom: 16px; }
-
-  .card-footer { display: flex; align-items: center; justify-content: space-between; padding-top: 14px; border-top: 1px solid var(--border); }
-  .rating { display: flex; align-items: center; gap: 5px; font-size: .8rem; color: var(--muted); }
-  .rating .stars { color: #fbbf24; letter-spacing: -2px; }
-  .price { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--accent); }
-  .price span { font-family: 'DM Sans'; font-weight: 300; font-size: .78rem; color: var(--muted); text-decoration: line-through; margin-right: 4px; }
-
-  /* ══════════ HOW IT WORKS ══════════ */
-  .how-grid {
-    display: grid; grid-template-columns: 1fr 1fr;
-    gap: 60px; align-items: center;
-  }
-  .steps { display: flex; flex-direction: column; gap: 24px; }
-  .step {
-    display: flex; gap: 20px; align-items: flex-start;
-    padding: 20px; border-radius: 14px;
-    border: 1px solid transparent;
-    transition: all .3s;
-    cursor: pointer;
-  }
-  .step:hover, .step.active {
-    background: var(--surface); border-color: var(--border);
-    box-shadow: 0 8px 30px rgba(0,0,0,.3);
-  }
-  .step-num {
-    width: 44px; height: 44px; flex-shrink: 0; border-radius: 10px;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    display: grid; place-items: center;
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1rem; color: #fff;
-    box-shadow: 0 0 20px rgba(123,92,255,.4);
-  }
-  .step-text h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 6px; }
-  .step-text p { font-size: .87rem; color: var(--muted); line-height: 1.6; }
-
-  .how-visual {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 24px; padding: 40px;
-    position: relative; overflow: hidden;
-    text-align: center;
-  }
-  .how-visual::before {
-    content: ''; position: absolute; top: -40px; right: -40px;
-    width: 200px; height: 200px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(123,92,255,.2), transparent 70%);
-  }
-  .visual-icon { font-size: 5rem; margin-bottom: 20px; display: block; }
-  .how-visual h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.4rem; margin-bottom: 10px; }
-  .how-visual p { color: var(--muted); font-size: .9rem; line-height: 1.7; }
-  .progress-bars { margin-top: 28px; display: flex; flex-direction: column; gap: 14px; }
-  .pb-row { display: flex; flex-direction: column; gap: 5px; text-align: left; }
-  .pb-label { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); }
-  .pb-label strong { color: var(--text); font-weight: 500; }
-  .pb-track { height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-  .pb-fill { height: 100%; border-radius: 3px; }
-  .pb-fill-1 { width: 92%; background: linear-gradient(90deg, var(--accent2), var(--accent)); box-shadow: 0 0 8px var(--accent); animation: grow 1.5s .5s cubic-bezier(.16,1,.3,1) both; }
-  .pb-fill-2 { width: 76%; background: linear-gradient(90deg, var(--accent3), var(--accent2)); animation: grow 1.5s .7s cubic-bezier(.16,1,.3,1) both; }
-  .pb-fill-3 { width: 88%; background: linear-gradient(90deg, #00e599, var(--accent)); animation: grow 1.5s .9s cubic-bezier(.16,1,.3,1) both; }
-  @keyframes grow { from{width:0} }
-
-  /* ══════════ MENTORS ══════════ */
-  .mentors-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
-  }
-  .mentor-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 28px 20px; text-align: center;
-    transition: all .3s;
-  }
-  .mentor-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(0,229,255,.2);
-    box-shadow: 0 20px 50px rgba(0,0,0,.4);
-  }
-  .mentor-avatar {
-    width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 14px;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.8rem; font-weight: 800; color: #fff;
-    border: 2px solid var(--border);
-    box-shadow: 0 0 24px rgba(123,92,255,.3);
-  }
-  .mentor-card h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 4px; }
-  .mentor-card .role { font-size: .8rem; color: var(--accent); margin-bottom: 12px; }
-  .mentor-card .bio { font-size: .82rem; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
-  .mentor-socials { display: flex; justify-content: center; gap: 10px; }
-  .social-btn {
-    width: 30px; height: 30px; border-radius: 6px;
-    background: var(--surface2); border: 1px solid var(--border);
-    display: grid; place-items: center; font-size: .8rem; cursor: pointer;
-    transition: all .2s; text-decoration: none; color: var(--muted);
-  }
-  .social-btn:hover { color: var(--accent); border-color: rgba(0,229,255,.3); }
-
-  /* ══════════ CTA ══════════ */
-  .cta-section {
-    background: linear-gradient(135deg, rgba(123,92,255,.1), rgba(0,229,255,.06));
-    border: 1px solid var(--border);
-    border-radius: 24px; margin: 0 5% 80px;
-    padding: 70px; text-align: center; position: relative; overflow: hidden; z-index: 1;
-  }
-  .cta-section::before {
-    content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, rgba(123,92,255,.2), transparent 60%);
-  }
-  .cta-section h2 {
-    font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    letter-spacing: -.03em; margin-bottom: 16px;
-    position: relative;
-  }
-  .cta-section p { color: var(--muted); font-size: 1rem; max-width: 480px; margin: 0 auto 32px; position: relative; }
-  .cta-btns { display: flex; gap: 14px; justify-content: center; position: relative; }
-
-  /* ══════════ FOOTER ══════════ */
-  footer {
-    position: relative; z-index: 1;
-    background: var(--surface);
-    border-top: 1px solid var(--border);
-    padding: 50px 5% 30px;
-  }
-  .footer-top {
-    display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr;
-    gap: 40px; margin-bottom: 40px;
-  }
-  .footer-brand p { color: var(--muted); font-size: .87rem; line-height: 1.7; margin: 14px 0 20px; max-width: 240px; }
-  .footer-col h5 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; margin-bottom: 16px; }
-  .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 10px; }
-  .footer-col ul a { color: var(--muted); text-decoration: none; font-size: .87rem; transition: color .2s; }
-  .footer-col ul a:hover { color: var(--accent); }
-  .footer-bottom { display: flex; align-items: center; justify-content: space-between; padding-top: 28px; border-top: 1px solid var(--border); }
-  .footer-bottom p { color: var(--muted); font-size: .82rem; }
-  .footer-links { display: flex; gap: 20px; }
-  .footer-links a { color: var(--muted); text-decoration: none; font-size: .82rem; transition: color .2s; }
-  .footer-links a:hover { color: var(--accent); }
-
-  /* ══════════ ANIMATIONS ══════════ */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(30px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ══════════ RESPONSIVE ══════════ */
-  @media (max-width: 900px) {
-    .nav-links { display: none; }
-    .hero { flex-direction: column; text-align: center; padding: 100px 5% 60px; gap: 50px; }
-    .hero p { max-width: 100%; }
-    .hero-btns { justify-content: center; }
-    .how-grid { grid-template-columns: 1fr; }
-    .footer-top { grid-template-columns: 1fr 1fr; }
-  }
-  @media (max-width: 600px) {
-    .hero-visual { min-height: 320px; }
-    .orbit-ring { width: 260px; height: 260px; }
-    .orbit-ring-2 { width: 180px; height: 180px; }
-    .center-badge { width: 110px; height: 110px; }
-    .center-badge .big-num { font-size: 1.5rem; }
-    .footer-top { grid-template-columns: 1fr; }
-    .cta-section { padding: 40px 24px; }
-    .cta-btns { flex-direction: column; align-items: center; }
-  }
+  
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 22px; border-radius: 8px; font-weight: 600; cursor: pointer; text-decoration: none; border: none; transition: all .2s; }
+  .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+  .btn-primary { background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #fff; box-shadow: 0 0 20px rgba(123,92,255,.4); }
+  
+  .hero { min-height: 100vh; display: flex; align-items: center; padding: 120px 5% 80px; }
+  .hero-content { flex: 1; max-width: 600px; }
+  .hero h1 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: clamp(2.6rem, 5.5vw, 4.2rem); line-height: 1.1; margin-bottom: 24px; }
+  
+  .courses-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; padding: 60px 5%; }
+  .course-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; overflow: hidden; transition: transform .3s; }
+  .course-card:hover { transform: translateY(-6px); border-color: var(--accent); }
+  .card-thumbnail { width: 100%; height: 180px; object-fit: cover; }
+  
+  /* 🌟 CHECKOUT MODAL STYLES 🌟 */
+  .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,.8); backdrop-filter: blur(8px); z-index:200; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .checkout-box { background: var(--surface); border: 1px solid rgba(0, 229, 255, 0.3); border-radius: 20px; p: 24px; width: 100%; max-width: 480px; padding: 32px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+  .checkout-input { width: 100%; padding: 14px; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; color: white; outline: none; margin-bottom: 16px; }
+  .checkout-input:focus { border-color: var(--accent); }
+  .payment-badges span { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: bold; }
 </style>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="scripts/three-scene.js" defer></script>
 </head>
 <body>
 
-<div class="blob blob-1"></div>
-<div class="blob blob-2"></div>
-<div class="blob blob-3"></div>
-
 <nav>
-  <a href="#" class="logo">
-    <div class="logo-icon">DF</div>
-    Decentra<span>Force</span>
-  </a>
+  <a href="#" class="logo"><div class="logo-icon">DF</div>Decentra<span style="color:var(--accent)">Force</span></a>
   <ul class="nav-links">
-    <li><a href="my-courses.html" class="active">Home</a></li>
-    <li><a href="my-courses.html">Courses</a></li>
-    <li><a href="my-courses.html?tab=nanodegree" style="display:flex;align-items:center;gap:4px">NanoDegree <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a></li>
-    <li><a href="my-courses.html?tab=free">বাংলায় শিখি</a></li>
-    <li><a href="my-courses.html" style="display:flex;align-items:center;gap:4px">Explore <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a></li>
+    <li><a href="my-courses.html">Dashboard</a></li>
   </ul>
-  
-  <div class="nav-right">
-    <a href="login.html" class="btn btn-ghost" data-auth="login">Log In</a>
-    <a href="register.html" class="btn btn-primary" style="font-weight: 700; padding: 10px 24px;" data-auth="register">Create Account</a>
-    
-    <div class="avatar-wrapper" data-auth="protected" style="display: none;">
-      <div class="avatar-btn" id="navAvatar" onclick="toggleDropdown(event)">...</div>
-      
-      <div class="user-dropdown" id="userMenu">
-        <div class="dropdown-header">
-          <h4 id="dropName" data-auth="user" data-field="username">Loading...</h4>
-          <p id="dropEmail" data-auth="user" data-field="email">loading@email.com</p>
-        </div>
-        <div class="dropdown-body">
-          <div style="display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); margin-bottom: 6px;">
-            <span>Avg. Progress</span><span style="color:var(--accent);font-weight:700">47%</span>
-          </div>
-          <div style="height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top:8px">
-            <div style="height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent)); box-shadow: 0 0 8px rgba(0,229,255,.4); width:47%"></div>
-          </div>
-        </div>
-        <div class="dropdown-footer">
-          <a href="my-courses.html?tab=profile" class="dropdown-item">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
-            My Profile
-          </a>
-          <button class="dropdown-item logout" data-auth="logout">
-            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-            Logout
-          </button>
-        </div>
-      </div>
-    </div>
+  <div style="display:flex;gap:12px">
+    <a href="login.html" class="btn btn-ghost">Log In</a>
+    <a href="register.html" class="btn btn-primary">Create Account</a>
   </div>
 </nav>
 
 <section class="hero">
   <div class="hero-content">
-    <div class="eyebrow">Build Your Web3 Career Right Now</div>
-    <h1>
-      Unlock Your<br>
-      Decentralized<br>
-      <span class="line-accent">Future</span>
-    </h1>
-    <p>We're committed to providing top-quality blockchain and Web3 education to boost your skills. Dive into focused, stress-free learning with industry-leading mentors.</p>
-    <div class="hero-btns">
-      <a href="my-courses.html" class="btn btn-primary" style="padding:13px 28px;font-size:.95rem;">🚀 Get Started</a>
-      <a href="my-courses.html?tab=free" class="btn btn-outline" style="padding:13px 22px;font-size:.95rem;">
-        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor"/></svg>
-        Watch Demo
-      </a>
-    </div>
-  </div>
-
-  <div class="hero-visual">
-    <div class="float-card fc-members">
-      <div class="fc-row">
-        <div class="fc-icon">👥</div>
-        <div>
-          <div class="fc-big">17k+</div>
-          <div class="fc-small">Active Members</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="hero-3d-container" class="three-container">
-      <div class="loading-fallback" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.9rem;">
-        <div style="text-align:center;">
-          <div style="font-size:2rem;margin-bottom:10px;">⏳</div>
-          <p>Loading interactive 3D visualization...</p>
-        </div>
-      </div>
-    </div>
-
-    <div class="float-card fc-mentors">
-      <div class="fc-big">20+</div>
-      <div class="fc-small" style="margin-bottom:8px">Top Expert Mentors</div>
-      <div class="mentor-avatars">
-        <div class="av">RK</div>
-        <div class="av" style="background:linear-gradient(135deg,#ff4d8d,#7b5cff)">SH</div>
-        <div class="av" style="background:linear-gradient(135deg,#00e599,#00e5ff)">TM</div>
-        <div class="av" style="background:linear-gradient(135deg,#fbbf24,#ff4d8d)">AR</div>
-        <div class="av" style="background:var(--surface2);border:1px solid var(--border);color:var(--muted);font-size:.6rem">+16</div>
-      </div>
-    </div>
+    <div style="color:var(--accent); font-weight:bold; margin-bottom:16px;">Build Your Web3 Career</div>
+    <h1>Unlock Your<br>Decentralized<br><span style="color:var(--accent2)">Future</span></h1>
+    <p style="color:var(--muted); margin-bottom: 30px;">Master blockchain development, smart contracts, and DeFi with industry experts.</p>
+    <a href="#courses" class="btn btn-primary" style="padding:14px 32px; font-size:1.1rem;">Explore Courses</a>
   </div>
 </section>
 
-<div class="stats-bar">
-  <div class="stat-item"><div class="stat-num">17k+</div><div class="stat-label">Active Learners</div></div>
-  <div class="stat-item"><div class="stat-num">50+</div><div class="stat-label">Live Courses</div></div>
-  <div class="stat-item"><div class="stat-num">20+</div><div class="stat-label">Expert Mentors</div></div>
-  <div class="stat-item"><div class="stat-num">98%</div><div class="stat-label">Satisfaction Rate</div></div>
-  <div class="stat-item"><div class="stat-num">12k+</div><div class="stat-label">Certifications Issued</div></div>
+<h2 style="text-align:center; font-family:'Syne'; font-size:2.5rem; margin-top:40px;" id="courses">Available Courses</h2>
+<div class="courses-grid" id="publicCoursesGrid">
+  <p style="text-align:center; width:100%; color:var(--muted);">Loading courses...</p>
 </div>
 
-<section id="courses">
-  <div class="section-header">
-    <div class="section-tag">Our Curriculum</div>
-    <h2>Explore <em>Top Courses</em></h2>
-    <p>Master the skills that shape the decentralized economy — from DeFi to NFTs, smart contracts, and beyond.</p>
-  </div>
-  <div class="courses-grid">
-    <div class="course-card">
-      <div class="card-banner banner-1">
-        <span style="z-index:2;position:relative">⛓️</span>
-        <span class="banner-badge">🔥 Bestseller</span>
-      </div>
-      <div class="card-body">
-        <div class="card-meta"><span class="tag tag-blue">Blockchain</span><span class="tag tag-purple">Beginner</span></div>
-        <h3>Blockchain Fundamentals & Web3 Intro</h3>
-        <p>Grasp the core concepts of distributed ledgers, consensus mechanisms, and the decentralized web.</p>
-        <div class="card-footer">
-          <div class="rating"><span class="stars">★★★★★</span> 4.9 (2.1k)</div>
-          <div class="price"><span>৳4,500</span>৳2,200</div>
-        </div>
+<div class="modal-overlay" id="checkoutModal">
+  <div class="checkout-box relative">
+    <button onclick="closeCheckout()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:var(--muted); font-size:1.5rem; cursor:pointer;">✕</button>
+    
+    <h3 style="font-family:'Syne'; font-size:1.4rem; font-weight:bold; margin-bottom:8px;" id="checkoutCourseTitle">Course Name</h3>
+    
+    <div style="display:flex; justify-content:space-between; align-items:center; background:var(--surface2); padding:16px; border-radius:12px; margin-bottom:20px;">
+      <span style="color:var(--muted)">Total Amount:</span>
+      <div>
+        <span id="checkoutOriginalPrice" style="text-decoration:line-through; color:var(--muted); margin-right:8px; font-size:0.9rem; display:none;"></span>
+        <span id="checkoutFinalPrice" style="font-size:1.8rem; font-weight:bold; color:var(--accent);">৳0</span>
       </div>
     </div>
-    <div class="course-card">
-      <div class="card-banner banner-2">
-        <span style="z-index:2;position:relative">📝</span>
-        <span class="banner-badge">⚡ New</span>
-      </div>
-      <div class="card-body">
-        <div class="card-meta"><span class="tag tag-green">Solidity</span><span class="tag tag-purple">Intermediate</span></div>
-        <h3>Smart Contract Development with Solidity</h3>
-        <p>Write, test, and deploy secure Ethereum smart contracts from scratch to production.</p>
-        <div class="card-footer">
-          <div class="rating"><span class="stars">★★★★★</span> 4.8 (1.6k)</div>
-          <div class="price"><span>৳5,000</span>৳2,800</div>
-        </div>
-      </div>
-    </div>
-    <div class="course-card">
-      <div class="card-banner banner-3">
-        <span style="z-index:2;position:relative">🖼️</span>
-        <span class="banner-badge">🎨 Popular</span>
-      </div>
-      <div class="card-body">
-        <div class="card-meta"><span class="tag tag-pink">NFT</span><span class="tag tag-blue">Beginner</span></div>
-        <h3>NFT Creation, Minting & Marketplace</h3>
-        <p>Create and launch your own NFT collection with royalties, metadata, and marketplace listings.</p>
-        <div class="card-footer">
-          <div class="rating"><span class="stars">★★★★☆</span> 4.7 (980)</div>
-          <div class="price"><span>৳3,500</span>৳1,800</div>
-        </div>
-      </div>
-    </div>
-    <div class="course-card">
-      <div class="card-banner banner-4">
-        <span style="z-index:2;position:relative">💰</span>
-        <span class="banner-badge">📈 Trending</span>
-      </div>
-      <div class="card-body">
-        <div class="card-meta"><span class="tag tag-green">DeFi</span><span class="tag tag-purple">Advanced</span></div>
-        <h3>DeFi Protocols & Yield Strategy Mastery</h3>
-        <p>Deep dive into liquidity pools, AMMs, lending protocols, and advanced yield farming strategies.</p>
-        <div class="card-footer">
-          <div class="rating"><span class="stars">★★★★★</span> 4.9 (1.2k)</div>
-          <div class="price"><span>৳6,000</span>৳3,200</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div style="text-align:center;margin-top:40px">
-    <a href="my-courses.html" class="btn btn-outline" style="padding:13px 28px;font-size:.95rem;">View All Courses →</a>
-  </div>
-</section>
 
-<section style="background:rgba(13,22,48,.5);">
-  <div class="section-header">
-    <div class="section-tag">The Process</div>
-    <h2>How <em>DecentraForce</em> Works</h2>
-    <p>A streamlined path from zero to blockchain professional in four clear steps.</p>
-  </div>
-  <div class="how-grid">
-    <div class="steps">
-      <div class="step active">
-        <div class="step-num">01</div>
-        <div class="step-text">
-          <h4>Choose Your Path</h4>
-          <p>Browse curated tracks for developers, creators, traders, and entrepreneurs in the Web3 space.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">02</div>
-        <div class="step-text">
-          <h4>Learn from Experts</h4>
-          <p>Study with top industry mentors through hands-on projects, live sessions, and code reviews.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">03</div>
-        <div class="step-text">
-          <h4>Build Real Projects</h4>
-          <p>Deploy smart contracts, launch dApps, and build a portfolio that proves your expertise on-chain.</p>
-        </div>
-      </div>
-      <div class="step">
-        <div class="step-num">04</div>
-        <div class="step-text">
-          <h4>Get Certified & Hired</h4>
-          <p>Earn blockchain-verified certificates and connect with 500+ partner companies worldwide.</p>
-        </div>
-      </div>
+    <div style="display:flex; gap:8px; margin-bottom:24px;">
+      <input type="text" id="couponCode" placeholder="Enter Coupon Code" class="checkout-input" style="margin-bottom:0; text-transform:uppercase;">
+      <button onclick="applyCoupon()" class="btn btn-ghost" style="height:52px;">Apply</button>
     </div>
-    <div class="how-visual">
-      <span class="visual-icon">🚀</span>
-      <h3>Your Skill Progress</h3>
-      <p>Track every milestone as you go from learner to certified Web3 professional.</p>
-      <div class="progress-bars">
-        <div class="pb-row">
-          <div class="pb-label"><strong>Blockchain Basics</strong><span>92%</span></div>
-          <div class="pb-track"><div class="pb-fill pb-fill-1"></div></div>
-        </div>
-        <div class="pb-row">
-          <div class="pb-label"><strong>Smart Contracts</strong><span>76%</span></div>
-          <div class="pb-track"><div class="pb-fill pb-fill-2"></div></div>
-        </div>
-        <div class="pb-row">
-          <div class="pb-label"><strong>DeFi Protocols</strong><span>88%</span></div>
-          <div class="pb-track"><div class="pb-fill pb-fill-3"></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<section>
-  <div class="section-header">
-    <div class="section-tag">Expert Faculty</div>
-    <h2>Meet Our <em>Top Mentors</em></h2>
-    <p>Learn from professionals who have built real products in the blockchain industry.</p>
-  </div>
-  <div class="mentors-grid">
-    <div class="mentor-card">
-      <div class="mentor-avatar">RK</div>
-      <h4>Rafiq Khan</h4>
-      <div class="role">Blockchain Architect</div>
-      <p class="bio">10+ years in distributed systems. Ex-Ethereum Foundation contributor and DeFi protocol designer.</p>
-      <div class="mentor-socials">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">⬡</a>
+    <div style="background:rgba(0,229,255,0.05); border:1px solid var(--border); border-radius:12px; padding:20px; margin-bottom:24px;">
+      <p style="font-weight:bold; margin-bottom:8px;">Manual Payment Instructions:</p>
+      <p style="font-size:0.85rem; color:var(--muted); margin-bottom:12px;">Send the exact amount via "Send Money" to the number below, then fill out the form to verify.</p>
+      
+      <div style="display:flex; justify-content:space-between; background:var(--bg); padding:12px; border-radius:8px; border:1px solid var(--border);">
+        <span style="font-family:monospace; font-size:1.2rem; font-weight:bold; color:var(--accent);">+8801302201431</span>
+        <button onclick="navigator.clipboard.writeText('+8801302201431'); alert('Number Copied!')" style="background:var(--surface2); color:white; border:none; padding:4px 12px; border-radius:4px; cursor:pointer;">Copy</button>
       </div>
-    </div>
-    <div class="mentor-card">
-      <div class="mentor-avatar" style="background:linear-gradient(135deg,#ff4d8d,#7b5cff)">SH</div>
-      <h4>Sara Hossain</h4>
-      <div class="role">Solidity Engineer</div>
-      <p class="bio">Smart contract auditor at CertiK. Authored 3 EIPs and runs a popular Web3 dev community.</p>
-      <div class="mentor-socials">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">⬡</a>
-      </div>
-    </div>
-    <div class="mentor-card">
-      <div class="mentor-avatar" style="background:linear-gradient(135deg,#00e599,#00e5ff)">TM</div>
-      <h4>Tanvir Miah</h4>
-      <div class="role">DeFi Strategist</div>
-      <p class="bio">Built a $20M TVL protocol from scratch. Deep expertise in AMM design and tokenomics modeling.</p>
-      <div class="mentor-socials">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">⬡</a>
-      </div>
-    </div>
-    <div class="mentor-card">
-      <div class="mentor-avatar" style="background:linear-gradient(135deg,#fbbf24,#ff4d8d)">AR</div>
-      <h4>Anika Rashid</h4>
-      <div class="role">NFT & Web3 Creative</div>
-      <p class="bio">Launched 5 successful NFT collections. Expert in digital ownership, metadata, and creator economies.</p>
-      <div class="mentor-socials">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">⬡</a>
-      </div>
-    </div>
-  </div>
-</section>
 
-<div class="cta-section">
-  <h2>Ready to Join the<br><em style="background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:normal">Decentralized Revolution?</em></h2>
-  <p>Over 17,000 learners are already building their Web3 careers with DecentraForce. Your seat is waiting.</p>
-  <div class="cta-btns">
-    <a href="my-courses.html?tab=free" class="btn btn-primary" style="padding:14px 32px;font-size:1rem;">Start Learning Free</a>
-    <a href="my-courses.html" class="btn btn-ghost" style="padding:14px 28px;font-size:1rem;">Explore Courses</a>
+      <div class="payment-badges" style="display:flex; gap:8px; margin-top:16px; justify-content:center;">
+        <span style="background:#e2136e; color:white;">bKash</span>
+        <span style="background:#f7941d; color:white;">Nagad</span>
+        <span style="background:#8c3494; color:white;">Rocket</span>
+        <span style="background:#00529b; color:white;">Upay</span>
+      </div>
+    </div>
+
+    <select id="paymentMethod" class="checkout-input">
+      <option value="" disabled selected>Select Payment Method Used</option>
+      <option value="bkash">bKash</option>
+      <option value="nagad">Nagad</option>
+      <option value="rocket">Rocket</option>
+      <option value="upay">Upay</option>
+    </select>
+    <input type="text" id="senderNumber" placeholder="Your Sender Number (e.g. 017...)" class="checkout-input">
+    <input type="text" id="trxId" placeholder="Transaction ID (TrxID)" class="checkout-input">
+
+    <button onclick="submitPayment()" class="btn btn-primary" style="width:100%; padding:16px; font-size:1.1rem; justify-content:center; margin-top:8px;">
+      Verify & Join Class
+    </button>
   </div>
 </div>
-
-<footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <a href="#" class="logo" style="margin-bottom:4px;display:inline-flex">
-        <div class="logo-icon">DF</div>
-        Decentra<span>Force</span>
-      </a>
-      <p>Your career-building university for the decentralized web. Learn, build, and thrive in Web3.</p>
-      <div style="display:flex;gap:10px">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">📘</a>
-        <a href="#" class="social-btn">▶</a>
-      </div>
-    </div>
-    <div class="footer-col">
-      <h5>Courses</h5>
-      <ul>
-        <li><a href="#">Blockchain Basics</a></li>
-        <li><a href="#">Smart Contracts</a></li>
-        <li><a href="#">DeFi Mastery</a></li>
-        <li><a href="#">NFT & Metaverse</a></li>
-        <li><a href="#">Web3 Development</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h5>Company</h5>
-      <ul>
-        <li><a href="#">About Us</a></li>
-        <li><a href="#">Our Mentors</a></li>
-        <li><a href="#">Careers</a></li>
-        <li><a href="#">Blog</a></li>
-        <li><a href="#">Press Kit</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h5>Support</h5>
-      <ul>
-        <li><a href="#">Help Center</a></li>
-        <li><a href="#">Community Forum</a></li>
-        <li><a href="#">Contact Us</a></li>
-        <li><a href="#">Refund Policy</a></li>
-        <li><a href="#">Affiliate Program</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2026 DecentraForce. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Cookie Settings</a>
-    </div>
-  </div>
-</footer>
-
-<script src="scripts/auth.js"></script>
 
 <script>
-  // Step hover interaction
-  document.querySelectorAll('.step').forEach(s => {
-    s.addEventListener('mouseenter', () => {
-      document.querySelectorAll('.step').forEach(x => x.classList.remove('active'));
-      s.classList.add('active');
-    });
-  });
+  let loadedCourses = [];
+  let checkoutCourse = null;
+  let currentPrice = 0;
 
-  // Handle logout button clicks
-  document.addEventListener('click', function(e) {
-    if (e.target.matches('[data-auth="logout"]') || e.target.closest('[data-auth="logout"]')) {
-      e.preventDefault();
-      if (window.auth) {
-        window.auth.logout().then(result => {
-          if (result.success) {
-            window.location.reload();
-          }
-        });
+  document.addEventListener('DOMContentLoaded', async () => {
+    try {
+      const res = await fetch('/api/public/courses');
+      const data = await res.json();
+      if(data.success) {
+        loadedCourses = data.courses;
+        renderPublicCourses();
       }
+    } catch(e) {
+      document.getElementById('publicCoursesGrid').innerHTML = '<p style="color:red; text-align:center;">Failed to load courses. Please try again later.</p>';
     }
   });
 
-  // Toggle Dropdown
-  function toggleDropdown(e) {
-    e.stopPropagation();
-    document.getElementById('userMenu').classList.toggle('show');
+  function renderPublicCourses() {
+    const grid = document.getElementById('publicCoursesGrid');
+    if(loadedCourses.length === 0) { grid.innerHTML = '<p style="text-align:center; width:100%;">No active courses right now.</p>'; return; }
+    
+    grid.innerHTML = loadedCourses.map(c => {
+      let stats = { price: 0, lectures: 0 };
+      try { const p = typeof c.modules === 'string' ? JSON.parse(c.modules) : c.modules; if(p) stats = p; } catch(e){}
+      
+      return `
+      <div class="course-card">
+        ${c.thumbnail_url ? `<img src="${c.thumbnail_url}" class="card-thumbnail">` : `<div class="card-thumbnail bg-surface2 flex items-center justify-center font-bold text-3xl">DF</div>`}
+        <div style="padding: 24px;">
+          <h3 style="font-family:'Syne'; font-size:1.2rem; font-weight:bold; margin-bottom:12px;">${c.title}</h3>
+          <p style="color:var(--muted); font-size:0.9rem; margin-bottom:20px; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;">${c.description}</p>
+          <div style="display:flex; justify-content:space-between; align-items:center; border-top:1px solid var(--border); padding-top:16px;">
+            <span style="font-weight:bold; color:var(--accent); font-size:1.2rem;">৳${stats.price || 'Free'}</span>
+            <button onclick="openCheckout(${c.id})" class="btn btn-primary" style="padding:8px 16px;">Enroll Now</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
   }
-  
-  // Close dropdown clicking outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.avatar-wrapper')) {
-      const menu = document.getElementById('userMenu');
-      if (menu) menu.classList.remove('show');
-    }
-  });
 
-  // Set avatar initials when auth loads
-  document.addEventListener('DOMContentLoaded', () => {
-    const checkAuth = setInterval(() => {
-      if (window.auth && window.auth.isLoggedIn && window.auth.currentUser) {
-        clearInterval(checkAuth);
-        const user = window.auth.currentUser;
-        const initials = user.username.substring(0, 2).toUpperCase();
-        const avatarEl = document.getElementById('navAvatar');
-        if (avatarEl) avatarEl.textContent = initials;
+  function openCheckout(id) {
+    checkoutCourse = loadedCourses.find(c => c.id === id);
+    if(!checkoutCourse) return;
+
+    let stats = {};
+    try { stats = typeof checkoutCourse.modules === 'string' ? JSON.parse(checkoutCourse.modules) : checkoutCourse.modules; } catch(e){}
+    
+    currentPrice = parseInt(stats.price) || 0;
+
+    document.getElementById('checkoutCourseTitle').textContent = checkoutCourse.title;
+    document.getElementById('checkoutFinalPrice').textContent = `৳${currentPrice}`;
+    document.getElementById('checkoutOriginalPrice').style.display = 'none';
+    document.getElementById('couponCode').value = '';
+    
+    document.getElementById('paymentMethod').value = '';
+    document.getElementById('senderNumber').value = '';
+    document.getElementById('trxId').value = '';
+
+    document.getElementById('checkoutModal').classList.add('open');
+  }
+
+  function closeCheckout() {
+    document.getElementById('checkoutModal').classList.remove('open');
+  }
+
+  async function applyCoupon() {
+    const code = document.getElementById('couponCode').value;
+    if(!code) return alert("Enter a coupon code");
+
+    try {
+      const res = await fetch('/api/public/verify-coupon', {
+        method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({code})
+      });
+      const data = await res.json();
+      
+      if(data.success) {
+        const discountPct = parseInt(data.discount);
+        const newPrice = Math.round(currentPrice - (currentPrice * (discountPct / 100)));
         
-        // If the user is an admin, change "My Profile" to "Admin Dashboard" in the dropdown
-        if (user.isAdmin) {
-          const profileLink = document.querySelector('.dropdown-item[href="my-courses.html?tab=profile"]');
-          if(profileLink) {
-             profileLink.href = "admin.html";
-             profileLink.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Admin Panel`;
-          }
-        }
-      } else if (window.auth && window.auth.isLoggedIn === false && window.auth.currentUser === null) {
-        clearInterval(checkAuth);
+        document.getElementById('checkoutOriginalPrice').textContent = `৳${currentPrice}`;
+        document.getElementById('checkoutOriginalPrice').style.display = 'inline';
+        document.getElementById('checkoutFinalPrice').textContent = `৳${newPrice}`;
+        alert(`Success! ${discountPct}% discount applied.`);
+      } else {
+        alert(data.error || "Invalid Coupon");
       }
-    }, 100);
-  });
+    } catch(e) {
+      alert("Error verifying coupon");
+    }
+  }
+
+  function submitPayment() {
+    const method = document.getElementById('paymentMethod').value;
+    const number = document.getElementById('senderNumber').value;
+    const trxId = document.getElementById('trxId').value;
+
+    if(!method || !number || !trxId) {
+      return alert("Please fill out all payment verification fields!");
+    }
+
+    // In a real app, you'd send this to a backend endpoint like `/api/user/enroll`
+    // For this flow, we will extract the WhatsApp link and redirect them immediately.
+    
+    let stats = {};
+    try { stats = typeof checkoutCourse.modules === 'string' ? JSON.parse(checkoutCourse.modules) : checkoutCourse.modules; } catch(e){}
+    
+    const waLink = stats.whatsappLink;
+
+    if(waLink) {
+      alert("Payment details submitted successfully! Redirecting to the VIP Class WhatsApp Group...");
+      window.location.href = waLink;
+    } else {
+      alert("Payment submitted! The admin will contact you shortly.");
+      closeCheckout();
+    }
+  }
 </script>
 </body>
 </html>
