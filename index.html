@@ -124,6 +124,42 @@
   }
   .btn-outline:hover { background: rgba(0,229,255,.08); }
 
+  /* ─── USER DROPDOWN & AVATAR ─── */
+  .avatar-wrapper { position: relative; display: flex; align-items: center; }
+  .avatar-btn {
+    width: 40px; height: 40px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border: 2px solid var(--border); display: grid; place-items: center;
+    font-size: .85rem; font-weight: 800; color: #fff; cursor: pointer;
+    box-shadow: 0 0 16px rgba(123,92,255,.35); transition: transform 0.2s;
+  }
+  .avatar-btn:hover { transform: scale(1.05); }
+
+  .user-dropdown {
+    position: absolute; top: 120%; right: 0; width: 260px;
+    background: rgba(13, 22, 48, 0.95); backdrop-filter: blur(20px); 
+    border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    overflow: hidden; z-index: 100; opacity: 0; visibility: hidden;
+    transform: translateY(-10px); transition: all 0.2s ease;
+  }
+  .user-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+  .dropdown-header { padding: 16px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .dropdown-header h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--text); margin-bottom: 2px; }
+  .dropdown-header p { font-size: 0.78rem; color: var(--muted); }
+  .dropdown-body { padding: 16px; border-bottom: 1px solid var(--border); }
+  .dropdown-footer { padding: 8px; }
+  .dropdown-item {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 10px 12px; border-radius: 8px; border: none;
+    background: transparent; color: var(--text); font-size: 0.88rem;
+    font-weight: 500; cursor: pointer; transition: background 0.2s; text-align: left;
+    text-decoration: none;
+  }
+  .dropdown-item:hover { background: var(--surface2); color: var(--accent); }
+  .dropdown-item.logout { color: var(--accent3); margin-top: 4px; }
+  .dropdown-item.logout:hover { background: rgba(255,77,141,0.1); }
+
   /* ══════════ HERO ══════════ */
   .hero {
     position: relative; z-index: 1;
@@ -212,51 +248,6 @@
     text-align: center;
     padding: 20px;
   }
-
-  /* Central ring */
-  .orbit-ring {
-    width: 380px; height: 380px; border-radius: 50%;
-    border: 1.5px dashed rgba(0,229,255,.2);
-    position: relative; animation: spin 30s linear infinite;
-    display: flex; align-items: center; justify-content: center;
-  }
-  .orbit-ring-2 {
-    width: 280px; height: 280px; border-radius: 50%;
-    border: 1px solid rgba(123,92,255,.25);
-    position: absolute; animation: spin 20s linear infinite reverse;
-  }
-
-  @keyframes spin { from{transform:rotate(0)} to{transform:rotate(360deg)} }
-
-  .center-badge {
-    width: 160px; height: 160px; border-radius: 50%;
-    background: radial-gradient(circle, var(--surface2), var(--surface));
-    border: 1px solid var(--border);
-    box-shadow: 0 0 60px rgba(0,229,255,.2), inset 0 0 40px rgba(0,229,255,.05);
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    z-index: 2; position: absolute; animation: none;
-  }
-  .center-badge .big-num {
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2.2rem;
-    background: linear-gradient(135deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-  }
-  .center-badge .sub { font-size: .72rem; color: var(--muted); font-weight: 500; letter-spacing: .05em; }
-
-  /* Orbiting dots */
-  .orbit-dot {
-    width: 44px; height: 44px; border-radius: 50%;
-    background: var(--surface2); border: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: center;
-    position: absolute;
-    font-size: 1.1rem;
-    box-shadow: 0 0 20px rgba(0,0,0,.5);
-  }
-
-  .d1 { top: -22px; left: 50%; transform: translateX(-50%); }
-  .d2 { right: -22px; top: 50%; transform: translateY(-50%); }
-  .d3 { bottom: -22px; left: 50%; transform: translateX(-50%); }
-  .d4 { left: -22px; top: 50%; transform: translateY(-50%); }
 
   /* Float cards */
   .float-card {
@@ -549,18 +540,15 @@
     .cta-btns { flex-direction: column; align-items: center; }
   }
 </style>
-<!-- Three.js for 3D visualization -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="scripts/three-scene.js" defer></script>
 </head>
 <body>
 
-<!-- Blobs -->
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
 <div class="blob blob-3"></div>
 
-<!-- ── NAV ── -->
 <nav>
   <a href="#" class="logo">
     <div class="logo-icon">DF</div>
@@ -573,21 +561,42 @@
     <li><a href="my-courses.html?tab=free">বাংলায় শিখি</a></li>
     <li><a href="my-courses.html" style="display:flex;align-items:center;gap:4px">Explore <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a></li>
   </ul>
+  
   <div class="nav-right">
-    <!-- Login button (shown when not logged in) -->
     <a href="login.html" class="btn btn-ghost" data-auth="login">Log In</a>
-    
-    <!-- User info and logout (shown when logged in) -->
-    <div class="user-info" data-auth="user" style="display: none;">
-      <span data-auth="user" data-field="username"></span>
-      <a href="#" class="btn btn-ghost" data-auth="logout" style="margin-left: 10px;">Logout</a>
-    </div>
-    
     <a href="register.html" class="btn btn-primary" style="font-weight: 700; padding: 10px 24px;" data-auth="register">Create Account</a>
+    
+    <div class="avatar-wrapper" data-auth="protected" style="display: none;">
+      <div class="avatar-btn" id="navAvatar" onclick="toggleDropdown(event)">...</div>
+      
+      <div class="user-dropdown" id="userMenu">
+        <div class="dropdown-header">
+          <h4 id="dropName" data-auth="user" data-field="username">Loading...</h4>
+          <p id="dropEmail" data-auth="user" data-field="email">loading@email.com</p>
+        </div>
+        <div class="dropdown-body">
+          <div style="display: flex; justify-content: space-between; font-size: .75rem; color: var(--muted); margin-bottom: 6px;">
+            <span>Avg. Progress</span><span style="color:var(--accent);font-weight:700">47%</span>
+          </div>
+          <div style="height: 5px; background: var(--surface2); border-radius: 3px; overflow: hidden; margin-top:8px">
+            <div style="height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent)); box-shadow: 0 0 8px rgba(0,229,255,.4); width:47%"></div>
+          </div>
+        </div>
+        <div class="dropdown-footer">
+          <a href="my-courses.html?tab=profile" class="dropdown-item">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+            My Profile
+          </a>
+          <button class="dropdown-item logout" data-auth="logout">
+            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            Logout
+          </button>
+        </div>
+      </div>
+    </div>
   </div>
 </nav>
 
-<!-- ── HERO ── -->
 <section class="hero">
   <div class="hero-content">
     <div class="eyebrow">Build Your Web3 Career Right Now</div>
@@ -607,7 +616,6 @@
   </div>
 
   <div class="hero-visual">
-    <!-- Float card: Members -->
     <div class="float-card fc-members">
       <div class="fc-row">
         <div class="fc-icon">👥</div>
@@ -618,9 +626,7 @@
       </div>
     </div>
 
-    <!-- 3D Blockchain Network Visualization -->
     <div id="hero-3d-container" class="three-container">
-      <!-- Canvas will be inserted here by Three.js -->
       <div class="loading-fallback" style="display:flex;align-items:center;justify-content:center;height:100%;color:var(--muted);font-size:.9rem;">
         <div style="text-align:center;">
           <div style="font-size:2rem;margin-bottom:10px;">⏳</div>
@@ -629,7 +635,6 @@
       </div>
     </div>
 
-    <!-- Float card: Mentors -->
     <div class="float-card fc-mentors">
       <div class="fc-big">20+</div>
       <div class="fc-small" style="margin-bottom:8px">Top Expert Mentors</div>
@@ -644,7 +649,6 @@
   </div>
 </section>
 
-<!-- ── STATS BAR ── -->
 <div class="stats-bar">
   <div class="stat-item"><div class="stat-num">17k+</div><div class="stat-label">Active Learners</div></div>
   <div class="stat-item"><div class="stat-num">50+</div><div class="stat-label">Live Courses</div></div>
@@ -653,7 +657,6 @@
   <div class="stat-item"><div class="stat-num">12k+</div><div class="stat-label">Certifications Issued</div></div>
 </div>
 
-<!-- ── COURSES ── -->
 <section id="courses">
   <div class="section-header">
     <div class="section-tag">Our Curriculum</div>
@@ -661,7 +664,6 @@
     <p>Master the skills that shape the decentralized economy — from DeFi to NFTs, smart contracts, and beyond.</p>
   </div>
   <div class="courses-grid">
-    <!-- Card 1 -->
     <div class="course-card">
       <div class="card-banner banner-1">
         <span style="z-index:2;position:relative">⛓️</span>
@@ -677,7 +679,6 @@
         </div>
       </div>
     </div>
-    <!-- Card 2 -->
     <div class="course-card">
       <div class="card-banner banner-2">
         <span style="z-index:2;position:relative">📝</span>
@@ -693,7 +694,6 @@
         </div>
       </div>
     </div>
-    <!-- Card 3 -->
     <div class="course-card">
       <div class="card-banner banner-3">
         <span style="z-index:2;position:relative">🖼️</span>
@@ -709,7 +709,6 @@
         </div>
       </div>
     </div>
-    <!-- Card 4 -->
     <div class="course-card">
       <div class="card-banner banner-4">
         <span style="z-index:2;position:relative">💰</span>
@@ -731,7 +730,6 @@
   </div>
 </section>
 
-<!-- ── HOW IT WORKS ── -->
 <section style="background:rgba(13,22,48,.5);">
   <div class="section-header">
     <div class="section-tag">The Process</div>
@@ -791,7 +789,6 @@
   </div>
 </section>
 
-<!-- ── MENTORS ── -->
 <section>
   <div class="section-header">
     <div class="section-tag">Expert Faculty</div>
@@ -846,7 +843,6 @@
   </div>
 </section>
 
-<!-- ── CTA ── -->
 <div class="cta-section">
   <h2>Ready to Join the<br><em style="background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:normal">Decentralized Revolution?</em></h2>
   <p>Over 17,000 learners are already building their Web3 careers with DecentraForce. Your seat is waiting.</p>
@@ -856,7 +852,6 @@
   </div>
 </div>
 
-<!-- ── FOOTER ── -->
 <footer>
   <div class="footer-top">
     <div class="footer-brand">
@@ -913,7 +908,6 @@
   </div>
 </footer>
 
-<!-- Include authentication script -->
 <script src="scripts/auth.js"></script>
 
 <script>
@@ -927,7 +921,7 @@
 
   // Handle logout button clicks
   document.addEventListener('click', function(e) {
-    if (e.target.matches('[data-auth="logout"]')) {
+    if (e.target.matches('[data-auth="logout"]') || e.target.closest('[data-auth="logout"]')) {
       e.preventDefault();
       if (window.auth) {
         window.auth.logout().then(result => {
@@ -937,6 +931,44 @@
         });
       }
     }
+  });
+
+  // Toggle Dropdown
+  function toggleDropdown(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('show');
+  }
+  
+  // Close dropdown clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.avatar-wrapper')) {
+      const menu = document.getElementById('userMenu');
+      if (menu) menu.classList.remove('show');
+    }
+  });
+
+  // Set avatar initials when auth loads
+  document.addEventListener('DOMContentLoaded', () => {
+    const checkAuth = setInterval(() => {
+      if (window.auth && window.auth.isLoggedIn && window.auth.currentUser) {
+        clearInterval(checkAuth);
+        const user = window.auth.currentUser;
+        const initials = user.username.substring(0, 2).toUpperCase();
+        const avatarEl = document.getElementById('navAvatar');
+        if (avatarEl) avatarEl.textContent = initials;
+        
+        // If the user is an admin, change "My Profile" to "Admin Dashboard" in the dropdown
+        if (user.isAdmin) {
+          const profileLink = document.querySelector('.dropdown-item[href="my-courses.html?tab=profile"]');
+          if(profileLink) {
+             profileLink.href = "admin.html";
+             profileLink.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Admin Panel`;
+          }
+        }
+      } else if (window.auth && window.auth.isLoggedIn === false && window.auth.currentUser === null) {
+        clearInterval(checkAuth);
+      }
+    }, 100);
   });
 </script>
 </body>
