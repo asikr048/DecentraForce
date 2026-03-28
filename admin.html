@@ -8,7 +8,7 @@
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <script>
-  // ⚠️ Replace these with your EmailJS credentials
+  // ⚠️ Replace these with your EmailJS credentials if needed
   const EMAILJS_SERVICE_ID  = 'service_wn7dn1f';
   const EMAILJS_TEMPLATE_ID = 'template_2067o6n';
   const EMAILJS_PUBLIC_KEY  = 'TxlilKkHJZDum1C5v';
@@ -225,7 +225,7 @@
           <div class="grid grid-cols-2 gap-6 mb-6">
             <div>
               <label class="block text-sm text-white mb-2">Course Title</label>
-              <input type="text" id="courseTitle" placeholder="e.g., Full Stack Blockchain Development" class="admin-input">
+              <input type="text" id="courseTitle" placeholder="e.g., Fullstack Blockchain Development" class="admin-input">
             </div>
             <div>
               <label class="block text-sm text-white mb-2">Category (Optional)</label>
@@ -234,7 +234,7 @@
             
             <div>
               <label class="block text-sm text-white mb-2">Short Description</label>
-              <input type="text" id="courseDesc" placeholder="e.g., Short Description" class="admin-input">
+              <input type="text" id="courseDesc" placeholder="Brief summary of the course..." class="admin-input">
             </div>
             <div>
               <label class="block text-sm text-white mb-2">Duration (weeks)</label>
@@ -242,11 +242,34 @@
             </div>
           </div>
 
+          <div class="grid grid-cols-3 gap-6 mb-6">
+            <div>
+              <label class="block text-sm text-white mb-2">Total Lectures</label>
+              <input type="number" id="courseLectures" placeholder="e.g., 300" class="admin-input">
+            </div>
+            <div>
+              <label class="block text-sm text-white mb-2">Total Exercises</label>
+              <input type="number" id="courseExercises" placeholder="e.g., 30" class="admin-input">
+            </div>
+            <div>
+              <label class="block text-sm text-white mb-2">Total Assignments</label>
+              <input type="number" id="courseAssignments" placeholder="e.g., 15" class="admin-input">
+            </div>
+          </div>
+
           <div class="mb-6">
-            <label class="block text-sm text-white mb-2">Course Image (URL)</label>
-            <div class="flex items-center admin-input p-1">
-              <button class="bg-surface2 border border-border text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-bg transition-colors">Choose File</button>
-              <input type="text" id="courseThumbnail" placeholder=" Or paste image URL here..." class="bg-transparent border-none text-white outline-none ml-3 w-full text-sm">
+            <label class="block text-sm text-white mb-2">Course Image</label>
+            <div class="flex flex-col gap-3">
+              <div class="flex items-center admin-input p-1">
+                <label for="imageUploadInput" class="bg-surface2 border border-border text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-bg transition-colors cursor-pointer">
+                  Upload Image
+                </label>
+                <input type="file" id="imageUploadInput" accept="image/*" class="hidden">
+                <input type="text" id="courseThumbnail" placeholder=" Or paste image URL here..." class="bg-transparent border-none text-white outline-none ml-3 w-full text-sm">
+              </div>
+              <div id="imagePreviewContainer" class="hidden w-full h-48 rounded-lg border border-border overflow-hidden bg-bg flex items-center justify-center">
+                <img id="imagePreview" src="" class="h-full object-contain">
+              </div>
             </div>
           </div>
 
@@ -443,6 +466,42 @@ async function loadCourses() {
 }
 
 /* ────────────────────────────────────────────────────────
+   IMAGE UPLOAD LOGIC (Base64 Converter)
+──────────────────────────────────────────────────────── */
+document.getElementById('imageUploadInput').addEventListener('change', function(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  // Check file size (limit to ~2MB to prevent freezing the database)
+  if (file.size > 2 * 1024 * 1024) {
+    showToast('Image is too large. Please use an image under 2MB.', 'error');
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(event) {
+    const base64String = event.target.result;
+    document.getElementById('courseThumbnail').value = base64String;
+    
+    // Show Preview
+    document.getElementById('imagePreview').src = base64String;
+    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+    showToast('Image processed successfully!', 'success');
+  };
+  reader.readAsDataURL(file);
+});
+
+// Show preview if URL is pasted manually
+document.getElementById('courseThumbnail').addEventListener('input', function(e) {
+  if(e.target.value) {
+    document.getElementById('imagePreview').src = e.target.value;
+    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+  } else {
+    document.getElementById('imagePreviewContainer').classList.add('hidden');
+  }
+});
+
+/* ────────────────────────────────────────────────────────
    OVERVIEW
 ──────────────────────────────────────────────────────── */
 function renderOverview() {
@@ -564,40 +623,60 @@ async function saveAccess() {
 }
 
 /* ────────────────────────────────────────────────────────
-   COURSES GRID
+   COURSES GRID (Matches Uploaded Screenshot UI)
 ──────────────────────────────────────────────────────── */
 function renderCoursesGrid() {
   const grid  = document.getElementById('coursesGrid');
   const empty = document.getElementById('coursesEmpty');
   if (allCourses.length === 0) { grid.innerHTML = ''; empty.classList.remove('hidden'); return; }
   empty.classList.add('hidden');
-  grid.innerHTML = allCourses.map(c => `
-    <div class="bg-surface rounded-xl shadow-lg border border-border overflow-hidden transition-transform hover:-translate-y-1 hover:border-[rgba(0,229,255,0.3)]">
+  
+  grid.innerHTML = allCourses.map(c => {
+    
+    // Parse the JSON modules to get our stats
+    let stats = { lectures: 0, exercises: 0, assignments: 0 };
+    try { 
+      const parsed = JSON.parse(c.modules);
+      if (typeof parsed === 'object') stats = parsed;
+    } catch(e) {}
+
+    return `
+    <div class="bg-surface rounded-2xl shadow-lg border border-border overflow-hidden transition-transform hover:-translate-y-1 hover:border-accent flex flex-col">
       ${c.thumbnail_url
-        ? `<img src="${esc(c.thumbnail_url)}" class="w-full h-40 object-cover" alt="" onerror="this.style.display='none'">`
-        : `<div class="w-full h-40 bg-gradient-to-br from-surface2 to-bg flex items-center justify-center border-b border-border">
+        ? `<img src="${esc(c.thumbnail_url)}" class="w-full h-48 object-cover" alt="" onerror="this.style.display='none'">`
+        : `<div class="w-full h-48 bg-gradient-to-br from-surface2 to-bg flex items-center justify-center border-b border-border">
              <span class="text-accent2 font-bold text-3xl opacity-50">${esc(c.title.charAt(0))}</span>
            </div>`}
-      <div class="p-6">
-        <div class="flex items-start justify-between gap-3 mb-2">
-          <h3 class="font-bold text-white text-lg leading-tight" style="font-family:'Syne',sans-serif">${esc(c.title)}</h3>
-          <span class="badge ${c.is_active ? 'badge-green' : 'badge-gray'} shrink-0">${c.is_active ? 'Active' : 'Draft'}</span>
+           
+      <div class="p-6 flex-1 flex flex-col">
+        <h3 class="font-bold text-white text-xl leading-tight mb-4" style="font-family:'Syne',sans-serif">${esc(c.title)}</h3>
+        
+        <div class="flex flex-wrap gap-3 mt-auto mb-6">
+          <div class="bg-surface2 text-muted px-3 py-1.5 rounded-md flex items-center gap-2 text-sm border border-border font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+            ${esc(stats.lectures || 0)} Lecture
+          </div>
+          <div class="bg-surface2 text-muted px-3 py-1.5 rounded-md flex items-center gap-2 text-sm border border-border font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+            ${esc(stats.exercises || 0)} Exercise
+          </div>
+          <div class="bg-surface2 text-muted px-3 py-1.5 rounded-md flex items-center gap-2 text-sm border border-border font-medium">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
+            ${esc(stats.assignments || 0)} Assignment
+          </div>
         </div>
-        <p class="text-sm text-muted mb-5 line-clamp-2">${esc(c.description || 'No description provided.')}</p>
-        <div class="flex items-center justify-between text-xs font-bold text-muted uppercase tracking-wider mb-5">
-          <span>👥 ${c.enrolled_count || 0} enrolled</span>
-          <span>📅 ${fmtDate(c.created_at)}</span>
-        </div>
+
         <div class="flex gap-3">
           <button onclick='openEditCourse(${JSON.stringify(c)})' class="flex-1 bg-surface2 border border-border text-white py-2 rounded-lg text-sm font-bold hover:bg-border transition-colors">EDIT</button>
           <button onclick="deleteCourse(${c.id})" class="flex-1 bg-[rgba(255,77,141,0.1)] border border-[rgba(255,77,141,0.3)] text-accent3 py-2 rounded-lg text-sm font-bold hover:bg-[rgba(255,77,141,0.2)] transition-colors">DELETE</button>
         </div>
       </div>
-    </div>`).join('');
+    </div>`
+  }).join('');
 }
 
 /* ────────────────────────────────────────────────────────
-   ADD / EDIT COURSE FORM (Replaces Modal)
+   ADD / EDIT COURSE FORM
 ──────────────────────────────────────────────────────── */
 function openAddCourse() {
   document.getElementById('courseFormTitle').textContent = 'Add New Course';
@@ -605,14 +684,18 @@ function openAddCourse() {
   document.getElementById('courseTitle').value      = '';
   document.getElementById('courseDesc').value       = '';
   document.getElementById('courseCategory').value   = '';
-  document.getElementById('courseDuration').value   = '';
+  document.getElementById('courseLectures').value   = '';
+  document.getElementById('courseExercises').value  = '';
+  document.getElementById('courseAssignments').value = '';
   document.getElementById('courseThumbnail').value  = '';
   document.getElementById('courseVideo').value      = '';
   document.getElementById('courseContent').value    = '';
   document.getElementById('courseActive').checked   = true;
   
+  document.getElementById('imagePreviewContainer').classList.add('hidden');
+  document.getElementById('imagePreview').src = '';
+  
   showTab('add-course');
-  // Update button text
   document.querySelector('#tab-add-course .btn-gold').textContent = "ADD COURSE";
 }
 
@@ -624,11 +707,27 @@ function openEditCourse(course) {
   document.getElementById('courseThumbnail').value  = course.thumbnail_url || '';
   document.getElementById('courseVideo').value      = course.video_url || '';
   
-  // The DB schema stores rich content in 'modules', map it to courseContent
-  let contentStr = '';
-  try { contentStr = JSON.parse(course.modules); } 
-  catch(e) { contentStr = course.modules || ''; }
-  document.getElementById('courseContent').value    = typeof contentStr === 'string' ? contentStr : JSON.stringify(contentStr);
+  if (course.thumbnail_url) {
+    document.getElementById('imagePreview').src = course.thumbnail_url;
+    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+  } else {
+    document.getElementById('imagePreviewContainer').classList.add('hidden');
+  }
+  
+  // Parse the JSON modules to populate the new fields
+  let modulesObj = { content: '', lectures: '', exercises: '', assignments: '' };
+  try { 
+    const parsed = JSON.parse(course.modules);
+    if (typeof parsed === 'object') modulesObj = parsed;
+    else modulesObj.content = parsed;
+  } catch(e) { 
+    modulesObj.content = course.modules || ''; 
+  }
+
+  document.getElementById('courseContent').value    = modulesObj.content || '';
+  document.getElementById('courseLectures').value   = modulesObj.lectures || '';
+  document.getElementById('courseExercises').value  = modulesObj.exercises || '';
+  document.getElementById('courseAssignments').value = modulesObj.assignments || '';
   
   document.getElementById('courseActive').checked   = course.is_active;
   
@@ -641,12 +740,20 @@ async function saveCourse() {
   const title = document.getElementById('courseTitle').value.trim();
   if (!title) { showToast('Course Title is required', 'error'); return; }
 
+  // Bundle content and new stats into a single JSON object for the database
+  const modulesData = {
+    content: document.getElementById('courseContent').value,
+    lectures: document.getElementById('courseLectures').value || 0,
+    exercises: document.getElementById('courseExercises').value || 0,
+    assignments: document.getElementById('courseAssignments').value || 0
+  };
+
   const body = {
     title,
     description:   document.getElementById('courseDesc').value,
     thumbnail_url: document.getElementById('courseThumbnail').value,
     video_url:     document.getElementById('courseVideo').value,
-    modules:       document.getElementById('courseContent').value, // Mapping detailed content to 'modules'
+    modules:       JSON.stringify(modulesData), 
     is_active:     document.getElementById('courseActive').checked,
   };
   if (id) body.id = parseInt(id);
