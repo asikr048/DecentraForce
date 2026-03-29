@@ -482,6 +482,105 @@ nav {
   }
 }
 
+/* ══════════ MOBILE MENU & TOUCH IMPROVEMENTS ══════════ */
+.mobile-menu-toggle {
+  display: none;
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  width: 44px;
+  height: 44px;
+  border-radius: 8px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  margin-left: 10px;
+  transition: all 0.2s ease;
+}
+
+.mobile-menu-toggle:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 70px;
+  left: 0;
+  right: 0;
+  background: rgba(5, 10, 24, 0.98);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 20px;
+  z-index: 99;
+  flex-direction: column;
+  gap: 15px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.mobile-menu .nav-links {
+  display: flex !important;
+  flex-direction: column;
+  gap: 15px;
+  list-style: none;
+}
+
+.mobile-menu .nav-links a {
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.mobile-menu .nav-links a:hover {
+  background: rgba(0, 229, 255, 0.1);
+  border-color: var(--border);
+}
+
+/* Improve touch targets */
+.btn, .course-card, .modal-close, .social-btn {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Modal improvements for mobile */
+@media (max-width: 768px) {
+  .modal {
+    width: 95%;
+    margin: 10px;
+  }
+  
+  .modal-actions {
+    flex-direction: column;
+  }
+  
+  .modal-actions .btn {
+    width: 100%;
+  }
+}
+
+/* Show mobile menu toggle on small screens */
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: block !important;
+  }
+  
+  .nav-links:not(.mobile-menu .nav-links) {
+    display: none !important;
+  }
+}
+
 /* ══════════ UTILITY CLASSES ══════════ */
 .container {
   width: 100%;
