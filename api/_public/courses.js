@@ -14,7 +14,7 @@ export default async function handler(req, res) {
         id, title, description,
         CASE WHEN length(thumbnail_url) > 2000000 THEN '' ELSE thumbnail_url END as thumbnail_url,
         modules, created_at,
-        price, whatsapp
+        price, whatsapp, status
       FROM courses
       WHERE is_active = TRUE
       ORDER BY created_at DESC

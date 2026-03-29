@@ -86,6 +86,10 @@
     display: flex; align-items: center; gap: 10px;
     font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem;
     color: var(--text); text-decoration: none; letter-spacing: -.5px;
+    white-space: nowrap;
+    overflow: visible;
+    text-overflow: unset;
+    flex-shrink: 0;
   }
   .logo-icon {
     width: 36px; height: 36px;
@@ -548,6 +552,8 @@
     .footer-top { grid-template-columns: 1fr; }
     .cta-section { padding: 40px 24px; }
     .cta-btns { flex-direction: column; align-items: center; }
+    .logo { font-size: 1.1rem; }
+    .logo-icon { width: 32px; height: 32px; font-size: 0.75rem; }
   }
 
   /* ══════════ CHECKOUT MODAL ══════════ */
@@ -718,12 +724,17 @@
       Decentralized<br>
       <span class="line-accent">Future</span>
     </h1>
-    <p>We're committed to providing top-quality blockchain and Web3 education to boost your skills. Dive into focused, stress-free learning with industry-leading mentors.</p>
+    <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 36px;">
+      Making Everyone a King 👑<br>
+      <span style="color:var(--accent)">Power</span>, <span style="color:var(--accent)">Knowledge</span>, and <span style="color:var(--accent)">Opportunity</span> — Decentralized for All.<br>
+      We believe in <span style="color:var(--accent)">equality</span>, <span style="color:var(--accent)">individuality</span>, and <span style="color:var(--accent)">financial freedom</span> beyond borders.<br>
+      Not just blockchain — a movement for <span style="color:var(--accent)">equal power</span> and <span style="color:var(--accent)">self‑sovereignty</span>.
+    </p>
     <div class="hero-btns">
       <a href="my-courses.html" class="btn btn-primary" style="padding:13px 28px;font-size:.95rem;">🚀 Get Started</a>
-      <a href="my-courses.html?tab=free" class="btn btn-outline" style="padding:13px 22px;font-size:.95rem;">
+      <a href="#free-courses" class="btn btn-outline" style="padding:13px 22px;font-size:.95rem;">
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="7" stroke="currentColor" stroke-width="1.5"/><path d="M6.5 5.5l4 2.5-4 2.5V5.5z" fill="currentColor"/></svg>
-        Watch Demo
+        Free Courses
       </a>
     </div>
   </div>
@@ -843,6 +854,23 @@
   </div>
 </section>
 
+<section id="free-courses">
+  <div class="section-header">
+    <div class="section-tag">Free Learning</div>
+    <h2>Start with <em>Free Courses</em></h2>
+    <p>Jump into blockchain with our curated free courses. No payment required — learn at your own pace.</p>
+  </div>
+  <div class="courses-grid" id="free-courses-grid">
+    <!-- Free courses will be loaded dynamically -->
+    <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
+      Loading free courses...
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:40px">
+    <a href="my-courses.html?tab=free" class="btn btn-outline" style="padding:13px 28px;font-size:.95rem;">Browse All Free Courses →</a>
+  </div>
+</section>
+
 <section style="background:rgba(13,22,48,.5);">
   <div class="section-header">
     <div class="section-tag">The Process</div>
@@ -902,57 +930,35 @@
   </div>
 </section>
 
-<section>
+<section id="mentors-section">
   <div class="section-header">
     <div class="section-tag">Expert Faculty</div>
     <h2>Meet Our <em>Top Mentors</em></h2>
     <p>Learn from professionals who have built real products in the blockchain industry.</p>
   </div>
-  <div class="mentors-grid">
-    <div class="mentor-card">
-      <div class="mentor-avatar">RK</div>
-      <h4>Rafiq Khan</h4>
-      <div class="role">Blockchain Architect</div>
-      <p class="bio">10+ years in distributed systems. Ex-Ethereum Foundation contributor and DeFi protocol designer.</p>
-      <div class="mentor-socials">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">⬡</a>
+  <div class="mentors-grid" id="mentors-container">
+    <!-- Mentors will be loaded dynamically from localStorage -->
+    <div class="empty-state" id="mentors-empty">
+      <div class="empty-icon">👨‍🏫</div>
+      <h3>No mentors yet</h3>
+      <p>Our expert mentors will be listed here soon.</p>
+      <div style="margin-top: 20px;">
+        <a href="admin.html?tab=mentors" class="btn btn-outline" style="padding: 10px 20px; font-size: 0.9rem;">
+          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px;">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          Add Mentors (Admin)
+        </a>
       </div>
     </div>
-    <div class="mentor-card">
-      <div class="mentor-avatar" style="background:linear-gradient(135deg,#ff4d8d,#7b5cff)">SH</div>
-      <h4>Sara Hossain</h4>
-      <div class="role">Solidity Engineer</div>
-      <p class="bio">Smart contract auditor at CertiK. Authored 3 EIPs and runs a popular Web3 dev community.</p>
-      <div class="mentor-socials">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">⬡</a>
-      </div>
-    </div>
-    <div class="mentor-card">
-      <div class="mentor-avatar" style="background:linear-gradient(135deg,#00e599,#00e5ff)">TM</div>
-      <h4>Tanvir Miah</h4>
-      <div class="role">DeFi Strategist</div>
-      <p class="bio">Built a $20M TVL protocol from scratch. Deep expertise in AMM design and tokenomics modeling.</p>
-      <div class="mentor-socials">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">⬡</a>
-      </div>
-    </div>
-    <div class="mentor-card">
-      <div class="mentor-avatar" style="background:linear-gradient(135deg,#fbbf24,#ff4d8d)">AR</div>
-      <h4>Anika Rashid</h4>
-      <div class="role">NFT & Web3 Creative</div>
-      <p class="bio">Launched 5 successful NFT collections. Expert in digital ownership, metadata, and creator economies.</p>
-      <div class="mentor-socials">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">⬡</a>
-      </div>
-    </div>
+  </div>
+  <div style="text-align:center; margin-top: 40px;">
+    <a href="admin.html?tab=mentors" class="btn btn-outline">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:8px">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+      Manage Mentors (Admin)
+    </a>
   </div>
 </section>
 
@@ -965,63 +971,117 @@
   </div>
 </div>
 
-<footer>
-  <div class="footer-top">
-    <div class="footer-brand">
-      <a href="#" class="logo" style="margin-bottom:4px;display:inline-flex">
-        <div class="logo-icon">DF</div>
-        Decentra<span>Force</span>
-      </a>
-      <p>Your career-building university for the decentralized web. Learn, build, and thrive in Web3.</p>
-      <div style="display:flex;gap:10px">
-        <a href="#" class="social-btn">𝕏</a>
-        <a href="#" class="social-btn">in</a>
-        <a href="#" class="social-btn">📘</a>
-        <a href="#" class="social-btn">▶</a>
-      </div>
-    </div>
-    <div class="footer-col">
-      <h5>Courses</h5>
-      <ul>
-        <li><a href="#">Blockchain Basics</a></li>
-        <li><a href="#">Smart Contracts</a></li>
-        <li><a href="#">DeFi Mastery</a></li>
-        <li><a href="#">NFT & Metaverse</a></li>
-        <li><a href="#">Web3 Development</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h5>Company</h5>
-      <ul>
-        <li><a href="#">About Us</a></li>
-        <li><a href="#">Our Mentors</a></li>
-        <li><a href="#">Careers</a></li>
-        <li><a href="#">Blog</a></li>
-        <li><a href="#">Press Kit</a></li>
-      </ul>
-    </div>
-    <div class="footer-col">
-      <h5>Support</h5>
-      <ul>
-        <li><a href="#">Help Center</a></li>
-        <li><a href="#">Community Forum</a></li>
-        <li><a href="#">Contact Us</a></li>
-        <li><a href="#">Refund Policy</a></li>
-        <li><a href="#">Affiliate Program</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <p>© 2026 DecentraForce. All rights reserved.</p>
-    <div class="footer-links">
-      <a href="#">Privacy Policy</a>
-      <a href="#">Terms of Service</a>
-      <a href="#">Cookie Settings</a>
-    </div>
-  </div>
+<footer id="dynamic-footer">
+  <!-- Footer content will be rendered by JavaScript -->
 </footer>
 
 <script src="scripts/auth.js"></script>
+<script src="scripts/feedback.js"></script>
+<script src="scripts/floating-feedback.js" defer></script>
+<script>
+// ==================== DYNAMIC FOOTER RENDERING ====================
+
+// Default footer data (same as in admin.html)
+const defaultFooterData = {
+  description: "Your career-building university for the decentralized web. Learn, build, and thrive in Web3.",
+  social: {
+    twitter: "#",
+    linkedin: "#",
+    facebook: "#",
+    youtube: "#"
+  },
+  courses: ["Blockchain Basics", "Smart Contracts", "DeFi Mastery", "NFT & Metaverse", "Web3 Development"],
+  company: ["About Us", "Our Mentors", "Careers", "Blog", "Press Kit"],
+  support: ["Help Center", "Community Forum", "Contact Us", "Refund Policy", "Affiliate Program"]
+};
+
+// Get footer data from localStorage
+function getFooterData() {
+  try {
+    const data = localStorage.getItem('footerData');
+    return data ? JSON.parse(data) : defaultFooterData;
+  } catch (error) {
+    console.error('Error reading footer data:', error);
+    return defaultFooterData;
+  }
+}
+
+// Render footer based on data
+function renderFooter() {
+  const footer = document.getElementById('dynamic-footer');
+  if (!footer) return;
+  
+  const data = getFooterData();
+  
+  // Determine social button icons and labels
+  const socialButtons = [
+    { key: 'twitter', icon: '𝕏', label: 'Twitter/X', url: data.social.twitter },
+    { key: 'linkedin', icon: 'in', label: 'LinkedIn', url: data.social.linkedin },
+    { key: 'facebook', icon: '📘', label: 'Facebook', url: data.social.facebook },
+    { key: 'youtube', icon: '▶', label: 'YouTube', url: data.social.youtube }
+  ];
+  
+  // Generate list HTML from array
+  function generateList(items) {
+    return items.map(item => `<li><a href="#">${item}</a></li>`).join('');
+  }
+  
+  const footerHTML = `
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a href="#" class="logo" style="margin-bottom:4px;display:inline-flex">
+          <div class="logo-icon">DF</div>
+          Decentra<span>Force</span>
+        </a>
+        <p>${data.description}</p>
+        <div style="display:flex;gap:10px">
+          ${socialButtons.map(btn =>
+            `<a href="${btn.url}" class="social-btn" title="${btn.label}" ${btn.url !== '#' ? 'target="_blank"' : ''}>${btn.icon}</a>`
+          ).join('')}
+        </div>
+      </div>
+      <div class="footer-col">
+        <h5>Courses</h5>
+        <ul>
+          ${generateList(data.courses)}
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          ${generateList(data.company)}
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Support</h5>
+        <ul>
+          ${generateList(data.support)}
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© ${new Date().getFullYear()} DecentraForce. All rights reserved.</p>
+      <div class="footer-links">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms of Service</a>
+        <a href="#">Cookie Settings</a>
+      </div>
+    </div>
+  `;
+  
+  footer.innerHTML = footerHTML;
+}
+
+// Initialize footer when DOM is loaded
+document.addEventListener('DOMContentLoaded', renderFooter);
+
+// Also re-render when localStorage changes (if user updates from admin panel)
+window.addEventListener('storage', (e) => {
+  if (e.key === 'footerData') {
+    renderFooter();
+  }
+});
+</script>
 
 <script>
   // Step hover interaction
@@ -1098,9 +1158,9 @@
       }
     }
 
-    // Render course cards
-    function renderCourses(courses) {
-      const container = document.querySelector('.courses-grid');
+    // Render course cards into a given container
+    function renderCourseGrid(containerSelector, courses, options = {}) {
+      const container = document.querySelector(containerSelector);
       if (!container) return;
 
       // Clear existing static cards
@@ -1122,6 +1182,27 @@
         const badge = badges[index % badges.length];
         const price = course.price ? `৳${course.price}` : '৳2,500';
         const originalPrice = course.price ? `৳${Math.round(course.price * 1.5)}` : '৳4,500';
+        
+        // For free courses, show "Free" instead of price
+        const isFree = course.price === 0 || course.price === '0' || course.price === null;
+        const priceDisplay = isFree ? '<span style="color:var(--accent);font-weight:700">Free</span>' : `<div class="price"><span>${originalPrice}</span>${price}</div>`;
+        
+        // Determine button text based on course status
+        const status = course.status || 'upcoming';
+        let buttonText, buttonClass;
+        if (status === 'completed') {
+          buttonText = 'Closed';
+          buttonClass = 'btn-disabled';
+        } else if (status === 'upcoming') {
+          buttonText = 'Coming Soon';
+          buttonClass = 'btn-secondary';
+        } else if (isFree) {
+          buttonText = 'Enroll Now';
+          buttonClass = 'btn-success';
+        } else {
+          buttonText = 'Buy Now';
+          buttonClass = 'btn-primary';
+        }
 
         const card = document.createElement('div');
         card.className = 'course-card';
@@ -1139,23 +1220,33 @@
             <h3>${course.title || 'Untitled Course'}</h3>
             <p>${course.description || 'Learn essential skills in this comprehensive course.'}</p>
             <div class="card-footer">
-              <button class="btn btn-primary buy-now-btn" style="padding:8px 16px;font-size:0.85rem;" data-course-id="${course.id}">
-                Buy Now
+              <button class="btn ${buttonClass} buy-now-btn" style="padding:8px 16px;font-size:0.85rem;" data-course-id="${course.id}" data-is-free="${isFree}">
+                ${buttonText}
               </button>
-              <div class="price"><span>${originalPrice}</span>${price}</div>
+              ${priceDisplay}
             </div>
           </div>
         `;
         container.appendChild(card);
       });
 
-      // Attach event listeners to Buy Now buttons
-      document.querySelectorAll('.buy-now-btn').forEach(btn => {
+      // Attach event listeners to Buy Now/Enroll Now buttons
+      container.querySelectorAll('.buy-now-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
           const courseId = this.dataset.courseId;
+          const isFree = this.dataset.isFree === 'true';
           const course = courses.find(c => c.id == courseId);
-          if (course) openCheckoutModal(course);
+          if (!course) return;
+          
+          if (isFree) {
+            // For free courses, show a success message or redirect
+            alert(`You have successfully enrolled in "${course.title}"! The course is now available in your dashboard.`);
+            // Optionally redirect to my-courses.html?tab=free
+            // window.location.href = 'my-courses.html?tab=free';
+          } else {
+            openCheckoutModal(course);
+          }
         });
       });
     }
@@ -1194,9 +1285,131 @@
 
     // Initialize courses
     const courses = getCoursesFromStorage();
-    renderCourses(courses);
+    
+    // Render all courses in the main courses grid
+    renderCourseGrid('.courses-grid', courses);
+    
+    // Filter free courses (price == 0) and render in free courses section
+    const freeCourses = courses.filter(course => course.price === 0 || course.price === '0' || course.price === null);
+    renderCourseGrid('#free-courses-grid', freeCourses);
+  });
+
+  // Mentor Management Functions for Frontend
+  function getMentorsFromStorage() {
+    try {
+      const mentorsJson = localStorage.getItem('mentors');
+      return mentorsJson ? JSON.parse(mentorsJson) : [];
+    } catch (error) {
+      console.error('Error reading mentors from localStorage:', error);
+      return [];
+    }
+  }
+
+  function renderMentorsGrid() {
+    const container = document.getElementById('mentors-container');
+    const emptyState = document.getElementById('mentors-empty');
+    if (!container) return;
+
+    const mentors = getMentorsFromStorage();
+    
+    if (mentors.length === 0) {
+      // Show empty state
+      if (emptyState) emptyState.style.display = 'block';
+      container.innerHTML = '';
+      // Keep the empty state HTML that's already in the container
+      return;
+    }
+
+    // Hide empty state
+    if (emptyState) emptyState.style.display = 'none';
+
+    // Generate initials from name
+    function getInitials(name) {
+      return name.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
+    }
+
+    // Generate random gradient
+    function getRandomGradient() {
+      const gradients = [
+        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+        'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
+        'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)'
+      ];
+      return gradients[Math.floor(Math.random() * gradients.length)];
+    }
+
+    const mentorsHTML = mentors.map(mentor => `
+      <div class="mentor-card">
+        <div class="mentor-avatar" style="background:${getRandomGradient()}">
+          ${mentor.imageUrl && mentor.imageUrl !== 'https://via.placeholder.com/150'
+            ? `<img src="${mentor.imageUrl}" alt="${mentor.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+            : getInitials(mentor.name)}
+        </div>
+        <h4>${mentor.name}</h4>
+        <div class="role">${mentor.title}</div>
+        <p class="bio">Expert in blockchain technology with extensive industry experience.</p>
+        <div class="mentor-socials">
+          <a href="#" class="social-btn">𝕏</a>
+          <a href="#" class="social-btn">in</a>
+          <a href="#" class="social-btn">⬡</a>
+        </div>
+      </div>
+    `).join('');
+
+    container.innerHTML = mentorsHTML;
+  }
+
+  // Initialize mentors section
+  document.addEventListener('DOMContentLoaded', () => {
+    renderMentorsGrid();
+    
+    // Also re-render when localStorage changes (optional)
+    window.addEventListener('storage', (e) => {
+      if (e.key === 'mentors') {
+        renderMentorsGrid();
+      }
+    });
+  });
+
+  // Initialize feedback section
+  document.addEventListener('DOMContentLoaded', () => {
+    if (typeof initFeedbackSection === 'function') {
+      initFeedbackSection();
+    }
   });
 </script>
+
+<!-- Student Feedback Section -->
+<section id="student-feedback" style="padding: 100px 5%; background: linear-gradient(135deg, rgba(13,22,48,0.8) 0%, rgba(5,10,24,0.9) 100%);">
+  <div class="section-header">
+    <div class="section-tag">Student Voices</div>
+    <h2>What Our <em>Students Say</em></h2>
+    <p>Real feedback from learners who transformed their careers with DecentraForce.</p>
+  </div>
+  
+  <div class="feedback-grid" id="feedback-container">
+    <!-- Feedback cards will be loaded dynamically -->
+    <div class="empty-state">
+      <div class="empty-icon">💬</div>
+      <h3>No feedback yet</h3>
+      <p>Be the first to share your experience!</p>
+    </div>
+  </div>
+  
+  <div style="text-align:center; margin-top: 50px;">
+    <button class="btn btn-outline" onclick="window.location.href='admin.html?tab=feedback'">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:8px">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+      </svg>
+      Add Your Feedback (Admin)
+    </button>
+  </div>
+</section>
 
 <!-- Checkout Modal -->
 <div class="modal-overlay" id="checkoutModal">
@@ -1215,6 +1428,51 @@
       </div>
     </div>
   </div>
+</div>
+
+<!-- Floating Feedback Button -->
+<div id="feedbackButton" class="feedback-button">
+  <div class="feedback-icon">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0034 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.9C9.87812 3.30493 11.1801 2.99656 12.5 3H13C15.0843 3.11499 17.053 3.99477 18.5291 5.47087C20.0052 6.94696 20.885 8.91565 21 11V11.5Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </div>
+  <span class="feedback-label">Feedback</span>
+</div>
+
+<!-- Feedback Modal -->
+<div id="feedbackModal" class="feedback-modal-overlay">
+  <div class="feedback-modal">
+    <div class="feedback-modal-header">
+      <h3>Share Your Feedback</h3>
+      <button class="feedback-modal-close" id="feedbackModalClose">&times;</button>
+    </div>
+    <div class="feedback-modal-body">
+      <form id="feedbackForm">
+        <div class="form-group">
+          <label for="feedbackName">Name (optional)</label>
+          <input type="text" id="feedbackName" class="feedback-input" placeholder="Your name">
+        </div>
+        <div class="form-group">
+          <label for="feedbackContact">Contact (optional)</label>
+          <input type="text" id="feedbackContact" class="feedback-input" placeholder="Email or phone">
+        </div>
+        <div class="form-group">
+          <label for="feedbackMessage">Feedback Message <span class="required">*</span></label>
+          <textarea id="feedbackMessage" class="feedback-textarea" placeholder="Your feedback, suggestions, or issues..." rows="4" required></textarea>
+        </div>
+        <div class="feedback-modal-actions">
+          <button type="button" class="feedback-btn feedback-btn-secondary" id="feedbackCancel">Cancel</button>
+          <button type="submit" class="feedback-btn feedback-btn-primary">Submit Feedback</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Success Toast -->
+<div id="feedbackToast" class="feedback-toast">
+  <span id="feedbackToastMessage">Feedback submitted successfully!</span>
 </div>
 
 </body>

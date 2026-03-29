@@ -317,6 +317,57 @@
   }
   .save-btn:hover { transform: translateY(-2px); box-shadow: 0 0 30px rgba(123,92,255,.5); }
 
+  /* ─── EMPTY STATES & LOADING ─── */
+  .empty-state {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    margin: 20px 0;
+  }
+  .empty-icon {
+    font-size: 3.5rem;
+    margin-bottom: 16px;
+    opacity: 0.7;
+  }
+  .empty-state h3 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .empty-state p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 400px;
+    margin: 0 auto;
+  }
+  .loading-courses {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--muted);
+    font-size: 1rem;
+  }
+  .loading-courses::after {
+    content: '';
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    margin-left: 10px;
+    animation: spin 1s linear infinite;
+    vertical-align: middle;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
   /* ─── ANIMATIONS ─── */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
@@ -328,6 +379,17 @@
     .courses-grid { grid-template-columns: 1fr; }
     .topbar { padding: 0 16px; }
     .student-id-badge { display: none; }
+    
+    /* Modal responsive improvements */
+    .modal { max-width: 95%; margin: 10px; }
+    .modal-header { padding: 18px 20px 16px; }
+    .modal-body { padding: 20px; }
+    .modal-actions { flex-direction: column; gap: 10px; }
+    .modal-actions .btn { width: 100%; }
+    .coupon-input-group { flex-direction: column; }
+    .coupon-input-group input { margin-bottom: 10px; }
+    .btn-coupon { width: 100%; }
+    .payment-methods { justify-content: center; }
   }
 
   /* ══════════ CHECKOUT MODAL ══════════ */
@@ -1024,21 +1086,66 @@
     renderCourses();
   }
 
+  // Load purchases from localStorage
+  function loadPurchasesFromLocalStorage() {
+    try {
+      const purchasesJson = localStorage.getItem('purchases');
+      if (!purchasesJson) return [];
+      
+      const purchases = JSON.parse(purchasesJson);
+      if (!Array.isArray(purchases)) return [];
+      
+      return purchases;
+    } catch (error) {
+      console.error('Error loading purchases from localStorage:', error);
+      return [];
+    }
+  }
+
+  // Filter purchases by status "approved"
+  function filterApprovedPurchases(purchases) {
+    if (!Array.isArray(purchases)) return [];
+    return purchases.filter(p =>
+      p && typeof p === 'object' &&
+      p.status && p.status.toLowerCase() === 'approved'
+    );
+  }
+
   function renderCourses() {
-    if (!allCourses || allCourses.length === 0) {
+    // Ensure allCourses is an array
+    const courses = Array.isArray(allCourses) ? allCourses : [];
+    
+    // Load and filter purchases
+    const allPurchases = loadPurchasesFromLocalStorage();
+    const approvedPurchases = filterApprovedPurchases(allPurchases);
+    
+    // Get course IDs from approved purchases
+    const purchasedCourseIds = approvedPurchases.map(p => p.courseId).filter(id => id);
+    
+    // Find purchased courses from allCourses
+    const purchasedCourses = courses.filter(course =>
+      purchasedCourseIds.includes(course.id?.toString())
+    );
+
+    if (courses.length === 0 && purchasedCourses.length === 0) {
       document.getElementById('available-courses').innerHTML =
-        '<div class="empty-state">No courses available yet.</div>';
+        '<div class="empty-state"><div class="empty-icon">📚</div><h3>No courses available</h3><p>Check back soon for new courses!</p></div>';
       document.getElementById('purchased-courses').innerHTML =
-        '<div class="empty-state">No purchased courses.</div>';
+        '<div class="empty-state"><div class="empty-icon">🛒</div><h3>No purchased courses</h3><p>Purchase a course to get started.</p></div>';
       document.getElementById('free-courses').innerHTML =
-        '<div class="empty-state">No free courses available.</div>';
+        '<div class="empty-state"><div class="empty-icon">🎁</div><h3>No free courses</h3><p>Free courses will appear here when available.</p></div>';
       return;
     }
 
-    // Filter courses by type (simplified logic)
-    const availableCourses = allCourses.filter(c => c.price > 0);
-    const freeCourses = allCourses.filter(c => c.price === 0);
-    const purchasedCourses = []; // In a real app, this would come from user data
+    // Filter courses by type with safe defaults
+    const availableCourses = courses.filter(c => {
+      const price = parseFloat(c.price) || 0;
+      return price > 0 && !purchasedCourseIds.includes(c.id?.toString());
+    });
+    const freeCourses = courses.filter(c => {
+      const price = parseFloat(c.price) || 0;
+      return price === 0 && !purchasedCourseIds.includes(c.id?.toString());
+    });
 
     renderCourseGrid('available-courses', availableCourses, 'Available');
     renderCourseGrid('purchased-courses', purchasedCourses, 'Purchased');
@@ -1048,28 +1155,54 @@
   function renderCourseGrid(containerId, courses, type) {
     const container = document.getElementById(containerId);
     
-    if (courses.length === 0) {
-      container.innerHTML = `<div class="empty-state">No ${type.toLowerCase()} courses.</div>`;
+    if (!container) return;
+    
+    if (!Array.isArray(courses) || courses.length === 0) {
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><h3>No ${type.toLowerCase()} courses</h3><p>${type === 'Available' ? 'Check back soon for new courses!' : type === 'Purchased' ? 'Purchase a course to get started.' : 'Free courses will appear here when available.'}</p></div>`;
       return;
     }
 
-    container.innerHTML = courses.map(course => `
+    container.innerHTML = courses.map(course => {
+      // Safe defaults for missing data
+      const courseId = course.id || Math.random().toString(36).substring(2);
+      const title = course.title || 'Untitled Course';
+      const description = course.description || 'Learn essential skills in this comprehensive course.';
+      const price = parseFloat(course.price) || 0;
+      const whatsapp = course.whatsapp || '';
+      const modules = course.modules || '';
+      
+      // Determine status badge
+      let statusText = 'Available';
+      let statusClass = 'nano';
+      if (type === 'Free') {
+        statusText = 'Free';
+        statusClass = 'free';
+      } else if (type === 'Purchased') {
+        statusText = 'Purchased';
+        statusClass = 'sub';
+      }
+      
+      // Format price display
+      const priceDisplay = price > 0 ? `৳${price}` : 'Free';
+      
+      return `
       <div class="course-card" style="animation-delay:.05s">
         <div class="card-thumbnail">
           <div class="thumb-placeholder thumb-bg-${Math.floor(Math.random() * 3) + 1}">
-            ${getEmojiForCourse(course.title)}
+            ${getEmojiForCourse(title)}
           </div>
           <div class="thumb-glow"></div>
-          <span class="card-badge badge-${type === 'Free' ? 'free' : type === 'Purchased' ? 'sub' : 'nano'}">
-            ${type === 'Free' ? 'Free' : type === 'Purchased' ? 'Purchased' : 'Available'}
+          <span class="card-badge badge-${statusClass}">
+            ${statusText}
           </span>
         </div>
         <div class="card-body">
-          <div class="card-title">${escapeHtml(course.title)}</div>
+          <div class="card-title">${escapeHtml(title)}</div>
+          <p class="card-description">${escapeHtml(description.substring(0, 100))}${description.length > 100 ? '...' : ''}</p>
           <div class="card-stats">
             <div class="stat-pill">📦 ${getModuleCount(course)} Lecture</div>
-            ${course.price > 0 ? `<div class="stat-pill">💰 $${course.price}</div>` : ''}
-            ${course.whatsapp ? `<div class="stat-pill">💬 WhatsApp Group</div>` : ''}
+            ${price > 0 ? `<div class="stat-pill">💰 ${priceDisplay}</div>` : ''}
+            ${whatsapp ? `<div class="stat-pill">💬 WhatsApp Group</div>` : ''}
           </div>
           <div class="card-progress">
             <div class="progress-label"><span>Progress</span><span>0%</span></div>
@@ -1081,7 +1214,7 @@
           ${getCourseButton(course, type)}
         </div>
       </div>
-    `).join('');
+    `}).join('');
 
     // Attach event listeners to Buy Now buttons
     if (type === 'Available') {
@@ -1089,27 +1222,108 @@
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
           const courseId = this.dataset.courseId;
-          const course = courses.find(c => c.id == courseId);
+          const course = courses.find(c => (c.id || '').toString() === courseId.toString());
           if (course) openCheckoutModal(course);
         });
       });
     }
+    
+    // Attach event listeners to Open Course buttons for purchased and free courses
+    if (type === 'Purchased' || type === 'Free') {
+      container.querySelectorAll('.open-course-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const courseId = this.dataset.courseId;
+          const course = courses.find(c => (c.id || '').toString() === courseId.toString());
+          if (course) openCourseContent(courseId, course.title);
+        });
+      });
+      
+      // Make entire course card clickable for purchased courses
+      if (type === 'Purchased') {
+        container.querySelectorAll('.course-card').forEach(card => {
+          const courseId = card.querySelector('.open-course-btn')?.dataset.courseId;
+          if (courseId) {
+            card.style.cursor = 'pointer';
+            card.addEventListener('click', function(e) {
+              // Don't trigger if clicking on button or link inside
+              if (e.target.closest('.open-course-btn') || e.target.closest('a')) {
+                return;
+              }
+              const course = courses.find(c => (c.id || '').toString() === courseId.toString());
+              if (course) openCourseContent(courseId, course.title);
+            });
+          }
+        });
+      }
+    }
   }
 
   function getCourseButton(course, type) {
+    const courseId = course.id || '';
+    const whatsapp = course.whatsapp || '';
+    const status = course.status || 'upcoming';
+    
     // WhatsApp group link takes priority
-    if (course.whatsapp) {
-      return `<a href="${escapeHtml(course.whatsapp)}" target="_blank" class="continue-btn">Join Group</a>`;
+    if (whatsapp) {
+      return `<a href="${escapeHtml(whatsapp)}" target="_blank" class="continue-btn">Join Group</a>`;
     }
     
     // Determine button based on course type
     if (type === 'Purchased') {
-      return `<a href="video-course.html?courseId=${course.id}" class="continue-btn">▶ Continue</a>`;
+      return `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">▶ Continue</button>`;
     } else if (type === 'Free') {
-      return `<a href="video-course.html?courseId=${course.id}" class="continue-btn">🎓 Enroll Now</a>`;
+      return `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">🎓 Enroll Now</button>`;
     } else { // Available (paid courses)
-      return `<button class="continue-btn buy-now-btn" data-course-id="${course.id}" style="cursor:pointer">Buy Now</button>`;
+      // Show "Buy Now" only if status = Ongoing
+      if (status === 'ongoing') {
+        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer">Buy Now</button>`;
+      } else if (status === 'completed') {
+        return `<span class="continue-btn disabled" style="cursor:default; opacity:0.6">Closed</span>`;
+      } else if (status === 'upcoming') {
+        return `<span class="continue-btn secondary" style="cursor:default; opacity:0.8">Coming Soon</span>`;
+      } else {
+        // Default fallback
+        return `<span class="continue-btn" style="cursor:default">Not Available</span>`;
+      }
     }
+  }
+
+  // Safe course content opening with validation
+  function openCourseContent(courseId, courseTitle = '') {
+    if (!courseId) {
+      showToast('Course ID is missing', 'error');
+      return;
+    }
+    
+    // Validate course exists in available courses
+    const courseExists = allCourses.some(c => (c.id || '').toString() === courseId.toString());
+    
+    if (!courseExists) {
+      showToast('Course not found or no longer available', 'error');
+      return;
+    }
+    
+    // For purchased courses, verify purchase status
+    if (courseId) {
+      const purchases = loadPurchasesFromLocalStorage();
+      const approvedPurchases = filterApprovedPurchases(purchases);
+      const hasApprovedPurchase = approvedPurchases.some(p => p.courseId === courseId.toString());
+      
+      // Allow access if course is free or user has approved purchase
+      const course = allCourses.find(c => (c.id || '').toString() === courseId.toString());
+      const isFreeCourse = course && parseFloat(course.price || 0) === 0;
+      
+      if (!isFreeCourse && !hasApprovedPurchase) {
+        showToast('You need to purchase this course to access content', 'error');
+        return;
+      }
+    }
+    
+    // Safe navigation with encoded parameters
+    const encodedId = encodeURIComponent(courseId);
+    const encodedTitle = encodeURIComponent(courseTitle || '');
+    window.location.href = `video-course.html?courseId=${encodedId}&title=${encodedTitle}`;
   }
 
   function getEmojiForCourse(title) {
@@ -1157,17 +1371,19 @@
   function openCheckoutModal(course) {
     const modal = document.getElementById('checkoutModal');
     const title = document.getElementById('modalCourseTitle');
+    const description = document.getElementById('modalCourseDescription');
     const originalPrice = document.getElementById('modalOriginalPrice');
     const finalPrice = document.getElementById('modalFinalPrice');
 
     if (title) title.textContent = course.title || 'Untitled Course';
+    if (description) description.textContent = course.description || 'No description available.';
     
     const price = course.price || 0;
     const originalPriceValue = price > 0 ? price : 99; // Default original price
     const finalPriceValue = price > 0 ? price : 99;
     
-    if (originalPrice) originalPrice.textContent = `$${originalPriceValue}`;
-    if (finalPrice) finalPrice.textContent = `$${finalPriceValue}`;
+    if (originalPrice) originalPrice.textContent = `৳${originalPriceValue}`;
+    if (finalPrice) finalPrice.textContent = `৳${finalPriceValue}`;
     
     // Reset coupon and form fields
     document.getElementById('couponInput').value = '';
@@ -1238,12 +1454,12 @@
       const discountAmount = originalPrice * discountRate;
       const finalPrice = originalPrice - discountAmount;
       
-      // Update final price
-      finalPriceElement.textContent = `$${finalPrice.toFixed(2)}`;
+      // Update final price (use Bangladeshi Taka symbol)
+      finalPriceElement.textContent = `৳${finalPrice.toFixed(0)}`;
       modal.dataset.currentPrice = finalPrice;
       
       // Show success message
-      couponMessage.textContent = `Coupon applied! You saved $${discountAmount.toFixed(2)} (${discountPercent}% off)`;
+      couponMessage.textContent = `Coupon applied! You saved ৳${discountAmount.toFixed(0)} (${discountPercent}% off)`;
       couponMessage.className = 'coupon-message success';
       
       // Store applied coupon info for later use
@@ -1255,7 +1471,7 @@
     }
   }
 
-  // Confirm payment - validates and redirects to WhatsApp
+  // Confirm payment - validates, saves to localStorage, and redirects to WhatsApp
   function confirmPayment() {
     const paymentMethod = document.getElementById('paymentMethod').value;
     const senderNumber = document.getElementById('senderNumber').value.trim();
@@ -1263,6 +1479,7 @@
     const modal = document.getElementById('checkoutModal');
     const courseTitle = document.getElementById('modalCourseTitle').textContent;
     const finalPrice = modal.dataset.currentPrice || modal.dataset.originalPrice;
+    const courseId = modal.dataset.courseId || '';
     
     // Validation
     if (!paymentMethod) {
@@ -1280,44 +1497,73 @@
       return;
     }
     
-    // Validate sender number format (basic validation)
-    const phoneRegex = /^[0-9+]{10,15}$/;
+    // Validate sender number format (Bangladeshi mobile numbers)
+    const phoneRegex = /^(\+88)?01[3-9]\d{8}$/;
     if (!phoneRegex.test(senderNumber)) {
-      showError('Please enter a valid mobile number (10-15 digits, can start with +)');
+      showError('Please enter a valid Bangladeshi mobile number (e.g., 01712345678 or +8801712345678)');
       return;
     }
     
-    // Validate transaction ID format (basic validation)
+    // Validate transaction ID format
     if (transactionId.length < 8) {
       showError('Transaction ID must be at least 8 characters');
       return;
     }
     
-    // In a real app, you would send this data to your backend
-    const paymentData = {
-      courseId: modal.dataset.courseId,
+    // Get WhatsApp link from selected course
+    const whatsappLink = window.selectedCourse?.whatsapp || '';
+    
+    // Create purchase object
+    const purchase = {
       courseTitle: courseTitle,
-      amount: finalPrice,
       paymentMethod: paymentMethod,
       senderNumber: senderNumber,
-      transactionId: transactionId,
+      trxId: transactionId,
+      status: "pending",
+      whatsappLink: whatsappLink,
+      courseId: courseId,
+      price: finalPrice,
       timestamp: new Date().toISOString()
     };
     
-    console.log('Payment submitted:', paymentData);
+    // Save to localStorage
+    savePurchaseToLocalStorage(purchase);
     
-    // Check if selected course has WhatsApp link
-    if (window.selectedCourse && window.selectedCourse.whatsapp) {
-      // Redirect to WhatsApp
-      window.location.href = window.selectedCourse.whatsapp;
-    } else {
-      // Fallback: Show success message and close modal
-      alert(`Payment details submitted successfully!\n\nCourse: ${courseTitle}\nAmount: $${finalPrice}\nPayment Method: ${paymentMethod}\nTransaction ID: ${transactionId}\n\nOur team will verify your payment and grant course access within 24 hours.`);
-      
-      // Close modal
+    // Show success message
+    showToast('Payment details saved successfully! Redirecting to WhatsApp...', 'success');
+    
+    // Close modal after a short delay
+    setTimeout(() => {
       closeCheckoutModal();
       
-      showToast('Payment submitted successfully! Course access will be granted after verification.', 'success');
+      // Redirect to WhatsApp group if available
+      if (whatsappLink) {
+        // Redirect user to WhatsApp group after submit
+        window.location.href = whatsappLink;
+      } else {
+        // Fallback: Show alert with instructions
+        alert(`Payment details saved!\n\nCourse: ${courseTitle}\nPayment Method: ${paymentMethod}\nTransaction ID: ${transactionId}\n\nOur team will verify your payment and grant course access within 24 hours.`);
+      }
+    }, 1500);
+  }
+  
+  // Save purchase to localStorage
+  function savePurchaseToLocalStorage(purchase) {
+    try {
+      // Get existing purchases
+      const purchases = JSON.parse(localStorage.getItem('purchases') || '[]');
+      
+      // Add new purchase
+      purchases.push(purchase);
+      
+      // Save back to localStorage
+      localStorage.setItem('purchases', JSON.stringify(purchases));
+      
+      console.log('Purchase saved to localStorage:', purchase);
+    } catch (error) {
+      console.error('Failed to save purchase to localStorage:', error);
+      // Fallback: Store in sessionStorage or variable
+      window.lastPurchase = purchase;
     }
   }
   
@@ -1387,11 +1633,12 @@
     <div class="modal-body">
       <div class="course-info-section">
         <h4 class="modal-course-title" id="modalCourseTitle">Course Title</h4>
+        <p class="modal-course-desc" id="modalCourseDescription">Course description will appear here.</p>
         <div class="price-section">
-          <div class="original-price" id="modalOriginalPrice">$99</div>
+          <div class="original-price" id="modalOriginalPrice">৳99</div>
           <div class="final-price">
             <span class="final-price-label">Final Price:</span>
-            <span class="final-price-amount" id="modalFinalPrice">$99</span>
+            <span class="final-price-amount" id="modalFinalPrice">৳99</span>
           </div>
         </div>
       </div>
@@ -1406,9 +1653,9 @@
       </div>
 
       <div class="payment-instructions">
-        <h5>Payment Instructions</h5>
+        <h5>Payment Instruction</h5>
         <div class="instructions-content">
-          <p>Send Money to <strong>+8801302201431</strong> via:</p>
+          <p><strong>Send Money to +8801302201431 via bKash, Nagad, Rocket, or Upay</strong></p>
           <div class="payment-methods">
             <span class="payment-method-tag">bKash</span>
             <span class="payment-method-tag">Nagad</span>

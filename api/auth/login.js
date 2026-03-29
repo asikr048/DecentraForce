@@ -116,7 +116,6 @@ export default async function handler(req, res) {
     // Check if user is admin (set in DB via setup-admin.js)
     const isAdmin = user.is_admin === true;
 
-    // TODO: In a real implementation, you would verify the password hash
     // Verify password with bcrypt
     const passwordValid = await bcrypt.compare(password, user.password_hash);
     if (!passwordValid) {

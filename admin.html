@@ -16,6 +16,7 @@
 <title>Admin Panel — DecentraForce</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+<script src="scripts/floating-feedback.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <script>
   // ⚠️ Replace these with your EmailJS credentials if needed
@@ -142,6 +143,26 @@
       <button onclick="showTab('coupons')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="coupons">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
         COUPONS
+      </button>
+      <button onclick="showTab('purchases')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="purchases">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        PURCHASES
+      </button>
+      <button onclick="showTab('feedback')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="feedback">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+        FEEDBACK
+      </button>
+      <button onclick="showTab('mentors')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="mentors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+        MENTORS
+      </button>
+      <button onclick="showTab('footer')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="footer">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+        FOOTER SETTINGS
+      </button>
+      <button onclick="showTab('assignments')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="assignments">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+        ASSIGNMENTS
       </button>
       <button onclick="showTab('profile')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="profile">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
@@ -280,6 +301,19 @@
               <label class="block text-sm text-white mb-2">WhatsApp Group Link</label>
               <input type="url" id="courseWhatsapp" placeholder="https://chat.whatsapp.com/..." class="admin-input" required>
             </div>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6 mb-6">
+            <div>
+              <label class="block text-sm text-white mb-2">Course Status</label>
+              <select id="courseStatus" class="admin-input" required>
+                <option value="">Select status</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="ongoing">Ongoing</option>
+                <option value="completed">Completed</option>
+              </select>
+            </div>
+            <div></div>
           </div>
 
           <div class="mb-6">
@@ -454,6 +488,215 @@
         </div>
       </div>
 
+      <div id="tab-purchases" class="hidden">
+        <h1 class="text-2xl font-bold text-white mb-8" style="font-family: 'Syne', sans-serif;">Purchase Management</h1>
+        <p class="text-muted mb-8">View and manage course purchase requests. Approve or reject purchases to update their status.</p>
+
+        <div class="bg-surface rounded-xl border border-border overflow-hidden shadow-lg">
+          <div class="flex items-center justify-between p-6 border-b border-border">
+            <div>
+              <h2 class="text-lg font-semibold text-white">All Purchases</h2>
+              <p class="text-sm text-muted mt-1">Purchases are loaded from localStorage key "purchases"</p>
+            </div>
+            <button onclick="refreshPurchases()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+              Refresh
+            </button>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+              <thead class="bg-surface2 text-muted border-b border-border">
+                <tr>
+                  <th class="px-6 py-4 font-semibold">Course Name</th>
+                  <th class="px-6 py-4 font-semibold">Sender Number</th>
+                  <th class="px-6 py-4 font-semibold">Transaction ID</th>
+                  <th class="px-6 py-4 font-semibold">Status</th>
+                  <th class="px-6 py-4 font-semibold">Date</th>
+                  <th class="px-6 py-4 font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="purchasesTableBody" class="divide-y divide-border">
+                <tr id="purchasesEmpty">
+                  <td colspan="6" class="text-center py-16 text-muted">
+                    <p class="text-lg font-medium mb-2">No purchases found</p>
+                    <p class="text-sm">Purchase requests will appear here when users make purchases.</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-assignments" class="hidden">
+        <h1 class="text-2xl font-bold text-white mb-8" style="font-family: 'Syne', sans-serif;">Assignment Management</h1>
+
+        <div class="grid grid-cols-3 gap-8">
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Create New Assignment
+            </h2>
+
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-white mb-2">Title</label>
+                <input type="text" id="assignmentTitle" placeholder="e.g., Build a Todo App" class="admin-input">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-white mb-2">Description</label>
+                <textarea id="assignmentDescription" placeholder="Detailed instructions for the assignment..." class="admin-input" rows="4"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-white mb-2">Course (Optional)</label>
+                <select id="assignmentCourse" class="admin-input">
+                  <option value="">All Courses</option>
+                </select>
+              </div>
+
+              <button onclick="addNewAssignment()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all mt-4">
+                Create Assignment
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8 col-span-2">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              All Assignments
+            </h2>
+
+            <div class="space-y-4">
+              <div class="flex items-center justify-between mb-4">
+                <p class="text-sm text-muted">Manage assignments for courses</p>
+                <button onclick="refreshAssignments()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  Refresh
+                </button>
+              </div>
+
+              <div id="assignmentsList" class="space-y-3 max-h-96 overflow-y-auto pr-2">
+                <div class="text-center py-8 text-muted">
+                  <p class="text-sm">No assignments yet.</p>
+                  <p class="text-xs mt-1">Create your first assignment using the form on the left.</p>
+                </div>
+              </div>
+
+              <div class="text-xs text-muted border-t border-border pt-4 mt-4">
+                <p>Assignments are stored in localStorage and will appear in course pages.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="tab-feedback" class="hidden">
+        <h1 class="text-2xl font-bold text-white mb-8" style="font-family: 'Syne', sans-serif;">Feedback Management</h1>
+
+        <div class="grid grid-cols-3 gap-8">
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              Add New Feedback
+            </h2>
+
+            <div class="space-y-6">
+              <div>
+                <label class="block text-sm font-medium text-white mb-2">Student Name</label>
+                <input type="text" id="feedbackName" placeholder="e.g., John Doe" class="admin-input">
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-white mb-2">Feedback Text</label>
+                <textarea id="feedbackText" placeholder="What did the student say?" class="admin-input" rows="4"></textarea>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-white mb-2">Language</label>
+                <select id="feedbackLanguage" class="admin-input">
+                  <option value="English">English</option>
+                  <option value="Bangla">Bangla</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-white mb-2">Profile Image URL</label>
+                <input type="url" id="feedbackImageUrl" placeholder="https://example.com/avatar.jpg" class="admin-input">
+                <p class="text-xs text-muted mt-1">Leave empty for auto-generated avatar</p>
+              </div>
+
+              <button onclick="addNewFeedback()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all mt-4">
+                Add Feedback
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              All Feedbacks
+            </h2>
+
+            <div class="space-y-4">
+              <div class="flex items-center justify-between mb-4">
+                <p class="text-sm text-muted">Manage student testimonials</p>
+                <button onclick="refreshFeedbacks()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  Refresh
+                </button>
+              </div>
+
+              <div id="feedbacksList" class="space-y-3 max-h-80 overflow-y-auto pr-2">
+                <div class="text-center py-8 text-muted">
+                  <p class="text-sm">No feedbacks yet.</p>
+                  <p class="text-xs mt-1">Add your first feedback using the form on the left.</p>
+                </div>
+              </div>
+
+              <div class="text-xs text-muted border-t border-border pt-4 mt-4">
+                <p>Feedbacks are stored in localStorage and will appear on the homepage.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+              User Feedback Inbox
+            </h2>
+
+            <div class="space-y-4">
+              <div class="flex items-center justify-between mb-4">
+                <p class="text-sm text-muted">Feedback from floating button</p>
+                <button onclick="refreshUserFeedbacks()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                  Refresh
+                </button>
+              </div>
+
+              <div class="flex items-center gap-2 mb-4">
+                <span class="badge badge-green" id="unreadCount">0 unread</span>
+                <span class="badge badge-gray" id="totalCount">0 total</span>
+              </div>
+
+              <div id="userFeedbacksList" class="space-y-3 max-h-80 overflow-y-auto pr-2">
+                <div class="text-center py-8 text-muted">
+                  <p class="text-sm">No user feedbacks yet.</p>
+                  <p class="text-xs mt-1">Users can submit feedback via the floating button.</p>
+                </div>
+              </div>
+
+              <div class="text-xs text-muted border-t border-border pt-4 mt-4">
+                <p>Feedbacks are stored in localStorage key: "userFeedbacks"</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
   </main>
 </div>
@@ -528,7 +771,7 @@ async function logout() {
    TAB NAVIGATION
 ──────────────────────────────────────────────────────── */
 function showTab(name) {
-  ['overview','users','courses','add-course','coupons','profile'].forEach(t => {
+  ['overview','users','courses','add-course','coupons','purchases','feedback','mentors','footer','profile'].forEach(t => {
     document.getElementById(`tab-${t}`)?.classList.add('hidden');
     document.querySelector(`[data-tab="${t}"]`)?.classList.remove('active');
   });
@@ -726,10 +969,21 @@ function renderCoursesGrid() {
   
   grid.innerHTML = allCourses.map(c => {
     let stats = { lectures: 0, exercises: 0, assignments: 0 };
-    try { 
+    try {
       const parsed = typeof c.modules === 'string' ? JSON.parse(c.modules) : c.modules;
       if (typeof parsed === 'object' && parsed !== null) stats = parsed;
     } catch(e) {}
+
+    // Determine status badge
+    const status = c.status || 'upcoming';
+    let statusBadge = '';
+    if (status === 'ongoing') {
+      statusBadge = '<span class="badge badge-green">Ongoing</span>';
+    } else if (status === 'completed') {
+      statusBadge = '<span class="badge badge-gray">Completed</span>';
+    } else {
+      statusBadge = '<span class="badge badge-blue">Upcoming</span>';
+    }
 
     return `
     <div class="bg-surface rounded-2xl shadow-lg border border-border overflow-hidden transition-transform hover:-translate-y-1 hover:border-accent flex flex-col">
@@ -740,7 +994,10 @@ function renderCoursesGrid() {
            </div>`}
            
       <div class="p-6 flex-1 flex flex-col">
-        <h3 class="font-bold text-white text-xl leading-tight mb-4" style="font-family:'Syne',sans-serif">${esc(c.title)}</h3>
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-bold text-white text-xl leading-tight" style="font-family:'Syne',sans-serif">${esc(c.title)}</h3>
+          ${statusBadge}
+        </div>
         
         <div class="flex flex-wrap gap-3 mt-auto mb-6">
           <div class="bg-surface2 text-muted px-3 py-1.5 rounded-md flex items-center gap-2 text-sm border border-border font-medium">
@@ -755,8 +1012,158 @@ function renderCoursesGrid() {
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
             ${esc(stats.assignments || 0)} Assignment
           </div>
+    
+          <div id="tab-mentors" class="hidden">
+            <h1 class="text-2xl font-bold text-white mb-8" style="font-family: 'Syne', sans-serif;">Mentor Management</h1>
+    
+            <div class="grid grid-cols-2 gap-8">
+              <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+                <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+                  <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                  Add New Mentor
+                </h2>
+    
+                <div class="space-y-6">
+                  <div>
+                    <label class="block text-sm font-medium text-white mb-2">Mentor Name</label>
+                    <input type="text" id="mentorName" placeholder="e.g., John Doe" class="admin-input">
+                  </div>
+    
+                  <div>
+                    <label class="block text-sm font-medium text-white mb-2">Title / Expertise</label>
+                    <input type="text" id="mentorTitle" placeholder="e.g., Senior Blockchain Developer" class="admin-input">
+                  </div>
+    
+                  <div>
+                    <label class="block text-sm font-medium text-white mb-2">Image URL</label>
+                    <input type="url" id="mentorImageUrl" placeholder="https://example.com/avatar.jpg" class="admin-input">
+                    <p class="text-xs text-muted mt-1">Leave empty for auto-generated avatar</p>
+                  </div>
+    
+                  <button onclick="addNewMentor()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all mt-4">
+                    Add Mentor
+                  </button>
+                </div>
+          
+                <div id="tab-footer" class="hidden">
+                  <h1 class="text-2xl font-bold text-white mb-8" style="font-family: 'Syne', sans-serif;">Footer Settings</h1>
+                  <p class="text-muted mb-8">Customize the footer content that appears on the homepage. Changes are saved automatically to localStorage.</p>
+          
+                  <div class="grid grid-cols-2 gap-8">
+                    <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+                      <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+                        <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+                        Platform Description & Social Links
+                      </h2>
+          
+                      <div class="space-y-6">
+                        <div>
+                          <label class="block text-sm font-medium text-white mb-2">Platform Description</label>
+                          <textarea id="footerDescription" placeholder="Your career-building university for the decentralized web. Learn, build, and thrive in Web3." class="admin-input" rows="3"></textarea>
+                        </div>
+          
+                        <div class="grid grid-cols-2 gap-4">
+                          <div>
+                            <label class="block text-sm font-medium text-white mb-2">Twitter/X URL</label>
+                            <input type="url" id="footerTwitter" placeholder="https://twitter.com/username" class="admin-input">
+                          </div>
+                          <div>
+                            <label class="block text-sm font-medium text-white mb-2">LinkedIn URL</label>
+                            <input type="url" id="footerLinkedin" placeholder="https://linkedin.com/company/username" class="admin-input">
+                          </div>
+                          <div>
+                            <label class="block text-sm font-medium text-white mb-2">Facebook URL</label>
+                            <input type="url" id="footerFacebook" placeholder="https://facebook.com/username" class="admin-input">
+                          </div>
+                          <div>
+                            <label class="block text-sm font-medium text-white mb-2">YouTube URL</label>
+                            <input type="url" id="footerYoutube" placeholder="https://youtube.com/@username" class="admin-input">
+                          </div>
+                        </div>
+          
+                        <button onclick="saveFooterSettings()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all mt-4">
+                          Save Footer Settings
+                        </button>
+                      </div>
+                    </div>
+          
+                    <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+                      <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+                        <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                        Footer Links Management
+                      </h2>
+          
+                      <div class="space-y-6">
+                        <div>
+                          <label class="block text-sm font-medium text-white mb-2">Courses List (comma separated)</label>
+                          <textarea id="footerCourses" placeholder="Blockchain Basics, Smart Contracts, DeFi Mastery, NFT & Metaverse, Web3 Development" class="admin-input" rows="3"></textarea>
+                          <p class="text-xs text-muted mt-1">Enter course names separated by commas</p>
+                        </div>
+          
+                        <div>
+                          <label class="block text-sm font-medium text-white mb-2">Company Links (comma separated)</label>
+                          <textarea id="footerCompany" placeholder="About Us, Our Mentors, Careers, Blog, Press Kit" class="admin-input" rows="3"></textarea>
+                        </div>
+          
+                        <div>
+                          <label class="block text-sm font-medium text-white mb-2">Support Links (comma separated)</label>
+                          <textarea id="footerSupport" placeholder="Help Center, Community Forum, Contact Us, Refund Policy, Affiliate Program" class="admin-input" rows="3"></textarea>
+                        </div>
+          
+                        <div class="flex items-center justify-between pt-4 border-t border-border">
+                          <button onclick="loadDefaultFooter()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                            Load Defaults
+                          </button>
+                          <button onclick="clearFooterSettings()" class="text-accent3 text-sm font-bold flex items-center gap-1 hover:underline">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                            Clear All
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+          
+                  <div class="mt-8 bg-surface rounded-xl border border-border p-6">
+                    <h3 class="text-lg font-semibold text-white mb-4">Preview</h3>
+                    <div id="footerPreview" class="text-muted text-sm p-4 bg-bg rounded-lg border border-border">
+                      Footer preview will appear here after saving.
+                    </div>
+                  </div>
+                </div>
+          
+              </div>
+              <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+                <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+                  <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                  All Mentors
+                </h2>
+    
+                <div class="space-y-4">
+                  <div class="flex items-center justify-between mb-4">
+                    <p class="text-sm text-muted">Manage mentors list</p>
+                    <button onclick="refreshMentors()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                      Refresh
+                    </button>
+                  </div>
+    
+                  <div id="mentorsList" class="space-y-3 max-h-80 overflow-y-auto pr-2">
+                    <div class="text-center py-8 text-muted">
+                      <p class="text-sm">No mentors yet.</p>
+                      <p class="text-xs mt-1">Add your first mentor using the form on the left.</p>
+                    </div>
+                  </div>
+    
+                  <div class="text-xs text-muted border-t border-border pt-4 mt-4">
+                    <p>Mentors are stored in localStorage with key "mentors" and will appear on the homepage.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+    
         </div>
-
         <div class="flex gap-3">
           <button onclick="openEditCourse(${c.id})" class="flex-1 bg-surface2 border border-border text-white py-2 rounded-lg text-sm font-bold hover:bg-border transition-colors">EDIT</button>
           <button onclick="deleteCourse(${c.id})" class="flex-1 bg-[rgba(255,77,141,0.1)] border border-[rgba(255,77,141,0.3)] text-accent3 py-2 rounded-lg text-sm font-bold hover:bg-[rgba(255,77,141,0.2)] transition-colors">DELETE</button>
@@ -848,6 +1255,7 @@ function openEditCourse(id) {
   document.getElementById('courseVideo').value      = course.video_url || '';
   document.getElementById('coursePrice').value      = course.price || '';
   document.getElementById('courseWhatsapp').value   = course.whatsapp || '';
+  document.getElementById('courseStatus').value     = course.status || '';
   
   if (course.thumbnail_url) {
     document.getElementById('imagePreview').src = course.thumbnail_url;
@@ -932,6 +1340,7 @@ async function saveCourse() {
     video_url:     document.getElementById('courseVideo').value,
     price:         document.getElementById('coursePrice').value,
     whatsapp:      document.getElementById('courseWhatsapp').value,
+    status:        document.getElementById('courseStatus').value,
     modules:       JSON.stringify(modulesData),
     is_active:     document.getElementById('courseActive').checked,
   };
@@ -1171,13 +1580,1005 @@ function refreshCoupons() {
   showToast('Coupons list refreshed', 'info');
 }
 
+/* ────────────────────────────────────────────────────────
+   PURCHASE MANAGEMENT
+──────────────────────────────────────────────────────── */
+// Load purchases from localStorage
+function getPurchases() {
+  try {
+    const stored = localStorage.getItem('purchases');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error loading purchases:', error);
+    return [];
+  }
+}
+
+// Save purchases to localStorage
+function savePurchases(purchases) {
+  try {
+    localStorage.setItem('purchases', JSON.stringify(purchases));
+    return true;
+  } catch (error) {
+    console.error('Error saving purchases:', error);
+    return false;
+  }
+}
+
+// Render purchases table
+function renderPurchasesList() {
+  const purchases = getPurchases();
+  const container = document.getElementById('purchasesTableBody');
+  const emptyRow = document.getElementById('purchasesEmpty');
+  
+  if (!purchases || purchases.length === 0) {
+    if (emptyRow) emptyRow.classList.remove('hidden');
+    if (container) container.innerHTML = '';
+    return;
+  }
+  
+  if (emptyRow) emptyRow.classList.add('hidden');
+  
+  container.innerHTML = purchases.map(purchase => `
+    <tr class="hover:bg-surface2 transition-colors">
+      <td class="px-6 py-4">
+        <div class="font-medium text-white">${esc(purchase.courseName || 'Unknown Course')}</div>
+        <div class="text-xs text-muted mt-1">ID: ${purchase.courseId || 'N/A'}</div>
+      </td>
+      <td class="px-6 py-4">
+        <div class="font-medium text-white">${esc(purchase.senderNumber || 'N/A')}</div>
+        <div class="text-xs text-muted mt-1">${purchase.senderName ? esc(purchase.senderName) : ''}</div>
+      </td>
+      <td class="px-6 py-4">
+        <div class="font-mono text-sm text-accent">${esc(purchase.transactionId || 'N/A')}</div>
+        <div class="text-xs text-muted mt-1">${purchase.paymentMethod ? esc(purchase.paymentMethod) : ''}</div>
+      </td>
+      <td class="px-6 py-4">
+        <span class="badge ${purchase.status === 'approved' ? 'badge-green' : purchase.status === 'rejected' ? 'badge-gray' : 'badge-blue'}">
+          ${purchase.status ? purchase.status.toUpperCase() : 'PENDING'}
+        </span>
+      </td>
+      <td class="px-6 py-4">
+        <div class="text-sm text-white">${fmtDate(purchase.date) || '—'}</div>
+        <div class="text-xs text-muted">${purchase.time || ''}</div>
+      </td>
+      <td class="px-6 py-4">
+        <div class="flex items-center gap-2">
+          ${purchase.status !== 'approved' ? `
+            <button onclick="approvePurchase('${purchase.id}')" class="bg-green-900/20 text-green-400 hover:bg-green-900/30 border border-green-800 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+              Approve
+            </button>
+          ` : ''}
+          ${purchase.status !== 'rejected' ? `
+            <button onclick="rejectPurchase('${purchase.id}')" class="bg-red-900/20 text-red-400 hover:bg-red-900/30 border border-red-800 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors flex items-center gap-1">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              Reject
+            </button>
+          ` : ''}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+// Approve a purchase
+function approvePurchase(id) {
+  if (!confirm('Approve this purchase? The user will be granted access to the course.')) return;
+  
+  const purchases = getPurchases();
+  const index = purchases.findIndex(p => p.id === id);
+  if (index === -1) {
+    showToast('Purchase not found', 'error');
+    return;
+  }
+  
+  purchases[index].status = 'approved';
+  purchases[index].processedAt = new Date().toISOString();
+  
+  if (savePurchases(purchases)) {
+    showToast('Purchase approved successfully', 'success');
+    renderPurchasesList();
+    
+    // Optional: Trigger course access grant logic here
+    // grantCourseAccess(purchases[index].userId, purchases[index].courseId);
+  } else {
+    showToast('Failed to approve purchase', 'error');
+  }
+}
+
+// Reject a purchase
+function rejectPurchase(id) {
+  if (!confirm('Reject this purchase? The purchase will be marked as rejected.')) return;
+  
+  const purchases = getPurchases();
+  const index = purchases.findIndex(p => p.id === id);
+  if (index === -1) {
+    showToast('Purchase not found', 'error');
+    return;
+  }
+  
+  purchases[index].status = 'rejected';
+  purchases[index].processedAt = new Date().toISOString();
+  
+  if (savePurchases(purchases)) {
+    showToast('Purchase rejected successfully', 'success');
+    renderPurchasesList();
+  } else {
+    showToast('Failed to reject purchase', 'error');
+  }
+}
+
+// Refresh purchases list
+function refreshPurchases() {
+  renderPurchasesList();
+  showToast('Purchases list refreshed', 'info');
+}
+
+// Load purchases when tab is shown
+function loadPurchases() {
+  renderPurchasesList();
+}
+
+/* ────────────────────────────────────────────────────────
+   FEEDBACK MANAGEMENT
+──────────────────────────────────────────────────────── */
+function addNewFeedback() {
+  const name = document.getElementById('feedbackName').value.trim();
+  const text = document.getElementById('feedbackText').value.trim();
+  const language = document.getElementById('feedbackLanguage').value;
+  const imageUrl = document.getElementById('feedbackImageUrl').value.trim();
+
+  if (!name || !text) {
+    showToast('Name and feedback text are required', 'error');
+    return;
+  }
+
+  try {
+    // Use the function from feedback.js
+    if (typeof addFeedback === 'function') {
+      addFeedback({ name, text, language, imageUrl });
+      showToast('Feedback added successfully!', 'success');
+      
+      // Clear form
+      document.getElementById('feedbackName').value = '';
+      document.getElementById('feedbackText').value = '';
+      document.getElementById('feedbackLanguage').value = 'en';
+      document.getElementById('feedbackImageUrl').value = '';
+      
+      renderFeedbacksList();
+    } else {
+      showToast('Feedback functions not loaded. Please refresh the page.', 'error');
+    }
+  } catch (error) {
+    console.error('Error adding feedback:', error);
+    showToast('Failed to add feedback', 'error');
+  }
+}
+
+function renderFeedbacksList() {
+  try {
+    const feedbacks = getAllFeedbacks();
+    const container = document.getElementById('feedbacksList');
+    
+    if (!feedbacks || feedbacks.length === 0) {
+      container.innerHTML = `
+        <div class="text-center py-8 text-muted">
+          <p class="text-sm">No feedback entries yet.</p>
+          <p class="text-xs mt-1">Add your first feedback using the form on the left.</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = feedbacks.map(feedback => `
+      <div class="bg-surface2 border border-border rounded-lg p-4">
+        <div class="flex items-start gap-4">
+          <img src="${esc(feedback.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(feedback.name)}&background=0D1630&color=00E5FF&bold=true`)}"
+               alt="${esc(feedback.name)}"
+               class="w-12 h-12 rounded-full object-cover border-2 border-accent">
+          <div class="flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <div class="flex items-center gap-3">
+                <h4 class="font-bold text-white">${esc(feedback.name)}</h4>
+                <span class="badge ${feedback.language === 'bn' ? 'badge-blue' : 'badge-green'}">
+                  ${feedback.language === 'bn' ? 'Bangla' : 'English'}
+                </span>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="editFeedbackUI('${feedback.id}')" class="text-accent hover:text-accent2 text-sm font-bold flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  Edit
+                </button>
+                <button onclick="deleteFeedbackUI('${feedback.id}')" class="text-red-400 hover:text-red-300 text-sm font-bold flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  Delete
+                </button>
+              </div>
+            </div>
+            <p class="text-sm text-gray-300 mb-2">${esc(feedback.text)}</p>
+            <p class="text-xs text-muted">Added ${fmtDate(feedback.createdAt)}</p>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  } catch (error) {
+    console.error('Error rendering feedbacks:', error);
+    const container = document.getElementById('feedbacksList');
+    container.innerHTML = `
+      <div class="text-center py-8 text-muted">
+        <p class="text-sm text-red-400">Error loading feedbacks</p>
+        <p class="text-xs mt-1">${esc(error.message)}</p>
+      </div>`;
+  }
+}
+
+function editFeedbackUI(id) {
+  const feedbacks = getAllFeedbacks();
+  const feedback = feedbacks.find(f => f.id === id);
+  
+  if (!feedback) {
+    showToast('Feedback not found', 'error');
+    return;
+  }
+
+  // Populate form with feedback data
+  document.getElementById('feedbackName').value = feedback.name;
+  document.getElementById('feedbackText').value = feedback.text;
+  document.getElementById('feedbackLanguage').value = feedback.language;
+  document.getElementById('feedbackImageUrl').value = feedback.imageUrl || '';
+  
+  // Change button to update mode
+  const form = document.querySelector('#tab-feedback form');
+  const submitBtn = form.querySelector('button[type="button"]');
+  submitBtn.textContent = 'Update Feedback';
+  submitBtn.onclick = function() { updateExistingFeedback(id); };
+  
+  showToast('Editing feedback. Update the fields and click "Update Feedback".', 'info');
+}
+
+function updateExistingFeedback(id) {
+  const name = document.getElementById('feedbackName').value.trim();
+  const text = document.getElementById('feedbackText').value.trim();
+  const language = document.getElementById('feedbackLanguage').value;
+  const imageUrl = document.getElementById('feedbackImageUrl').value.trim();
+
+  if (!name || !text) {
+    showToast('Name and feedback text are required', 'error');
+    return;
+  }
+
+  try {
+    if (typeof updateFeedback === 'function') {
+      updateFeedback(id, { name, text, language, imageUrl });
+      showToast('Feedback updated successfully!', 'success');
+      
+      // Reset form
+      document.getElementById('feedbackName').value = '';
+      document.getElementById('feedbackText').value = '';
+      document.getElementById('feedbackLanguage').value = 'en';
+      document.getElementById('feedbackImageUrl').value = '';
+      
+      // Reset button to add mode
+      const submitBtn = document.querySelector('#tab-feedback button[type="button"]');
+      submitBtn.textContent = 'Add Feedback';
+      submitBtn.onclick = addNewFeedback;
+      
+      renderFeedbacksList();
+    } else {
+      showToast('Update function not available', 'error');
+    }
+  } catch (error) {
+    console.error('Error updating feedback:', error);
+    showToast('Failed to update feedback', 'error');
+  }
+}
+
+function deleteFeedbackUI(id) {
+  if (!confirm('Are you sure you want to delete this feedback?')) return;
+  
+  try {
+    if (typeof deleteFeedback === 'function') {
+      deleteFeedback(id);
+      showToast('Feedback deleted successfully', 'success');
+      renderFeedbacksList();
+    } else {
+      showToast('Delete function not available', 'error');
+    }
+  } catch (error) {
+    console.error('Error deleting feedback:', error);
+    showToast('Failed to delete feedback', 'error');
+  }
+}
+
+function refreshFeedbacks() {
+  renderFeedbacksList();
+  showToast('Feedbacks list refreshed', 'info');
+}
+
+// User Feedback Inbox Functions
+function refreshUserFeedbacks() {
+  renderUserFeedbacksList();
+  showToast('User feedbacks refreshed', 'info');
+}
+
+function renderUserFeedbacksList() {
+  const container = document.getElementById('userFeedbacksList');
+  const unreadCountEl = document.getElementById('unreadCount');
+  const totalCountEl = document.getElementById('totalCount');
+  
+  if (!container) return;
+  
+  // Check if FloatingFeedback functions are available
+  if (typeof window.FloatingFeedback === 'undefined') {
+    container.innerHTML = `
+      <div class="text-center py-8 text-muted">
+        <p class="text-sm">Floating feedback system not loaded.</p>
+        <p class="text-xs mt-1">Make sure scripts/floating-feedback.js is included.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  const feedbacks = window.FloatingFeedback.getAllUserFeedbacks();
+  const unreadCount = feedbacks.filter(f => !f.read).length;
+  const totalCount = feedbacks.length;
+  
+  // Update counters
+  if (unreadCountEl) {
+    unreadCountEl.textContent = `${unreadCount} unread`;
+  }
+  if (totalCountEl) {
+    totalCountEl.textContent = `${totalCount} total`;
+  }
+  
+  if (feedbacks.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8 text-muted">
+        <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/>
+        </svg>
+        <p class="text-sm">No user feedbacks yet.</p>
+        <p class="text-xs opacity-70 mt-1">Users can submit feedback via the floating button.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = feedbacks.map(feedback => `
+    <div class="bg-surface2 rounded-lg p-4 border ${feedback.read ? 'border-border' : 'border-accent/50'} hover:border-accent/30 transition-colors">
+      <div class="flex items-start justify-between mb-2">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1">
+            <h4 class="font-semibold text-white truncate">${feedback.name}</h4>
+            ${!feedback.read ? '<span class="badge badge-green text-xs">New</span>' : ''}
+            ${feedback.contact ? `<span class="text-xs text-muted">• ${feedback.contact}</span>` : ''}
+          </div>
+          <p class="text-sm text-muted">${new Date(feedback.createdAt).toLocaleString()}</p>
+        </div>
+        <div class="flex items-center gap-2">
+          ${!feedback.read ? `
+            <button onclick="markUserFeedbackAsRead(${feedback.id})" class="text-accent hover:text-white transition-colors p-1" title="Mark as read">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+            </button>
+          ` : ''}
+          <button onclick="deleteUserFeedbackUI(${feedback.id})" class="text-red-400 hover:text-red-300 transition-colors p-1" title="Delete">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <div class="mt-3">
+        <p class="text-sm text-white whitespace-pre-wrap">${feedback.message}</p>
+      </div>
+    </div>
+  `).join('');
+}
+
+function markUserFeedbackAsRead(id) {
+  if (typeof window.FloatingFeedback !== 'undefined' && window.FloatingFeedback.markFeedbackAsRead) {
+    const success = window.FloatingFeedback.markFeedbackAsRead(id);
+    if (success) {
+      showToast('Feedback marked as read', 'success');
+      renderUserFeedbacksList();
+    } else {
+      showToast('Failed to mark feedback as read', 'error');
+    }
+  } else {
+    showToast('Function not available', 'error');
+  }
+}
+
+function deleteUserFeedbackUI(id) {
+  if (!confirm('Are you sure you want to delete this user feedback?')) return;
+  
+  if (typeof window.FloatingFeedback !== 'undefined' && window.FloatingFeedback.deleteUserFeedback) {
+    const success = window.FloatingFeedback.deleteUserFeedback(id);
+    if (success) {
+      showToast('User feedback deleted successfully', 'success');
+      renderUserFeedbacksList();
+    } else {
+      showToast('Failed to delete user feedback', 'error');
+    }
+  } else {
+    showToast('Delete function not available', 'error');
+  }
+}
+
+// Initialize user feedbacks when tab is shown
+document.querySelector('[data-tab="feedback"]')?.addEventListener('click', () => {
+  setTimeout(() => {
+    renderFeedbacksList();
+    renderUserFeedbacksList();
+  }, 100);
+});
+
+// Mentor Management Functions
+function getMentors() {
+  const mentorsJson = localStorage.getItem('mentors');
+  return mentorsJson ? JSON.parse(mentorsJson) : [];
+}
+
+function saveMentors(mentors) {
+  localStorage.setItem('mentors', JSON.stringify(mentors));
+}
+
+function addNewMentor() {
+  const name = document.getElementById('mentorName').value.trim();
+  const title = document.getElementById('mentorTitle').value.trim();
+  const imageUrl = document.getElementById('mentorImageUrl').value.trim();
+
+  if (!name || !title) {
+    showToast('Name and Title/Expertise are required', 'error');
+    return;
+  }
+
+  const mentors = getMentors();
+  const newMentor = {
+    id: Date.now().toString(),
+    name,
+    title,
+    imageUrl: imageUrl || 'https://via.placeholder.com/150',
+    createdAt: new Date().toISOString()
+  };
+
+  mentors.push(newMentor);
+  saveMentors(mentors);
+  
+  // Clear form
+  document.getElementById('mentorName').value = '';
+  document.getElementById('mentorTitle').value = '';
+  document.getElementById('mentorImageUrl').value = '';
+  
+  showToast('Mentor added successfully!', 'success');
+  renderMentorsList();
+}
+
+function renderMentorsList() {
+  const container = document.getElementById('mentorsList');
+  if (!container) return;
+  
+  const mentors = getMentors();
+  
+  if (mentors.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8 text-muted">
+        <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <p class="text-sm">No mentors added yet.</p>
+        <p class="text-xs opacity-70 mt-1">Add your first mentor using the form on the left.</p>
+      </div>
+    `;
+    return;
+  }
+  
+  container.innerHTML = mentors.map(mentor => `
+    <div class="bg-surface2 rounded-lg p-4 border border-border hover:border-accent/30 transition-colors">
+      <div class="flex items-start gap-4">
+        <div class="flex-shrink-0">
+          <img src="${mentor.imageUrl}" alt="${mentor.name}" class="w-14 h-14 rounded-full object-cover border-2 border-accent/20">
+        </div>
+        <div class="flex-1 min-w-0">
+          <div class="flex items-start justify-between">
+            <div>
+              <h4 class="font-semibold text-white truncate">${mentor.name}</h4>
+              <p class="text-sm text-muted mt-1">${mentor.title}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="editMentorUI('${mentor.id}')" class="text-accent hover:text-white transition-colors p-1" title="Edit">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+              </button>
+              <button onclick="deleteMentorUI('${mentor.id}')" class="text-red-400 hover:text-red-300 transition-colors p-1" title="Delete">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+          <div class="mt-3 text-xs text-muted flex items-center gap-2">
+            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+            </svg>
+            <span>Added ${new Date(mentor.createdAt).toLocaleDateString()}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function editMentorUI(id) {
+  const mentors = getMentors();
+  const mentor = mentors.find(m => m.id === id);
+  
+  if (!mentor) {
+    showToast('Mentor not found', 'error');
+    return;
+  }
+
+  // Populate form with mentor data
+  document.getElementById('mentorName').value = mentor.name;
+  document.getElementById('mentorTitle').value = mentor.title;
+  document.getElementById('mentorImageUrl').value = mentor.imageUrl;
+  
+  // Change button to update mode
+  const form = document.querySelector('#tab-mentors form');
+  const submitBtn = form.querySelector('button[type="button"]');
+  submitBtn.textContent = 'Update Mentor';
+  submitBtn.onclick = function() { updateExistingMentor(id); };
+  
+  showToast('Editing mentor. Update the fields and click "Update Mentor".', 'info');
+}
+
+function updateExistingMentor(id) {
+  const name = document.getElementById('mentorName').value.trim();
+  const title = document.getElementById('mentorTitle').value.trim();
+  const imageUrl = document.getElementById('mentorImageUrl').value.trim();
+
+  if (!name || !title) {
+    showToast('Name and Title/Expertise are required', 'error');
+    return;
+  }
+
+  const mentors = getMentors();
+  const index = mentors.findIndex(m => m.id === id);
+  
+  if (index === -1) {
+    showToast('Mentor not found', 'error');
+    return;
+  }
+  
+  mentors[index] = {
+    ...mentors[index],
+    name,
+    title,
+    imageUrl: imageUrl || 'https://via.placeholder.com/150'
+  };
+  
+  saveMentors(mentors);
+  showToast('Mentor updated successfully!', 'success');
+  
+  // Reset form
+  document.getElementById('mentorName').value = '';
+  document.getElementById('mentorTitle').value = '';
+  document.getElementById('mentorImageUrl').value = '';
+  
+  // Reset button to add mode
+  const submitBtn = document.querySelector('#tab-mentors button[type="button"]');
+  submitBtn.textContent = 'Add Mentor';
+  submitBtn.onclick = addNewMentor;
+  
+  renderMentorsList();
+}
+
+function deleteMentorUI(id) {
+  if (!confirm('Are you sure you want to delete this mentor?')) return;
+  
+  const mentors = getMentors();
+  const filtered = mentors.filter(m => m.id !== id);
+  
+  if (filtered.length === mentors.length) {
+    showToast('Mentor not found', 'error');
+    return;
+  }
+  
+  saveMentors(filtered);
+  showToast('Mentor deleted successfully', 'success');
+  renderMentorsList();
+}
+
+function refreshMentors() {
+  renderMentorsList();
+  showToast('Mentors list refreshed', 'info');
+}
+
+/* ────────────────────────────────────────────────────────
+   ASSIGNMENT MANAGEMENT
+──────────────────────────────────────────────────────── */
+// Load assignments from localStorage
+function getAssignments() {
+  try {
+    const stored = localStorage.getItem('assignments');
+    return stored ? JSON.parse(stored) : [];
+  } catch (error) {
+    console.error('Error loading assignments:', error);
+    return [];
+  }
+}
+
+// Save assignments to localStorage
+function saveAssignments(assignments) {
+  try {
+    localStorage.setItem('assignments', JSON.stringify(assignments));
+    return true;
+  } catch (error) {
+    console.error('Error saving assignments:', error);
+    return false;
+  }
+}
+
+// Add new assignment
+function addNewAssignment() {
+  const title = document.getElementById('assignmentTitle').value.trim();
+  const description = document.getElementById('assignmentDescription').value.trim();
+  const course = document.getElementById('assignmentCourse').value;
+
+  if (!title || !description) {
+    showToast('Title and description are required', 'error');
+    return;
+  }
+
+  const assignments = getAssignments();
+  const newAssignment = {
+    id: Date.now().toString(),
+    title,
+    description,
+    course: course || null,
+    createdAt: new Date().toISOString(),
+    submissions: []
+  };
+
+  assignments.push(newAssignment);
+  if (saveAssignments(assignments)) {
+    showToast('Assignment created successfully!', 'success');
+    // Clear form
+    document.getElementById('assignmentTitle').value = '';
+    document.getElementById('assignmentDescription').value = '';
+    document.getElementById('assignmentCourse').value = '';
+    renderAssignmentsList();
+  } else {
+    showToast('Failed to create assignment', 'error');
+  }
+}
+
+// Render assignments list
+function renderAssignmentsList() {
+  const container = document.getElementById('assignmentsList');
+  if (!container) return;
+
+  const assignments = getAssignments();
+
+  if (assignments.length === 0) {
+    container.innerHTML = `
+      <div class="text-center py-8 text-muted">
+        <p class="text-sm">No assignments yet.</p>
+        <p class="text-xs mt-1">Create your first assignment using the form on the left.</p>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = assignments.map(assignment => `
+    <div class="bg-surface2 rounded-lg p-4 border border-border hover:border-accent/30 transition-colors">
+      <div class="flex items-start justify-between">
+        <div class="flex-1">
+          <div class="flex items-center gap-2 mb-2">
+            <h4 class="font-semibold text-white">${esc(assignment.title)}</h4>
+            <span class="badge badge-blue text-xs">${assignment.course || 'All Courses'}</span>
+          </div>
+          <p class="text-sm text-muted mb-3">${esc(assignment.description)}</p>
+          <div class="flex items-center gap-4 text-xs text-muted">
+            <span class="flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              ${new Date(assignment.createdAt).toLocaleDateString()}
+            </span>
+            <span class="flex items-center gap-1">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              ${assignment.submissions?.length || 0} submissions
+            </span>
+          </div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="editAssignmentUI('${assignment.id}')" class="text-accent hover:text-white transition-colors p-1" title="Edit">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+            </svg>
+          </button>
+          <button onclick="deleteAssignmentUI('${assignment.id}')" class="text-red-400 hover:text-red-300 transition-colors p-1" title="Delete">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// Edit assignment UI
+function editAssignmentUI(id) {
+  const assignments = getAssignments();
+  const assignment = assignments.find(a => a.id === id);
+  
+  if (!assignment) {
+    showToast('Assignment not found', 'error');
+    return;
+  }
+
+  // Populate form
+  document.getElementById('assignmentTitle').value = assignment.title;
+  document.getElementById('assignmentDescription').value = assignment.description;
+  document.getElementById('assignmentCourse').value = assignment.course || '';
+  
+  // Change button to update mode
+  const submitBtn = document.querySelector('#tab-assignments button[onclick="addNewAssignment()"]');
+  submitBtn.textContent = 'Update Assignment';
+  submitBtn.onclick = function() { updateExistingAssignment(id); };
+  
+  showToast('Editing assignment. Update the fields and click "Update Assignment".', 'info');
+}
+
+// Update existing assignment
+function updateExistingAssignment(id) {
+  const title = document.getElementById('assignmentTitle').value.trim();
+  const description = document.getElementById('assignmentDescription').value.trim();
+  const course = document.getElementById('assignmentCourse').value;
+
+  if (!title || !description) {
+    showToast('Title and description are required', 'error');
+    return;
+  }
+
+  const assignments = getAssignments();
+  const index = assignments.findIndex(a => a.id === id);
+  
+  if (index === -1) {
+    showToast('Assignment not found', 'error');
+    return;
+  }
+  
+  assignments[index] = {
+    ...assignments[index],
+    title,
+    description,
+    course: course || null
+  };
+  
+  if (saveAssignments(assignments)) {
+    showToast('Assignment updated successfully!', 'success');
+    // Reset form
+    document.getElementById('assignmentTitle').value = '';
+    document.getElementById('assignmentDescription').value = '';
+    document.getElementById('assignmentCourse').value = '';
+    // Reset button
+    const submitBtn = document.querySelector('#tab-assignments button[onclick="updateExistingAssignment(\'' + id + '\')"]');
+    if (submitBtn) {
+      submitBtn.textContent = 'Create Assignment';
+      submitBtn.onclick = addNewAssignment;
+    }
+    renderAssignmentsList();
+  } else {
+    showToast('Failed to update assignment', 'error');
+  }
+}
+
+// Delete assignment
+function deleteAssignmentUI(id) {
+  if (!confirm('Are you sure you want to delete this assignment?')) return;
+  
+  const assignments = getAssignments();
+  const filtered = assignments.filter(a => a.id !== id);
+  
+  if (filtered.length === assignments.length) {
+    showToast('Assignment not found', 'error');
+    return;
+  }
+  
+  if (saveAssignments(filtered)) {
+    showToast('Assignment deleted successfully', 'success');
+    renderAssignmentsList();
+  } else {
+    showToast('Failed to delete assignment', 'error');
+  }
+}
+
+// Refresh assignments list
+function refreshAssignments() {
+  renderAssignmentsList();
+  showToast('Assignments list refreshed', 'info');
+}
+
+// Load assignments when tab is shown
+document.querySelector('[data-tab="assignments"]')?.addEventListener('click', () => {
+  setTimeout(() => {
+    renderAssignmentsList();
+    // Populate course dropdown
+    const courseSelect = document.getElementById('assignmentCourse');
+    if (courseSelect && allCourses) {
+      courseSelect.innerHTML = '<option value="">All Courses</option>' +
+        allCourses.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('');
+    }
+  }, 100);
+});
+
 // Initialize coupons list when coupons tab is shown
 document.addEventListener('DOMContentLoaded', () => {
   // Add event listener for coupons tab
   document.querySelector('[data-tab="coupons"]')?.addEventListener('click', () => {
     setTimeout(renderCouponsList, 100);
   });
+  
+  // Add event listener for feedback tab
+  document.querySelector('[data-tab="feedback"]')?.addEventListener('click', () => {
+    setTimeout(renderFeedbacksList, 100);
+  });
+  
+  // Add event listener for mentors tab
+  document.querySelector('[data-tab="mentors"]')?.addEventListener('click', () => {
+    setTimeout(renderMentorsList, 100);
+  });
+
+  // Add event listener for footer tab
+  document.querySelector('[data-tab="footer"]')?.addEventListener('click', () => {
+    setTimeout(loadFooterSettings, 100);
+  });
 });
+
+// ==================== FOOTER SETTINGS FUNCTIONS ====================
+
+// Default footer data structure
+const defaultFooterData = {
+  description: "Your career-building university for the decentralized web. Learn, build, and thrive in Web3.",
+  social: {
+    twitter: "#",
+    linkedin: "#",
+    facebook: "#",
+    youtube: "#"
+  },
+  courses: ["Blockchain Basics", "Smart Contracts", "DeFi Mastery", "NFT & Metaverse", "Web3 Development"],
+  company: ["About Us", "Our Mentors", "Careers", "Blog", "Press Kit"],
+  support: ["Help Center", "Community Forum", "Contact Us", "Refund Policy", "Affiliate Program"]
+};
+
+// Get footer data from localStorage
+function getFooterData() {
+  try {
+    const data = localStorage.getItem('footerData');
+    return data ? JSON.parse(data) : defaultFooterData;
+  } catch (error) {
+    console.error('Error reading footer data:', error);
+    return defaultFooterData;
+  }
+}
+
+// Save footer data to localStorage
+function saveFooterData(data) {
+  try {
+    localStorage.setItem('footerData', JSON.stringify(data));
+    return true;
+  } catch (error) {
+    console.error('Error saving footer data:', error);
+    return false;
+  }
+}
+
+// Load footer settings into form
+function loadFooterSettings() {
+  const data = getFooterData();
+  
+  // Fill form fields
+  document.getElementById('footerDescription').value = data.description || '';
+  document.getElementById('footerTwitter').value = data.social.twitter || '';
+  document.getElementById('footerLinkedin').value = data.social.linkedin || '';
+  document.getElementById('footerFacebook').value = data.social.facebook || '';
+  document.getElementById('footerYoutube').value = data.social.youtube || '';
+  
+  // Convert arrays to comma-separated strings
+  document.getElementById('footerCourses').value = Array.isArray(data.courses) ? data.courses.join(', ') : data.courses || '';
+  document.getElementById('footerCompany').value = Array.isArray(data.company) ? data.company.join(', ') : data.company || '';
+  document.getElementById('footerSupport').value = Array.isArray(data.support) ? data.support.join(', ') : data.support || '';
+  
+  updateFooterPreview();
+}
+
+// Save footer settings from form
+function saveFooterSettings() {
+  const description = document.getElementById('footerDescription').value.trim();
+  const twitter = document.getElementById('footerTwitter').value.trim();
+  const linkedin = document.getElementById('footerLinkedin').value.trim();
+  const facebook = document.getElementById('footerFacebook').value.trim();
+  const youtube = document.getElementById('footerYoutube').value.trim();
+  
+  // Parse comma-separated lists into arrays
+  const coursesText = document.getElementById('footerCourses').value.trim();
+  const companyText = document.getElementById('footerCompany').value.trim();
+  const supportText = document.getElementById('footerSupport').value.trim();
+  
+  const courses = coursesText ? coursesText.split(',').map(item => item.trim()).filter(item => item) : [];
+  const company = companyText ? companyText.split(',').map(item => item.trim()).filter(item => item) : [];
+  const support = supportText ? supportText.split(',').map(item => item.trim()).filter(item => item) : [];
+  
+  const footerData = {
+    description: description || defaultFooterData.description,
+    social: {
+      twitter: twitter || '#',
+      linkedin: linkedin || '#',
+      facebook: facebook || '#',
+      youtube: youtube || '#'
+    },
+    courses: courses.length ? courses : defaultFooterData.courses,
+    company: company.length ? company : defaultFooterData.company,
+    support: support.length ? support : defaultFooterData.support
+  };
+  
+  if (saveFooterData(footerData)) {
+    showToast('Footer settings saved successfully!', 'success');
+    updateFooterPreview();
+  } else {
+    showToast('Failed to save footer settings', 'error');
+  }
+}
+
+// Load default footer settings
+function loadDefaultFooter() {
+  if (confirm('Load default footer settings? This will replace your current settings.')) {
+    saveFooterData(defaultFooterData);
+    loadFooterSettings();
+    showToast('Default footer settings loaded', 'info');
+  }
+}
+
+// Clear all footer settings
+function clearFooterSettings() {
+  if (confirm('Clear all footer settings? This will remove all customizations.')) {
+    localStorage.removeItem('footerData');
+    loadFooterSettings();
+    showToast('Footer settings cleared', 'info');
+  }
+}
+
+// Update footer preview
+function updateFooterPreview() {
+  const data = getFooterData();
+  const preview = document.getElementById('footerPreview');
+  
+  if (!preview) return;
+  
+  const socialLinks = Object.entries(data.social)
+    .filter(([_, url]) => url && url !== '#')
+    .map(([platform, url]) => `${platform}: ${url}`)
+    .join(', ');
+  
+  preview.innerHTML = `
+    <div class="space-y-3">
+      <div><strong>Description:</strong> ${data.description}</div>
+      <div><strong>Social Links:</strong> ${socialLinks || 'None configured'}</div>
+      <div><strong>Courses:</strong> ${Array.isArray(data.courses) ? data.courses.join(', ') : data.courses}</div>
+      <div><strong>Company Links:</strong> ${Array.isArray(data.company) ? data.company.join(', ') : data.company}</div>
+      <div><strong>Support Links:</strong> ${Array.isArray(data.support) ? data.support.join(', ') : data.support}</div>
+      <div class="text-xs text-muted mt-4">This preview shows the data that will be used in the homepage footer.</div>
+    </div>
+  `;
+}
 
 function showToast(msg, type = 'success') {
   const el = document.getElementById('toast');

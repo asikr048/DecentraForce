@@ -1,4 +1,5 @@
 import { query } from '../../lib/db.js';
+import bcrypt from 'bcrypt';
 
 /**
  * Password reset API endpoint
@@ -133,24 +134,23 @@ export default async function handler(req, res) {
         });
       }
 
-      // In a real application, you would hash the password before storing
-      // For now, we'll simulate password update
-      // TODO: Implement proper password hashing with bcrypt or similar
+      // Hash the new password with bcrypt
+      const saltRounds = 10;
+      const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
       
       console.log(`Password reset for user ${email}`);
       
-      // Update user password (in a real app, you would hash it)
-      // For now, we'll just log it and mark the PIN as used
+      // Update user password with hash
+      await query(
+        'UPDATE users SET password_hash = $1 WHERE id = $2',
+        [hashedPassword, user.id]
+      );
+
+      // Delete the used PIN
       await query(
         'DELETE FROM password_reset_tokens WHERE id = $1',
         [pinRecord.id]
       );
-
-      // In a real implementation, you would update the password field in users table
-      // await query(
-      //   'UPDATE users SET password_hash = $1 WHERE id = $2',
-      //   [hashedPassword, user.id]
-      // );
 
       return res.status(200).json({
         success: true,
