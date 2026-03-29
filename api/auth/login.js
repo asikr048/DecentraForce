@@ -154,7 +154,7 @@ export default async function handler(req, res) {
       },
       // For development, also return token in response (not in production)
       sessionToken: process.env.NODE_ENV === 'development' ? sessionToken : undefined,
-      redirectUrl: isAdmin ? '/admin.html' : '/dashboard.html'
+      redirectUrl: isAdmin ? '/admin.html' : '/index.html'
     });
 
   } catch (error) {
