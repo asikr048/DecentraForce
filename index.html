@@ -659,177 +659,117 @@
     box-shadow: 0 8px 32px rgba(0, 229, 153, 0.4);
   }
 
-  /* ══════════ ADMIN-ONLY (hidden from normal users) ══════════ */
+  /* ══════════ ADMIN-ONLY ══════════ */
   .admin-only { display: none !important; }
   .admin-only.show { display: block !important; }
 
-  /* ══════════ FEEDBACK SECTION ══════════ */
-  .feedback-section {
-    padding: 100px 5%;
-    background: linear-gradient(135deg, rgba(13,22,48,0.9) 0%, rgba(5,10,24,0.95) 100%);
-    position: relative; z-index: 1;
+  /* ══════════ FLOATING TESTIMONIAL MARQUEE ══════════ */
+  .tmarquee-track {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+  }
+  .tmarquee-inner {
+    display: flex;
+    gap: 18px;
+    width: max-content;
+    animation: marqueeScroll 44s linear infinite;
+  }
+  .tmarquee-inner:hover { animation-play-state: paused; }
+
+  @keyframes marqueeScroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
   }
 
-  .feedback-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 24px;
-    margin-top: 20px;
-  }
-
-  .feedback-card {
+  .tcard {
+    width: 308px;
+    flex-shrink: 0;
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 20px;
-    padding: 28px;
+    border-radius: 18px;
+    padding: 20px 20px 16px;
+    box-shadow: 0 16px 48px rgba(0,0,0,.42);
     position: relative;
     overflow: hidden;
-    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
+    transition: transform .25s, box-shadow .25s, border-color .25s;
+    cursor: default;
   }
-  .feedback-card::before {
+  .tcard::before {
     content: '';
-    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    position: absolute; top: 0; left: 0; right: 0; height: 2px;
     background: linear-gradient(90deg, var(--accent2), var(--accent));
     opacity: 0; transition: opacity .3s;
   }
-  .feedback-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(123,92,255,.2);
-    border-color: rgba(123,92,255,.3);
-  }
-  .feedback-card:hover::before { opacity: 1; }
+  .tcard:hover { transform: translateY(-5px) scale(1.015); box-shadow: 0 28px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(123,92,255,.25); border-color: rgba(123,92,255,.3); }
+  .tcard:hover::before { opacity: 1; }
 
-  .feedback-quote-mark {
-    font-family: 'Syne', sans-serif;
-    font-size: 5rem;
-    line-height: .5;
-    color: var(--accent2);
-    opacity: .3;
-    font-weight: 800;
-    position: absolute;
-    top: 20px; right: 24px;
+  .tcard-glow {
+    position: absolute; top: -30px; right: -30px;
+    width: 100px; height: 100px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(123,92,255,.2), transparent 70%);
     pointer-events: none;
   }
-
-  .feedback-body-text {
-    font-size: .92rem;
+  .tcard-quote {
+    font-family: 'Syne', sans-serif;
+    font-size: 3.5rem; line-height: .55;
+    color: var(--accent2); opacity: .35;
+    font-weight: 900;
+    margin-bottom: 4px;
+    display: block;
+  }
+  .tcard-text {
+    font-size: .84rem;
     color: var(--text);
-    line-height: 1.75;
+    line-height: 1.7;
     opacity: .9;
-    flex: 1;
+    margin-bottom: 12px;
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
   }
+  .tcard-stars { font-size: .82rem; letter-spacing: 1px; margin-bottom: 12px; }
 
-  .feedback-rating {
-    font-size: 1rem;
-    letter-spacing: 2px;
-  }
-
-  .feedback-author-row {
+  .tcard-footer {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding-top: 14px;
+    gap: 10px;
+    padding-top: 12px;
     border-top: 1px solid var(--border);
   }
-
-  .feedback-avatar-img {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    overflow: hidden;
-    flex-shrink: 0;
-    border: 2px solid var(--border);
-    box-shadow: 0 0 16px rgba(123,92,255,.2);
+  .tcard-avatar {
+    width: 38px; height: 38px; border-radius: 50%;
+    overflow: hidden; flex-shrink: 0;
+    border: 2px solid rgba(123,92,255,.25);
+    box-shadow: 0 0 12px rgba(123,92,255,.2);
   }
-  .feedback-avatar-img img {
-    width: 100%; height: 100%; object-fit: cover;
-  }
-
-  .feedback-author-info { flex: 1; }
-
-  .feedback-author-name {
+  .tcard-avatar img { width: 100%; height: 100%; object-fit: cover; }
+  .tcard-info { flex: 1; min-width: 0; }
+  .tcard-name {
     font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: .95rem;
-    color: var(--text); margin-bottom: 2px;
+    font-weight: 700; font-size: .84rem;
+    color: var(--text); margin-bottom: 1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
+  .tcard-role { font-size: .7rem; color: var(--accent); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .tcard-lang {
+    font-size: .6rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase;
+    padding: 2px 7px; border-radius: 100px; flex-shrink: 0;
+  }
+  .tcard-lang.bangla { background: rgba(0,229,153,.12); color: #00e599; border:1px solid rgba(0,229,153,.2); }
+  .tcard-lang.english { background: rgba(0,229,255,.1); color: var(--accent); border:1px solid rgba(0,229,255,.2); }
 
-  .feedback-author-role {
-    font-size: .75rem;
-    color: var(--accent);
-    margin-bottom: 4px;
-  }
-
-  .feedback-meta-row {
-    display: flex; align-items: center; gap: 8px;
-  }
-
-  .lang-badge {
-    font-size: .65rem; font-weight: 700;
-    letter-spacing: .08em; text-transform: uppercase;
-    padding: 2px 8px; border-radius: 100px;
-  }
-  .lang-badge.bangla, .lang-badge.বাংলা {
-    background: rgba(0,229,153,.12); color: #00e599;
-    border: 1px solid rgba(0,229,153,.2);
-  }
-  .lang-badge.english {
-    background: rgba(0,229,255,.1); color: var(--accent);
-    border: 1px solid rgba(0,229,255,.2);
-  }
-
-  .feedback-date-text {
-    font-size: .7rem; color: var(--muted);
-  }
-
-  .feedback-empty-state {
-    grid-column: 1/-1;
-    text-align: center; padding: 60px 20px;
-    color: var(--muted);
-  }
-  .feedback-empty-state h3 {
-    font-family: 'Syne', sans-serif; font-weight: 700;
-    margin-bottom: 8px; color: var(--text);
-  }
-
-  .feedback-admin-btns {
-    display: flex; gap: 8px; margin-top: 4px;
-  }
-  .fb-edit-btn, .fb-delete-btn {
-    padding: 5px 12px; border-radius: 6px;
-    border: 1px solid var(--border); cursor: pointer;
-    font-size: .78rem; font-weight: 500;
-    transition: all .2s; background: transparent;
-  }
-  .fb-edit-btn { color: var(--accent); }
-  .fb-edit-btn:hover { background: rgba(0,229,255,.1); }
-  .fb-delete-btn { color: var(--accent3); }
-  .fb-delete-btn:hover { background: rgba(255,77,141,.1); }
-
-  /* ══════════ IMPROVED MENTOR CARDS ══════════ */
-  .mentor-card {
-    position: relative; overflow: hidden;
-  }
+  /* ══════════ MENTOR CARDS ══════════ */
+  .mentor-card { position: relative; overflow: hidden; }
   .mentor-card::after {
-    content: '';
-    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
     background: linear-gradient(90deg, var(--accent2), var(--accent));
     opacity: 0; transition: opacity .3s;
   }
   .mentor-card:hover::after { opacity: 1; }
-
-  .mentor-card .mentor-name-en {
-    font-size: .72rem; color: var(--muted); margin-top: 2px; margin-bottom: 8px;
-  }
-
-  /* ══════════ SECTION DIVIDER ══════════ */
-  .section-divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--border), transparent);
-    margin: 0 5%;
-  }
+  .mentor-name-en { font-size: .72rem; color: var(--muted); margin-top: 2px; margin-bottom: 8px; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="scripts/three-scene.js" defer></script>
@@ -1125,6 +1065,32 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
       </svg>
       Manage Mentors (Admin)
+    </a>
+  </div>
+</section>
+
+<!-- ══════════ FLOATING TESTIMONIALS ══════════ -->
+<section id="student-feedback" style="position:relative;z-index:1;padding:90px 0;overflow:hidden;">
+  <div class="section-header" style="padding:0 5%;margin-bottom:50px;">
+    <div class="section-tag">Student Voices</div>
+    <h2>What Our <em>Students Say</em></h2>
+    <p>Real feedback from learners who transformed their careers with DecentraForce.</p>
+  </div>
+
+  <!-- Row 1 — scroll left -->
+  <div class="tmarquee-track">
+    <div class="tmarquee-inner" id="trow1" style="animation-direction:normal"></div>
+  </div>
+
+  <!-- Row 2 — scroll right -->
+  <div class="tmarquee-track" style="margin-top:20px;">
+    <div class="tmarquee-inner" id="trow2" style="animation-direction:reverse"></div>
+  </div>
+
+  <div style="text-align:center;margin-top:44px;" class="admin-only" id="manage-feedback-btn">
+    <a href="admin.html?tab=feedback" class="btn btn-outline">
+      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:8px"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+      Manage Feedback (Admin)
     </a>
   </div>
 </section>
@@ -1579,38 +1545,60 @@ window.addEventListener('storage', (e) => {
 
   // Initialize feedback section
   document.addEventListener('DOMContentLoaded', () => {
-    if (typeof initFeedbackSection === 'function') {
-      initFeedbackSection();
+    // ── Build floating testimonial marquee ──
+    if (typeof initDefaultFeedbacks === 'function') initDefaultFeedbacks();
+    if (typeof initDefaultMentors  === 'function') initDefaultMentors();
+    if (typeof initDefaultCourses  === 'function') initDefaultCourses();
+
+    function buildMarquee() {
+      const feedbacks = (typeof getAllFeedbacks === 'function') ? getAllFeedbacks() : [];
+      if (!feedbacks.length) return;
+
+      function makeCard(fb) {
+        const r = fb.rating || 5;
+        const stars = '<span style="color:#fbbf24">' + '★'.repeat(r) + '</span>'
+                    + '<span style="color:rgba(255,255,255,.15)">' + '☆'.repeat(5 - r) + '</span>';
+        const lang = (fb.language || 'English').toLowerCase();
+        const langLabel = fb.language || 'English';
+        const safeText = (fb.text || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        const safeName = (fb.name || '').replace(/</g,'&lt;');
+        const safeRole = (fb.role || 'Web3 Learner').replace(/</g,'&lt;');
+        const avatarSrc = fb.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(fb.name.substring(0,2))}&background=7b5cff&color=fff&size=80&bold=true`;
+        return `
+          <div class="tcard">
+            <div class="tcard-glow"></div>
+            <span class="tcard-quote">"</span>
+            <p class="tcard-text">${safeText}</p>
+            <div class="tcard-stars">${stars}</div>
+            <div class="tcard-footer">
+              <div class="tcard-avatar">
+                <img src="${avatarSrc}" alt="${safeName}" loading="lazy"
+                  onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(fb.name.substring(0,2))}&background=7b5cff&color=fff&size=80&bold=true'">
+              </div>
+              <div class="tcard-info">
+                <div class="tcard-name">${safeName}</div>
+                <div class="tcard-role">${safeRole}</div>
+              </div>
+              <span class="tcard-lang ${lang}">${langLabel}</span>
+            </div>
+          </div>`;
+      }
+
+      // Split into two rows, alternate cards
+      const row1 = feedbacks.filter((_, i) => i % 2 === 0);
+      const row2 = feedbacks.filter((_, i) => i % 2 === 1);
+      // Need at least a few cards per row — pad if short
+      function pad(arr) { while(arr.length < 4) arr = [...arr, ...arr]; return arr; }
+      const r1 = pad(row1), r2 = pad(row2);
+
+      const el1 = document.getElementById('trow1');
+      const el2 = document.getElementById('trow2');
+      if (el1) { const h = r1.map(makeCard).join(''); el1.innerHTML = h + h; } // double for seamless loop
+      if (el2) { const h = r2.map(makeCard).join(''); el2.innerHTML = h + h; }
     }
+    buildMarquee();
   });
 </script>
-
-<!-- Student Feedback Section -->
-<section id="student-feedback" class="feedback-section">
-  <div class="section-header">
-    <div class="section-tag">Student Voices</div>
-    <h2>What Our <em>Students Say</em></h2>
-    <p>Real feedback from learners who transformed their careers with DecentraForce.</p>
-  </div>
-
-  <div class="feedback-grid" id="feedback-container">
-    <!-- Feedback cards will be loaded dynamically -->
-    <div class="feedback-empty-state">
-      <div style="font-size:3rem;margin-bottom:16px">💬</div>
-      <h3>No feedback yet</h3>
-      <p>Be the first to share your experience!</p>
-    </div>
-  </div>
-
-  <div style="text-align:center; margin-top: 50px;" class="admin-only" id="manage-feedback-btn">
-    <a href="admin.html?tab=feedback" class="btn btn-outline">
-      <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:8px">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-      </svg>
-      Manage Feedback (Admin)
-    </a>
-  </div>
-</section>
 
 <!-- Checkout Modal -->
 <div class="modal-overlay" id="checkoutModal">
