@@ -658,6 +658,178 @@
     transform: translateY(-2px);
     box-shadow: 0 8px 32px rgba(0, 229, 153, 0.4);
   }
+
+  /* ══════════ ADMIN-ONLY (hidden from normal users) ══════════ */
+  .admin-only { display: none !important; }
+  .admin-only.show { display: block !important; }
+
+  /* ══════════ FEEDBACK SECTION ══════════ */
+  .feedback-section {
+    padding: 100px 5%;
+    background: linear-gradient(135deg, rgba(13,22,48,0.9) 0%, rgba(5,10,24,0.95) 100%);
+    position: relative; z-index: 1;
+  }
+
+  .feedback-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-top: 20px;
+  }
+
+  .feedback-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 28px;
+    position: relative;
+    overflow: hidden;
+    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .feedback-card::before {
+    content: '';
+    position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    opacity: 0; transition: opacity .3s;
+  }
+  .feedback-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(123,92,255,.2);
+    border-color: rgba(123,92,255,.3);
+  }
+  .feedback-card:hover::before { opacity: 1; }
+
+  .feedback-quote-mark {
+    font-family: 'Syne', sans-serif;
+    font-size: 5rem;
+    line-height: .5;
+    color: var(--accent2);
+    opacity: .3;
+    font-weight: 800;
+    position: absolute;
+    top: 20px; right: 24px;
+    pointer-events: none;
+  }
+
+  .feedback-body-text {
+    font-size: .92rem;
+    color: var(--text);
+    line-height: 1.75;
+    opacity: .9;
+    flex: 1;
+  }
+
+  .feedback-rating {
+    font-size: 1rem;
+    letter-spacing: 2px;
+  }
+
+  .feedback-author-row {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .feedback-avatar-img {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    overflow: hidden;
+    flex-shrink: 0;
+    border: 2px solid var(--border);
+    box-shadow: 0 0 16px rgba(123,92,255,.2);
+  }
+  .feedback-avatar-img img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+
+  .feedback-author-info { flex: 1; }
+
+  .feedback-author-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700; font-size: .95rem;
+    color: var(--text); margin-bottom: 2px;
+  }
+
+  .feedback-author-role {
+    font-size: .75rem;
+    color: var(--accent);
+    margin-bottom: 4px;
+  }
+
+  .feedback-meta-row {
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .lang-badge {
+    font-size: .65rem; font-weight: 700;
+    letter-spacing: .08em; text-transform: uppercase;
+    padding: 2px 8px; border-radius: 100px;
+  }
+  .lang-badge.bangla, .lang-badge.বাংলা {
+    background: rgba(0,229,153,.12); color: #00e599;
+    border: 1px solid rgba(0,229,153,.2);
+  }
+  .lang-badge.english {
+    background: rgba(0,229,255,.1); color: var(--accent);
+    border: 1px solid rgba(0,229,255,.2);
+  }
+
+  .feedback-date-text {
+    font-size: .7rem; color: var(--muted);
+  }
+
+  .feedback-empty-state {
+    grid-column: 1/-1;
+    text-align: center; padding: 60px 20px;
+    color: var(--muted);
+  }
+  .feedback-empty-state h3 {
+    font-family: 'Syne', sans-serif; font-weight: 700;
+    margin-bottom: 8px; color: var(--text);
+  }
+
+  .feedback-admin-btns {
+    display: flex; gap: 8px; margin-top: 4px;
+  }
+  .fb-edit-btn, .fb-delete-btn {
+    padding: 5px 12px; border-radius: 6px;
+    border: 1px solid var(--border); cursor: pointer;
+    font-size: .78rem; font-weight: 500;
+    transition: all .2s; background: transparent;
+  }
+  .fb-edit-btn { color: var(--accent); }
+  .fb-edit-btn:hover { background: rgba(0,229,255,.1); }
+  .fb-delete-btn { color: var(--accent3); }
+  .fb-delete-btn:hover { background: rgba(255,77,141,.1); }
+
+  /* ══════════ IMPROVED MENTOR CARDS ══════════ */
+  .mentor-card {
+    position: relative; overflow: hidden;
+  }
+  .mentor-card::after {
+    content: '';
+    position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    opacity: 0; transition: opacity .3s;
+  }
+  .mentor-card:hover::after { opacity: 1; }
+
+  .mentor-card .mentor-name-en {
+    font-size: .72rem; color: var(--muted); margin-top: 2px; margin-bottom: 8px;
+  }
+
+  /* ══════════ SECTION DIVIDER ══════════ */
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0 5%;
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="scripts/three-scene.js" defer></script>
@@ -686,7 +858,10 @@
     <a href="register.html" class="btn btn-primary" style="font-weight: 700; padding: 10px 24px;" data-auth="register">Create Account</a>
     
     <div class="avatar-wrapper" data-auth="protected" style="display: none;">
-      <div class="avatar-btn" id="navAvatar" onclick="toggleDropdown(event)">...</div>
+      <div class="avatar-btn" id="navAvatar" onclick="toggleDropdown(event)">
+        <svg id="navAvatarIcon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        <span id="navAvatarText" style="display:none;font-size:.85rem;font-weight:800;"></span>
+      </div>
       
       <div class="user-dropdown" id="userMenu">
         <div class="dropdown-header">
@@ -938,21 +1113,13 @@
   </div>
   <div class="mentors-grid" id="mentors-container">
     <!-- Mentors will be loaded dynamically from localStorage -->
-    <div class="empty-state" id="mentors-empty">
+    <div class="empty-state" id="mentors-empty" style="display:none;">
       <div class="empty-icon">👨‍🏫</div>
       <h3>No mentors yet</h3>
       <p>Our expert mentors will be listed here soon.</p>
-      <div style="margin-top: 20px;">
-        <a href="admin.html?tab=mentors" class="btn btn-outline" style="padding: 10px 20px; font-size: 0.9rem;">
-          <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px;">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-          </svg>
-          Add Mentors (Admin)
-        </a>
-      </div>
     </div>
   </div>
-  <div style="text-align:center; margin-top: 40px;">
+  <div style="text-align:center; margin-top: 40px;" class="admin-only" id="manage-mentors-btn" style="display:none;">
     <a href="admin.html?tab=mentors" class="btn btn-outline">
       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:8px">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
@@ -1126,24 +1293,36 @@ window.addEventListener('storage', (e) => {
       if (window.auth && window.auth.isLoggedIn && window.auth.currentUser) {
         clearInterval(checkAuth);
         const user = window.auth.currentUser;
-        const initials = user.username.substring(0, 2).toUpperCase();
-        const avatarEl = document.getElementById('navAvatar');
-        if (avatarEl) avatarEl.textContent = initials;
-        
-        // If the user is an admin, change "My Profile" to "Admin Dashboard" in the dropdown
-        if (user.isAdmin) {
-          const profileLink = document.querySelector('.dropdown-item[href="my-courses.html?tab=profile"]');
-          if(profileLink) {
-             profileLink.href = "admin.html";
-             profileLink.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Admin Panel`;
-          }
+        // Show first 2 initials from username (supports Bangla and English)
+        const words = user.username.trim().split(/\s+/);
+        let initials;
+        if (words.length >= 2) {
+          initials = (words[0][0] + words[1][0]).toUpperCase();
         } else {
-          // Hide admin-only buttons for normal users
-          const adminButtons = document.querySelectorAll('a[href*="admin.html"], button[onclick*="admin.html"]');
-          adminButtons.forEach(btn => {
-            btn.style.display = 'none';
-          });
+          initials = user.username.substring(0, 2).toUpperCase();
         }
+        const avatarEl = document.getElementById('navAvatar');
+        const iconEl = document.getElementById('navAvatarIcon');
+        const textEl = document.getElementById('navAvatarText');
+        if (avatarEl) {
+          if (iconEl) iconEl.style.display = 'none';
+          if (textEl) { textEl.textContent = initials; textEl.style.display = 'inline'; }
+        }
+
+        if (user.isAdmin) {
+          // Show admin-only elements for admins
+          document.querySelectorAll('.admin-only').forEach(el => {
+            el.style.removeProperty('display');
+            el.classList.add('show');
+          });
+          // Change "My Profile" to "Admin Dashboard"
+          const profileLink = document.querySelector('.dropdown-item[href="my-courses.html?tab=profile"]');
+          if (profileLink) {
+            profileLink.href = "admin.html";
+            profileLink.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Admin Panel`;
+          }
+        }
+        // For non-admins, admin-only elements stay hidden (CSS default)
       } else if (window.auth && window.auth.isLoggedIn === false && window.auth.currentUser === null) {
         clearInterval(checkAuth);
       }
@@ -1185,9 +1364,12 @@ window.addEventListener('storage', (e) => {
       courses.forEach((course, index) => {
         const bannerClass = banners[index % banners.length];
         const emoji = emojis[index % emojis.length];
-        const badge = badges[index % badges.length];
+        const badge = course.badge || badges[index % badges.length];
         const price = course.price ? `৳${course.price}` : '৳2,500';
         const originalPrice = course.price ? `৳${Math.round(course.price * 1.5)}` : '৳4,500';
+        const ratingVal = course.rating || 4.8;
+        const reviewsVal = course.reviews ? (course.reviews >= 1000 ? (course.reviews/1000).toFixed(1)+'k' : course.reviews) : '500+';
+        const levelTag = course.level || (index % 3 === 0 ? 'Beginner' : index % 3 === 1 ? 'Intermediate' : 'Advanced');
         
         // For free courses, show "Free" instead of price
         const isFree = course.price === 0 || course.price === '0' || course.price === null;
@@ -1221,19 +1403,26 @@ window.addEventListener('storage', (e) => {
           <div class="card-body">
             <div class="card-meta">
               <span class="tag tag-blue">${course.modules ? course.modules.split(',')[0] || 'Blockchain' : 'Blockchain'}</span>
-              <span class="tag tag-purple">${index % 3 === 0 ? 'Beginner' : index % 3 === 1 ? 'Intermediate' : 'Advanced'}</span>
+              <span class="tag tag-purple">${levelTag}</span>
             </div>
             <h3>${course.title || 'Untitled Course'}</h3>
             <p>${course.description || 'Learn essential skills in this comprehensive course.'}</p>
             <div class="card-footer">
-              <button class="btn ${buttonClass} buy-now-btn" style="padding:8px 16px;font-size:0.85rem;" data-course-id="${course.id}" data-is-free="${isFree}">
-                ${buttonText}
-              </button>
+              <div class="rating"><span class="stars">★★★★★</span> ${ratingVal} (${reviewsVal})</div>
               ${priceDisplay}
             </div>
           </div>
         `;
         container.appendChild(card);
+
+        // Make the card itself open the checkout/enroll
+        card.addEventListener('click', function() {
+          if (isFree) {
+            window.location.href = 'my-courses.html?tab=free';
+          } else {
+            openCheckoutModal(course);
+          }
+        });
       });
 
       // Attach event listeners to Buy Now/Enroll Now buttons
@@ -1321,8 +1510,13 @@ window.addEventListener('storage', (e) => {
     if (mentors.length === 0) {
       // Show empty state
       if (emptyState) emptyState.style.display = 'block';
-      container.innerHTML = '';
-      // Keep the empty state HTML that's already in the container
+      container.innerHTML = `
+        <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">
+          <div style="font-size:3rem;margin-bottom:16px">👨‍🏫</div>
+          <h3 style="font-family:'Syne',sans-serif;font-weight:700;margin-bottom:8px;color:var(--text)">Expert Mentors Coming Soon</h3>
+          <p style="font-size:.9rem">Our team of blockchain professionals will be listed here.</p>
+        </div>
+      `;
       return;
     }
 
@@ -1353,16 +1547,17 @@ window.addEventListener('storage', (e) => {
       <div class="mentor-card">
         <div class="mentor-avatar" style="background:${getRandomGradient()}">
           ${mentor.imageUrl && mentor.imageUrl !== 'https://via.placeholder.com/150'
-            ? `<img src="${mentor.imageUrl}" alt="${mentor.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`
+            ? `<img src="${mentor.imageUrl}" alt="${mentor.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none'">`
             : getInitials(mentor.name)}
         </div>
         <h4>${mentor.name}</h4>
+        ${mentor.nameEn && mentor.nameEn !== mentor.name ? `<div class="mentor-name-en">${mentor.nameEn}</div>` : ''}
         <div class="role">${mentor.title}</div>
-        <p class="bio">Expert in blockchain technology with extensive industry experience.</p>
+        <p class="bio">${mentor.bio || 'Expert in blockchain technology with extensive industry experience.'}</p>
         <div class="mentor-socials">
-          <a href="#" class="social-btn">𝕏</a>
-          <a href="#" class="social-btn">in</a>
-          <a href="#" class="social-btn">⬡</a>
+          <a href="${mentor.twitter || '#'}" class="social-btn" title="Twitter">𝕏</a>
+          <a href="${mentor.linkedin || '#'}" class="social-btn" title="LinkedIn">in</a>
+          <a href="${mentor.github || '#'}" class="social-btn" title="GitHub">⬡</a>
         </div>
       </div>
     `).join('');
@@ -1391,29 +1586,29 @@ window.addEventListener('storage', (e) => {
 </script>
 
 <!-- Student Feedback Section -->
-<section id="student-feedback" style="padding: 100px 5%; background: linear-gradient(135deg, rgba(13,22,48,0.8) 0%, rgba(5,10,24,0.9) 100%);">
+<section id="student-feedback" class="feedback-section">
   <div class="section-header">
     <div class="section-tag">Student Voices</div>
     <h2>What Our <em>Students Say</em></h2>
     <p>Real feedback from learners who transformed their careers with DecentraForce.</p>
   </div>
-  
+
   <div class="feedback-grid" id="feedback-container">
     <!-- Feedback cards will be loaded dynamically -->
-    <div class="empty-state">
-      <div class="empty-icon">💬</div>
+    <div class="feedback-empty-state">
+      <div style="font-size:3rem;margin-bottom:16px">💬</div>
       <h3>No feedback yet</h3>
       <p>Be the first to share your experience!</p>
     </div>
   </div>
-  
-  <div style="text-align:center; margin-top: 50px;">
-    <button class="btn btn-outline" onclick="window.location.href='admin.html?tab=feedback'">
+
+  <div style="text-align:center; margin-top: 50px;" class="admin-only" id="manage-feedback-btn">
+    <a href="admin.html?tab=feedback" class="btn btn-outline">
       <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right:8px">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
       </svg>
-      Add Your Feedback (Admin)
-    </button>
+      Manage Feedback (Admin)
+    </a>
   </div>
 </section>
 
