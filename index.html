@@ -1322,45 +1322,143 @@ window.addEventListener('storage', (e) => {
   });
 
   // Set avatar initials when auth loads
-  document.addEventListener('DOMContentLoaded', () => {
-    const checkAuth = setInterval(() => {
-      if (window.auth && window.auth.isLoggedIn && window.auth.currentUser) {
-        clearInterval(checkAuth);
-        const user = window.auth.currentUser;
-        // Show first 2 initials from username (supports Bangla and English)
-        const words = user.username.trim().split(/\s+/);
-        let initials;
-        if (words.length >= 2) {
-          initials = (words[0][0] + words[1][0]).toUpperCase();
-        } else {
-          initials = user.username.substring(0, 2).toUpperCase();
+  // Course rendering and checkout modal functionality
+  document.addEventListener('DOMContentLoaded', async () => {
+    
+    // Fetch real courses from the Database via API instead of localStorage
+    async function fetchPublicCourses() {
+      try {
+        const res = await fetch('/api/_public/courses');
+        const data = await res.json();
+        if (data.success && data.courses && data.courses.length > 0) {
+          return data.courses;
         }
-        const avatarEl = document.getElementById('navAvatar');
-        const iconEl = document.getElementById('navAvatarIcon');
-        const textEl = document.getElementById('navAvatarText');
-        if (avatarEl) {
-          if (iconEl) iconEl.style.display = 'none';
-          if (textEl) { textEl.textContent = initials; textEl.style.display = 'inline'; }
-        }
-
-        if (user.isAdmin) {
-          // Show admin-only elements for admins
-          document.querySelectorAll('.admin-only').forEach(el => {
-            el.style.removeProperty('display');
-            el.classList.add('show');
-          });
-          // Change "My Profile" to "Admin Dashboard"
-          const profileLink = document.querySelector('.dropdown-item[href="my-courses.html?tab=profile"]');
-          if (profileLink) {
-            profileLink.href = "admin.html";
-            profileLink.innerHTML = `<svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg> Admin Panel`;
-          }
-        }
-        // For non-admins, admin-only elements stay hidden (CSS default)
-      } else if (window.auth && window.auth.isLoggedIn === false && window.auth.currentUser === null) {
-        clearInterval(checkAuth);
+        return [];
+      } catch (error) {
+        console.error('Error fetching courses from API:', error);
+        return [];
       }
-    }, 100);
+    }
+
+    // Render course cards into a given container
+    function renderCourseGrid(containerSelector, courses, options = {}) {
+      const container = document.querySelector(containerSelector);
+      if (!container) return;
+
+      container.innerHTML = '';
+
+      if (courses.length === 0) {
+        container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No courses available. Check back soon!</div>';
+        return;
+      }
+
+      const banners = ['banner-1', 'banner-2', 'banner-3', 'banner-4'];
+      const emojis = ['⛓️', '📝', '🖼️', '💰', '🚀', '🔗', '⚡', '🎓'];
+      const badges = ['🔥 Bestseller', '⚡ New', '🎨 Popular', '📈 Trending', '⭐ Featured'];
+
+      courses.forEach((course, index) => {
+        const bannerClass = banners[index % banners.length];
+        const emoji = emojis[index % emojis.length];
+        const badge = course.badge || badges[index % badges.length];
+        
+        const priceValue = parseFloat(course.price);
+        const isFree = isNaN(priceValue) || priceValue === 0;
+        
+        const price = isFree ? 'Free' : `৳${priceValue}`;
+        const originalPrice = isFree ? '' : `৳${Math.round(priceValue * 1.5)}`;
+        const ratingVal = course.rating || 4.8;
+        const reviewsVal = course.reviews ? (course.reviews >= 1000 ? (course.reviews/1000).toFixed(1)+'k' : course.reviews) : '500+';
+        
+        const priceDisplay = isFree ? '<span style="color:var(--accent);font-weight:700">Free</span>' : `<div class="price"><span>${originalPrice}</span>${price}</div>`;
+        const status = course.status || 'upcoming';
+
+        // Extract category if available in modules JSON
+        let categoryTag = 'Blockchain';
+        try {
+          const modulesObj = typeof course.modules === 'string' ? JSON.parse(course.modules) : course.modules;
+          if (modulesObj && modulesObj.category) categoryTag = modulesObj.category;
+        } catch(e) {}
+
+        // Handle Image rendering dynamically
+        const bgStyle = course.thumbnail_url ? `style="background-image: url('${course.thumbnail_url}'); background-size: cover; background-position: center;"` : '';
+        const innerEmoji = course.thumbnail_url ? '' : `<span style="z-index:2;position:relative">${emoji}</span>`;
+
+        const card = document.createElement('div');
+        card.className = 'course-card';
+        card.dataset.courseId = course.id;
+        card.innerHTML = `
+          <div class="card-banner ${course.thumbnail_url ? '' : bannerClass}" ${bgStyle}>
+            ${innerEmoji}
+            <span class="banner-badge">${badge}</span>
+          </div>
+          <div class="card-body">
+            <div class="card-meta">
+              <span class="tag tag-blue">${categoryTag}</span>
+              <span class="tag tag-purple">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+            </div>
+            <h3>${course.title || 'Untitled Course'}</h3>
+            <p>${course.description ? course.description.substring(0, 100) + '...' : 'Learn essential skills in this comprehensive course.'}</p>
+            <div class="card-footer">
+              <div class="rating"><span class="stars">★★★★★</span> ${ratingVal} (${reviewsVal})</div>
+              ${priceDisplay}
+            </div>
+          </div>
+        `;
+        container.appendChild(card);
+
+        card.addEventListener('click', function() {
+          if (isFree) {
+            window.location.href = 'my-courses.html?tab=free';
+          } else {
+            openCheckoutModal(course);
+          }
+        });
+      });
+    }
+
+    // Modal functions
+    function openCheckoutModal(course) {
+      const modal = document.getElementById('checkoutModal');
+      const title = document.getElementById('modalCourseTitle');
+      const desc = document.getElementById('modalCourseDesc');
+      const price = document.getElementById('modalCoursePrice');
+
+      if (title) title.textContent = course.title || 'Untitled Course';
+      if (desc) desc.textContent = course.description || 'Learn essential skills in this comprehensive course.';
+      if (price) price.textContent = course.price ? `৳${course.price}` : '৳2,500';
+
+      modal.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeCheckoutModal() {
+      const modal = document.getElementById('checkoutModal');
+      modal.classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    const modalClose = document.getElementById('modalClose');
+    const modalOverlay = document.getElementById('checkoutModal');
+    const cancelBtn = document.getElementById('modalCancel');
+
+    if (modalClose) modalClose.addEventListener('click', closeCheckoutModal);
+    if (modalOverlay) modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeCheckoutModal();
+    });
+    if (cancelBtn) cancelBtn.addEventListener('click', closeCheckoutModal);
+
+    // Initialize courses dynamically from the API
+    const courses = await fetchPublicCourses();
+    
+    // Render all courses
+    renderCourseGrid('.courses-grid', courses);
+    
+    // Render Free Courses (Price == 0)
+    const freeCourses = courses.filter(course => {
+      const p = parseFloat(course.price);
+      return isNaN(p) || p === 0;
+    });
+    renderCourseGrid('#free-courses-grid', freeCourses);
   });
 
   // Course rendering and checkout modal functionality
