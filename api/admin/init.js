@@ -10,9 +10,7 @@ export default async function handler(req, res) {
     const pool = await getPool();
 
     // 1. Add is_admin column safely
-    await pool.query(`
-      ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;
-    `);
+    await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE;`);
 
     // 2. Create courses table with all required columns
     await pool.query(`
@@ -25,7 +23,7 @@ export default async function handler(req, res) {
         price NUMERIC DEFAULT 0,
         whatsapp VARCHAR(255),
         status VARCHAR(50) DEFAULT 'upcoming',
-        modules JSONB DEFAULT '[]',
+        modules JSONB DEFAULT '{}',
         is_active BOOLEAN DEFAULT TRUE,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
@@ -47,20 +45,27 @@ export default async function handler(req, res) {
       );
     `);
 
-    // 4. Seed Mock Courses if the table is empty
+    // 4. Seed Mock Courses perfectly formatted for the Admin Panel
     const courseCount = await pool.query('SELECT COUNT(*) FROM courses');
     if (parseInt(courseCount.rows[0].count) === 0) {
+      
+      // Helper to generate the exact JSON structure your admin.html uses
+      const buildModules = (category, level, lectures, exercises, assignments) => JSON.stringify({
+        content: "Welcome to this amazing DecentraForce course. You will learn everything you need to succeed in Web3.",
+        lectures, exercises, assignments, category, level, curriculum: []
+      });
+
       const mockCourses = [
-        { title: 'Blockchain Fundamentals & Web3 Intro', description: 'Grasp the core concepts of distributed ledgers, consensus mechanisms, and the decentralized web.', price: 2200, status: 'ongoing', whatsapp: 'https://chat.whatsapp.com/mock1' },
-        { title: 'Smart Contract Development with Solidity', description: 'Write, test, and deploy secure Ethereum smart contracts from scratch to production.', price: 2800, status: 'upcoming', whatsapp: 'https://chat.whatsapp.com/mock2' },
-        { title: 'NFT Creation, Minting & Marketplace', description: 'Create and launch your own NFT collection with royalties, metadata, and marketplace listings.', price: 1800, status: 'completed', whatsapp: 'https://chat.whatsapp.com/mock3' },
-        { title: 'DeFi Protocols & Yield Strategy Mastery', description: 'Deep dive into liquidity pools, AMMs, lending protocols, and advanced yield farming strategies.', price: 0, status: 'upcoming', whatsapp: 'https://chat.whatsapp.com/mock4' }
+        { title: 'Blockchain Fundamentals & Web3 Intro', desc: 'Grasp the core concepts of distributed ledgers, consensus mechanisms, and the decentralized web.', price: 2200, status: 'ongoing', whatsapp: 'https://chat.whatsapp.com/mock1', mod: buildModules('Blockchain', 'Beginner', 45, 12, 4) },
+        { title: 'Smart Contract Development with Solidity', desc: 'Write, test, and deploy secure Ethereum smart contracts from scratch to production.', price: 2800, status: 'upcoming', whatsapp: 'https://chat.whatsapp.com/mock2', mod: buildModules('Solidity', 'Intermediate', 60, 20, 8) },
+        { title: 'NFT Creation, Minting & Marketplace', desc: 'Create and launch your own NFT collection with royalties, metadata, and marketplace listings.', price: 1800, status: 'completed', whatsapp: 'https://chat.whatsapp.com/mock3', mod: buildModules('NFT', 'Beginner', 30, 8, 3) },
+        { title: 'DeFi Protocols & Yield Strategy Mastery', desc: 'Deep dive into liquidity pools, AMMs, lending protocols, and advanced yield farming strategies.', price: 0, status: 'upcoming', whatsapp: 'https://chat.whatsapp.com/mock4', mod: buildModules('DeFi', 'Advanced', 80, 25, 10) }
       ];
       
       for (const c of mockCourses) {
         await pool.query(
-          `INSERT INTO courses (title, description, price, status, whatsapp, is_active) VALUES ($1, $2, $3, $4, $5, TRUE)`,
-          [c.title, c.description, c.price, c.status, c.whatsapp]
+          `INSERT INTO courses (title, description, price, status, whatsapp, modules, is_active) VALUES ($1, $2, $3, $4, $5, $6::jsonb, TRUE)`,
+          [c.title, c.desc, c.price, c.status, c.whatsapp, c.mod]
         );
       }
     }
@@ -90,11 +95,11 @@ export default async function handler(req, res) {
 
     return res.status(200).json({
       success: true,
-      message: `✅ Admin setup complete! User ${action}. Mock courses initialized.`,
+      message: `✅ Vercel Admin setup complete! User ${action}. Real editable mock courses initialized.`,
       instructions: [
         '1. Go to /login.html',
         '2. Login with asikrac@gmail.com / asikasik',
-        '3. You will be redirected to /admin.html'
+        '3. Go to Manage Courses in the Admin Panel to edit them!'
       ]
     });
 

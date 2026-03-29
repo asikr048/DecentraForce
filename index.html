@@ -771,14 +771,11 @@
   .mentor-card:hover::after { opacity: 1; }
   .mentor-name-en { font-size: .72rem; color: var(--muted); margin-top: 2px; margin-bottom: 8px; }
 
-
-
-
-/* ══════════ FLOATING FEEDBACK SYSTEM ══════════ */
+  /* ══════════ FLOATING FEEDBACK SYSTEM ══════════ */
   .feedback-button {
     position: fixed;
-    top: 90px; /* Floats at the top right */
-    right: 30px;
+    bottom: 30px; /* Changed to bottom */
+    left: 30px;   /* Changed to left */
     z-index: 1000;
     display: flex;
     align-items: center;
@@ -788,7 +785,7 @@
     color: #fff;
     border: none;
     border-radius: 50px;
-    box-shadow: 0 6px 0 #008eb3, 0 15px 25px rgba(0, 0, 0, 0.4); /* 3D effect */
+    box-shadow: 0 6px 0 #008eb3, 0 15px 25px rgba(0, 0, 0, 0.4);
     font-family: 'Syne', sans-serif;
     font-weight: 700;
     font-size: 0.95rem;
@@ -802,7 +799,7 @@
     background: linear-gradient(135deg, #8a6fff, #00f0ff);
   }
   .feedback-button:active {
-    transform: translateY(6px); /* Pressed in effect */
+    transform: translateY(6px);
     box-shadow: 0 0px 0 #008eb3, 0 5px 10px rgba(0, 0, 0, 0.4);
   }
   .feedback-icon {
@@ -817,6 +814,25 @@
   }
   .feedback-button:hover .feedback-icon {
     background: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Responsive Adjustments for Feedback Button */
+  @media (max-width: 600px) {
+    .feedback-button {
+      bottom: 20px;
+      left: 20px;
+      padding: 10px 16px;
+      font-size: 0.85rem;
+      gap: 8px;
+    }
+    .feedback-icon {
+      width: 26px;
+      height: 26px;
+    }
+    .feedback-button svg {
+      width: 18px;
+      height: 18px;
+    }
   }
 
   /* Feedback Modal Styles */
@@ -994,67 +1010,7 @@
     <p>Master the skills that shape the decentralized economy — from DeFi to NFTs, smart contracts, and beyond.</p>
   </div>
   <div class="courses-grid">
-    <div class="course-card">
-      <div class="card-banner banner-1">
-        <span style="z-index:2;position:relative">⛓️</span>
-        <span class="banner-badge">🔥 Bestseller</span>
-      </div>
-      <div class="card-body">
-        <div class="card-meta"><span class="tag tag-blue">Blockchain</span><span class="tag tag-purple">Beginner</span></div>
-        <h3>Blockchain Fundamentals & Web3 Intro</h3>
-        <p>Grasp the core concepts of distributed ledgers, consensus mechanisms, and the decentralized web.</p>
-        <div class="card-footer">
-          <div class="rating"><span class="stars">★★★★★</span> 4.9 (2.1k)</div>
-          <div class="price"><span>৳4,500</span>৳2,200</div>
-        </div>
-      </div>
     </div>
-    <div class="course-card">
-      <div class="card-banner banner-2">
-        <span style="z-index:2;position:relative">📝</span>
-        <span class="banner-badge">⚡ New</span>
-      </div>
-      <div class="card-body">
-        <div class="card-meta"><span class="tag tag-green">Solidity</span><span class="tag tag-purple">Intermediate</span></div>
-        <h3>Smart Contract Development with Solidity</h3>
-        <p>Write, test, and deploy secure Ethereum smart contracts from scratch to production.</p>
-        <div class="card-footer">
-          <div class="rating"><span class="stars">★★★★★</span> 4.8 (1.6k)</div>
-          <div class="price"><span>৳5,000</span>৳2,800</div>
-        </div>
-      </div>
-    </div>
-    <div class="course-card">
-      <div class="card-banner banner-3">
-        <span style="z-index:2;position:relative">🖼️</span>
-        <span class="banner-badge">🎨 Popular</span>
-      </div>
-      <div class="card-body">
-        <div class="card-meta"><span class="tag tag-pink">NFT</span><span class="tag tag-blue">Beginner</span></div>
-        <h3>NFT Creation, Minting & Marketplace</h3>
-        <p>Create and launch your own NFT collection with royalties, metadata, and marketplace listings.</p>
-        <div class="card-footer">
-          <div class="rating"><span class="stars">★★★★☆</span> 4.7 (980)</div>
-          <div class="price"><span>৳3,500</span>৳1,800</div>
-        </div>
-      </div>
-    </div>
-    <div class="course-card">
-      <div class="card-banner banner-4">
-        <span style="z-index:2;position:relative">💰</span>
-        <span class="banner-badge">📈 Trending</span>
-      </div>
-      <div class="card-body">
-        <div class="card-meta"><span class="tag tag-green">DeFi</span><span class="tag tag-purple">Advanced</span></div>
-        <h3>DeFi Protocols & Yield Strategy Mastery</h3>
-        <p>Deep dive into liquidity pools, AMMs, lending protocols, and advanced yield farming strategies.</p>
-        <div class="card-footer">
-          <div class="rating"><span class="stars">★★★★★</span> 4.9 (1.2k)</div>
-          <div class="price"><span>৳6,000</span>৳3,200</div>
-        </div>
-      </div>
-    </div>
-  </div>
   <div style="text-align:center;margin-top:40px">
     <a href="my-courses.html" class="btn btn-outline" style="padding:13px 28px;font-size:.95rem;">View All Courses →</a>
   </div>
@@ -1067,7 +1023,6 @@
     <p>Jump into blockchain with our curated free courses. No payment required — learn at your own pace.</p>
   </div>
   <div class="courses-grid" id="free-courses-grid">
-    <!-- Free courses will be loaded dynamically -->
     <div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">
       Loading free courses...
     </div>
@@ -1143,7 +1098,6 @@
     <p>Learn from professionals who have built real products in the blockchain industry.</p>
   </div>
   <div class="mentors-grid" id="mentors-container">
-    <!-- Mentors will be loaded dynamically from localStorage -->
     <div class="empty-state" id="mentors-empty" style="display:none;">
       <div class="empty-icon">👨‍🏫</div>
       <h3>No mentors yet</h3>
@@ -1160,9 +1114,6 @@
   </div>
 </section>
 
-<!-- ══════════ FLOATING TESTIMONIALS ══════════ -->
-
-
 <div class="cta-section">
   <h2>Ready to Join the<br><em style="background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;font-style:normal">Decentralized Revolution?</em></h2>
   <p>Over 17,000 learners are already building their Web3 careers with DecentraForce. Your seat is waiting.</p>
@@ -1173,8 +1124,7 @@
 </div>
 
 <footer id="dynamic-footer">
-  <!-- Footer content will be rendered by JavaScript -->
-</footer>
+  </footer>
 
 <script src="scripts/auth.js"></script>
 <script src="scripts/feedback.js"></script>
@@ -1321,11 +1271,22 @@ window.addEventListener('storage', (e) => {
     }
   });
 
-  // Set avatar initials when auth loads
-  // Course rendering and checkout modal functionality
+  // Smart Loader for Courses (API first, LocalStorage fallback + Sequence Sort)
   document.addEventListener('DOMContentLoaded', async () => {
     
-    // Fetch real courses from the Database via API instead of localStorage
+    // Fallback: Fetch courses from localStorage
+    function getCoursesFromStorage() {
+      try {
+        const cached = localStorage.getItem('courses');
+        if (!cached) return [];
+        return JSON.parse(cached);
+      } catch (error) {
+        console.error('Error reading courses from localStorage:', error);
+        return [];
+      }
+    }
+
+    // Fetch real courses from the Database via API
     async function fetchPublicCourses() {
       try {
         const res = await fetch('/api/_public/courses');
@@ -1341,7 +1302,7 @@ window.addEventListener('storage', (e) => {
     }
 
     // Render course cards into a given container
-    function renderCourseGrid(containerSelector, courses, options = {}) {
+    function renderCourseGrid(containerSelector, courses) {
       const container = document.querySelector(containerSelector);
       if (!container) return;
 
@@ -1362,10 +1323,10 @@ window.addEventListener('storage', (e) => {
         const badge = course.badge || badges[index % badges.length];
         
         const priceValue = parseFloat(course.price);
-        const isFree = isNaN(priceValue) || priceValue === 0;
+        const isFree = isNaN(priceValue) || priceValue === 0 || course.price === null || course.price === '0';
         
-        const price = isFree ? 'Free' : `৳${priceValue}`;
-        const originalPrice = isFree ? '' : `৳${Math.round(priceValue * 1.5)}`;
+        const price = isFree ? 'Free' : `৳${priceValue || course.price || '2,500'}`;
+        const originalPrice = isFree ? '' : `৳${Math.round((priceValue || 2500) * 1.5)}`;
         const ratingVal = course.rating || 4.8;
         const reviewsVal = course.reviews ? (course.reviews >= 1000 ? (course.reviews/1000).toFixed(1)+'k' : course.reviews) : '500+';
         
@@ -1374,9 +1335,11 @@ window.addEventListener('storage', (e) => {
 
         // Extract category if available in modules JSON
         let categoryTag = 'Blockchain';
+        let levelTag = index % 3 === 0 ? 'Beginner' : index % 3 === 1 ? 'Intermediate' : 'Advanced';
         try {
           const modulesObj = typeof course.modules === 'string' ? JSON.parse(course.modules) : course.modules;
           if (modulesObj && modulesObj.category) categoryTag = modulesObj.category;
+          if (modulesObj && modulesObj.level) levelTag = modulesObj.level;
         } catch(e) {}
 
         // Handle Image rendering dynamically
@@ -1397,148 +1360,7 @@ window.addEventListener('storage', (e) => {
               <span class="tag tag-purple">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
             </div>
             <h3>${course.title || 'Untitled Course'}</h3>
-            <p>${course.description ? course.description.substring(0, 100) + '...' : 'Learn essential skills in this comprehensive course.'}</p>
-            <div class="card-footer">
-              <div class="rating"><span class="stars">★★★★★</span> ${ratingVal} (${reviewsVal})</div>
-              ${priceDisplay}
-            </div>
-          </div>
-        `;
-        container.appendChild(card);
-
-        card.addEventListener('click', function() {
-          if (isFree) {
-            window.location.href = 'my-courses.html?tab=free';
-          } else {
-            openCheckoutModal(course);
-          }
-        });
-      });
-    }
-
-    // Modal functions
-    function openCheckoutModal(course) {
-      const modal = document.getElementById('checkoutModal');
-      const title = document.getElementById('modalCourseTitle');
-      const desc = document.getElementById('modalCourseDesc');
-      const price = document.getElementById('modalCoursePrice');
-
-      if (title) title.textContent = course.title || 'Untitled Course';
-      if (desc) desc.textContent = course.description || 'Learn essential skills in this comprehensive course.';
-      if (price) price.textContent = course.price ? `৳${course.price}` : '৳2,500';
-
-      modal.classList.add('open');
-      document.body.style.overflow = 'hidden';
-    }
-
-    function closeCheckoutModal() {
-      const modal = document.getElementById('checkoutModal');
-      modal.classList.remove('open');
-      document.body.style.overflow = '';
-    }
-
-    const modalClose = document.getElementById('modalClose');
-    const modalOverlay = document.getElementById('checkoutModal');
-    const cancelBtn = document.getElementById('modalCancel');
-
-    if (modalClose) modalClose.addEventListener('click', closeCheckoutModal);
-    if (modalOverlay) modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) closeCheckoutModal();
-    });
-    if (cancelBtn) cancelBtn.addEventListener('click', closeCheckoutModal);
-
-    // Initialize courses dynamically from the API
-    const courses = await fetchPublicCourses();
-    
-    // Render all courses
-    renderCourseGrid('.courses-grid', courses);
-    
-    // Render Free Courses (Price == 0)
-    const freeCourses = courses.filter(course => {
-      const p = parseFloat(course.price);
-      return isNaN(p) || p === 0;
-    });
-    renderCourseGrid('#free-courses-grid', freeCourses);
-  });
-
-  // Course rendering and checkout modal functionality
-  document.addEventListener('DOMContentLoaded', () => {
-    // Fetch courses from localStorage
-    function getCoursesFromStorage() {
-      try {
-        const cached = localStorage.getItem('courses');
-        if (!cached) return [];
-        return JSON.parse(cached);
-      } catch (error) {
-        console.error('Error reading courses from localStorage:', error);
-        return [];
-      }
-    }
-
-    // Render course cards into a given container
-    function renderCourseGrid(containerSelector, courses, options = {}) {
-      const container = document.querySelector(containerSelector);
-      if (!container) return;
-
-      // Clear existing static cards
-      container.innerHTML = '';
-
-      if (courses.length === 0) {
-        container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No courses available. Check back soon!</div>';
-        return;
-      }
-
-      // Banner classes and emojis for variety
-      const banners = ['banner-1', 'banner-2', 'banner-3', 'banner-4'];
-      const emojis = ['⛓️', '📝', '🖼️', '💰', '🚀', '🔗', '⚡', '🎓'];
-      const badges = ['🔥 Bestseller', '⚡ New', '🎨 Popular', '📈 Trending', '⭐ Featured'];
-
-      courses.forEach((course, index) => {
-        const bannerClass = banners[index % banners.length];
-        const emoji = emojis[index % emojis.length];
-        const badge = course.badge || badges[index % badges.length];
-        const price = course.price ? `৳${course.price}` : '৳2,500';
-        const originalPrice = course.price ? `৳${Math.round(course.price * 1.5)}` : '৳4,500';
-        const ratingVal = course.rating || 4.8;
-        const reviewsVal = course.reviews ? (course.reviews >= 1000 ? (course.reviews/1000).toFixed(1)+'k' : course.reviews) : '500+';
-        const levelTag = course.level || (index % 3 === 0 ? 'Beginner' : index % 3 === 1 ? 'Intermediate' : 'Advanced');
-        
-        // For free courses, show "Free" instead of price
-        const isFree = course.price === 0 || course.price === '0' || course.price === null;
-        const priceDisplay = isFree ? '<span style="color:var(--accent);font-weight:700">Free</span>' : `<div class="price"><span>${originalPrice}</span>${price}</div>`;
-        
-        // Determine button text based on course status
-        const status = course.status || 'upcoming';
-        let buttonText, buttonClass;
-        if (status === 'completed') {
-          buttonText = 'Closed';
-          buttonClass = 'btn-disabled';
-        } else if (status === 'upcoming') {
-          buttonText = 'Coming Soon';
-          buttonClass = 'btn-secondary';
-        } else if (isFree) {
-          buttonText = 'Enroll Now';
-          buttonClass = 'btn-success';
-        } else {
-          buttonText = 'Buy Now';
-          buttonClass = 'btn-primary';
-        }
-
-        const card = document.createElement('div');
-        card.className = 'course-card';
-        card.dataset.courseId = course.id;
-        card.innerHTML = `
-          <div class="card-banner ${bannerClass}">
-            <span style="z-index:2;position:relative">${emoji}</span>
-            <span class="banner-badge">${badge}</span>
-          </div>
-          <div class="card-body">
-            <div class="card-meta">
-              <span class="tag tag-blue">${course.modules ? course.modules.split(',')[0] || 'Blockchain' : 'Blockchain'}</span>
-              <span class="tag tag-purple">${levelTag}</span>
-            </div>
-            <h3>${course.title || 'Untitled Course'}</h3>
-            <p>${course.description || 'Learn essential skills in this comprehensive course.'}</p>
+            <p>${course.description ? (course.description.length > 100 ? course.description.substring(0, 100) + '...' : course.description) : 'Learn essential skills in this comprehensive course.'}</p>
             <div class="card-footer">
               <div class="rating"><span class="stars">★★★★★</span> ${ratingVal} (${reviewsVal})</div>
               ${priceDisplay}
@@ -1556,26 +1378,6 @@ window.addEventListener('storage', (e) => {
           }
         });
       });
-
-      // Attach event listeners to Buy Now/Enroll Now buttons
-      container.querySelectorAll('.buy-now-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const courseId = this.dataset.courseId;
-          const isFree = this.dataset.isFree === 'true';
-          const course = courses.find(c => c.id == courseId);
-          if (!course) return;
-          
-          if (isFree) {
-            // For free courses, show a success message or redirect
-            alert(`You have successfully enrolled in "${course.title}"! The course is now available in your dashboard.`);
-            // Optionally redirect to my-courses.html?tab=free
-            // window.location.href = 'my-courses.html?tab=free';
-          } else {
-            openCheckoutModal(course);
-          }
-        });
-      });
     }
 
     // Modal functions
@@ -1587,7 +1389,7 @@ window.addEventListener('storage', (e) => {
 
       if (title) title.textContent = course.title || 'Untitled Course';
       if (desc) desc.textContent = course.description || 'Learn essential skills in this comprehensive course.';
-      if (price) price.textContent = course.price ? `৳${course.price}` : '৳2,500';
+      if (price) price.textContent = (course.price && course.price !== '0' && course.price !== 0) ? `৳${course.price}` : 'Free';
 
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -1599,7 +1401,6 @@ window.addEventListener('storage', (e) => {
       document.body.style.overflow = '';
     }
 
-    // Attach modal close handlers
     const modalClose = document.getElementById('modalClose');
     const modalOverlay = document.getElementById('checkoutModal');
     const cancelBtn = document.getElementById('modalCancel');
@@ -1610,14 +1411,27 @@ window.addEventListener('storage', (e) => {
     });
     if (cancelBtn) cancelBtn.addEventListener('click', closeCheckoutModal);
 
-    // Initialize courses
-    const courses = getCoursesFromStorage();
+    // Initialize courses dynamically from the API, fallback to localStorage if needed
+    let courses = await fetchPublicCourses();
+    if (!courses || courses.length === 0) {
+      courses = getCoursesFromStorage();
+    }
     
-    // Render all courses in the main courses grid
+    // Enable Course Sorting/Sequencing (Sorts by sequence_order. Missing values fall to the bottom)
+    courses.sort((a, b) => {
+      const seqA = (a.sequence_order !== undefined && a.sequence_order !== null) ? parseInt(a.sequence_order) : 9999;
+      const seqB = (b.sequence_order !== undefined && b.sequence_order !== null) ? parseInt(b.sequence_order) : 9999;
+      return seqA - seqB;
+    });
+    
+    // Render all courses to the main grid
     renderCourseGrid('.courses-grid', courses);
     
-    // Filter free courses (price == 0) and render in free courses section
-    const freeCourses = courses.filter(course => course.price === 0 || course.price === '0' || course.price === null);
+    // Filter and Render Free Courses (Price == 0)
+    const freeCourses = courses.filter(course => {
+      const p = parseFloat(course.price);
+      return isNaN(p) || p === 0 || course.price === '0' || course.price === null;
+    });
     renderCourseGrid('#free-courses-grid', freeCourses);
   });
 
@@ -1766,7 +1580,6 @@ window.addEventListener('storage', (e) => {
   });
 </script>
 
-<!-- Checkout Modal -->
 <div class="modal-overlay" id="checkoutModal">
   <div class="modal">
     <div class="modal-header">
@@ -1785,7 +1598,6 @@ window.addEventListener('storage', (e) => {
   </div>
 </div>
 
-<!-- Floating Feedback Button -->
 <div id="feedbackButton" class="feedback-button">
   <div class="feedback-icon">
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1795,7 +1607,6 @@ window.addEventListener('storage', (e) => {
   <span class="feedback-label">Feedback</span>
 </div>
 
-<!-- Feedback Modal -->
 <div id="feedbackModal" class="feedback-modal-overlay">
   <div class="feedback-modal">
     <div class="feedback-modal-header">
@@ -1825,12 +1636,10 @@ window.addEventListener('storage', (e) => {
   </div>
 </div>
 
-<!-- Success Toast -->
 <div id="feedbackToast" class="feedback-toast">
   <span id="feedbackToastMessage">Feedback submitted successfully!</span>
 </div>
 
-<!-- UX Enhancements Script -->
 <script src="scripts/ux-enhancements.js" defer></script>
 
 </body>
