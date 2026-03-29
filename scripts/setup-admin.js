@@ -74,6 +74,81 @@ async function setupAdmin() {
     console.log('✅ Admin user created');
   }
 
+  // 5. Add sample courses if table is empty
+  const courseCount = await pool.query('SELECT COUNT(*) FROM courses');
+  if (parseInt(courseCount.rows[0].count) === 0) {
+    console.log('Adding sample courses...');
+    
+    const sampleCourses = [
+      {
+        title: 'Fullstack Blockchain Development',
+        description: 'Master Ethereum, Solidity, Web3.js, and build real DApps from scratch.',
+        price: 5000,
+        whatsapp: 'https://chat.whatsapp.com/sample1',
+        status: 'active',
+        thumbnail_url: 'https://images.unsplash.com/photo-1620336655055-bd87c5d1d73f?w=400&h=225&fit=crop',
+        video_url: 'https://youtube.com/watch?v=sample1'
+      },
+      {
+        title: 'ব্লকচেইন ডেভেলপমেন্ট বাংলায়',
+        description: 'বাংলা ভাষায় সম্পূর্ণ ব্লকচেইন ডেভেলপমেন্ট শিখুন। ইথেরিয়াম, সলিডিটি, ওয়েব৩.জেস।',
+        price: 4000,
+        whatsapp: 'https://chat.whatsapp.com/sample2',
+        status: 'active',
+        thumbnail_url: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?w=400&h=225&fit=crop',
+        video_url: 'https://youtube.com/watch?v=sample2'
+      },
+      {
+        title: 'DeFi & Smart Contracts Mastery',
+        description: 'Learn to build and audit DeFi protocols, yield farming, liquidity pools, and more.',
+        price: 6000,
+        whatsapp: 'https://chat.whatsapp.com/sample3',
+        status: 'upcoming',
+        thumbnail_url: 'https://images.unsplash.com/photo-1621761191319-c6fb62004040?w=400&h=225&fit=crop',
+        video_url: 'https://youtube.com/watch?v=sample3'
+      },
+      {
+        title: 'NFT & Metaverse Development',
+        description: 'Create NFT marketplaces, metaverse assets, and Web3 gaming experiences.',
+        price: 5500,
+        whatsapp: 'https://chat.whatsapp.com/sample4',
+        status: 'active',
+        thumbnail_url: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=400&h=225&fit=crop',
+        video_url: 'https://youtube.com/watch?v=sample4'
+      },
+      {
+        title: 'ওয়েব৩ ও ক্রিপ্টোকারেন্সি বেসিক',
+        description: 'ক্রিপ্টোকারেন্সি এবং ওয়েব৩ প্রযুক্তির বেসিক থেকে এডভান্সড সবকিছু বাংলায়।',
+        price: 3000,
+        whatsapp: 'https://chat.whatsapp.com/sample5',
+        status: 'active',
+        thumbnail_url: 'https://images.unsplash.com/photo-1518546305927-5a555bb7020d?w=400&h=225&fit=crop',
+        video_url: 'https://youtube.com/watch?v=sample5'
+      }
+    ];
+
+    for (const course of sampleCourses) {
+      await pool.query(
+        `INSERT INTO courses (title, description, price, whatsapp, status, thumbnail_url, video_url, modules, is_active)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
+        [
+          course.title,
+          course.description,
+          course.price,
+          course.whatsapp,
+          course.status,
+          course.thumbnail_url,
+          course.video_url,
+          JSON.stringify([]), // empty modules
+          true
+        ]
+      );
+    }
+    console.log(`✅ ${sampleCourses.length} sample courses added`);
+  } else {
+    console.log('✅ Courses table already has data, skipping sample courses');
+  }
+
   console.log('\n🎉 Admin setup complete!');
   console.log(`   Email:    ${ADMIN_EMAIL}`);
   console.log(`   Password: ${ADMIN_PASSWORD}`);

@@ -2025,6 +2025,59 @@ function saveMentors(mentors) {
   localStorage.setItem('mentors', JSON.stringify(mentors));
 }
 
+function initDefaultMentors() {
+  const mentors = getMentors();
+  if (mentors.length > 0) return; // Already has data
+  
+  const defaultMentors = [
+    {
+      id: '1',
+      name: 'Ahmed Hossain',
+      title: 'Senior Blockchain Developer | Ethereum Expert',
+      imageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face',
+      createdAt: new Date('2024-01-15').toISOString()
+    },
+    {
+      id: '2',
+      name: 'নুসরাত জাহান',
+      title: 'Web3 Security Specialist | Smart Contract Auditor',
+      imageUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=400&h=400&fit=crop&crop=face',
+      createdAt: new Date('2024-02-20').toISOString()
+    },
+    {
+      id: '3',
+      name: 'David Chen',
+      title: 'DeFi Protocol Architect | Solidity Guru',
+      imageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face',
+      createdAt: new Date('2024-03-10').toISOString()
+    },
+    {
+      id: '4',
+      name: 'ফারহানা আক্তার',
+      title: 'NFT & Metaverse Developer | 3D Artist',
+      imageUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face',
+      createdAt: new Date('2024-03-25').toISOString()
+    },
+    {
+      id: '5',
+      name: 'Michael Rodriguez',
+      title: 'Full-Stack Web3 Developer | React + Solidity',
+      imageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face',
+      createdAt: new Date('2024-04-05').toISOString()
+    },
+    {
+      id: '6',
+      name: 'সাদিয়া ইসলাম',
+      title: 'Blockchain Educator | Content Creator',
+      imageUrl: 'https://images.unsplash.com/photo-1544725176-7c40e5a71c5e?w=400&h=400&fit=crop&crop=face',
+      createdAt: new Date('2024-04-12').toISOString()
+    }
+  ];
+  
+  saveMentors(defaultMentors);
+  console.log('Default mentors initialized');
+}
+
 function addNewMentor() {
   const name = document.getElementById('mentorName').value.trim();
   const title = document.getElementById('mentorTitle').value.trim();
@@ -2059,6 +2112,9 @@ function addNewMentor() {
 function renderMentorsList() {
   const container = document.getElementById('mentorsList');
   if (!container) return;
+  
+  // Initialize default mentors if empty
+  initDefaultMentors();
   
   const mentors = getMentors();
   

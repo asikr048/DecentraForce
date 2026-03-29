@@ -181,9 +181,57 @@ function escapeHtml(text) {
 }
 
 /**
+ * Initialize default mock feedback data if none exists
+ */
+function initDefaultFeedbacks() {
+    const feedbacks = getAllFeedbacks();
+    if (feedbacks.length > 0) return; // Already has data
+    
+    const mockFeedbacks = [
+        {
+            name: "Ahmed Rahman",
+            text: "This course transformed my career! The blockchain content is top-notch and the mentors are incredibly supportive.",
+            language: "English"
+        },
+        {
+            name: "সুমাইয়া আক্তার",
+            text: "ডিসেন্ট্রাফোর্সের কোর্সগুলো অসাধারণ! বাংলায় ব্লকচেইন শেখার এত ভালো প্ল্যাটফর্ম আর দেখিনি।",
+            language: "Bangla"
+        },
+        {
+            name: "John Smith",
+            text: "As a senior developer, I found the Web3 modules exceptionally well-structured. The hands-on projects are industry-relevant.",
+            language: "English"
+        },
+        {
+            name: "ফারহানা ইসলাম",
+            text: "মেন্টররা খুবই সহায়ক, প্রতিটি সমস্যায় গাইড করেন। এখন আমি নিজেই স্মার্ট কন্ট্র্যাক্ট ডেভেলপ করতে পারি!",
+            language: "Bangla"
+        },
+        {
+            name: "Maria Garcia",
+            text: "The DeFi mastery course exceeded my expectations. The practical exercises helped me land a job in a crypto startup.",
+            language: "English"
+        },
+        {
+            name: "রাকিব হাসান",
+            text: "বাংলাদেশ থেকে ব্লকচেইন ডেভেলপার হওয়ার স্বপ্ন পূরণ করেছে ডিসেন্ট্রাফোর্স। ধন্যবাদ পুরো টিমকে!",
+            language: "Bangla"
+        }
+    ];
+    
+    mockFeedbacks.forEach(feedback => {
+        addFeedback(feedback);
+    });
+    
+    console.log('Default mock feedbacks added');
+}
+
+/**
  * Initialize feedback system on homepage
  */
 function initFeedbackSection() {
+    initDefaultFeedbacks();
     const feedbacks = getAllFeedbacks();
     if (feedbacks.length > 0) {
         renderFeedbacks('#feedback-container', feedbacks);
@@ -198,6 +246,7 @@ if (typeof module !== 'undefined' && module.exports) {
         updateFeedback,
         deleteFeedback,
         renderFeedbacks,
-        initFeedbackSection
+        initFeedbackSection,
+        initDefaultFeedbacks
     };
 }
