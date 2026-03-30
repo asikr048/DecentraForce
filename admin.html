@@ -510,14 +510,22 @@
             <div class="space-y-6">
               <div>
                 <label class="block text-sm font-medium text-white mb-2">Coupon Code</label>
-                <input type="text" id="couponCode" placeholder="e.g., SUMMER25" class="admin-input" maxlength="20">
+                <input type="text" id="couponCode" placeholder="e.g., SUMMER50" class="admin-input" maxlength="20">
                 <p class="text-xs text-muted mt-1">Enter a unique coupon code (letters, numbers, hyphens)</p>
               </div>
 
               <div>
                 <label class="block text-sm font-medium text-white mb-2">Discount Percentage</label>
-                <input type="number" id="couponDiscount" placeholder="e.g., 25" class="admin-input" min="1" max="100">
+                <input type="number" id="couponDiscount" placeholder="e.g., 50" class="admin-input" min="1" max="100">
                 <p class="text-xs text-muted mt-1">Discount percentage (1-100%)</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium text-white mb-2">Target Course</label>
+                <select id="couponCourse" class="admin-input">
+                  <option value="all">All Courses</option>
+                </select>
+                <p class="text-xs text-muted mt-1">Select specific course or allow for all</p>
               </div>
 
               <button onclick="createCoupon()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all mt-4">
@@ -1600,30 +1608,23 @@ function saveCoupons(coupons) {
   localStorage.setItem('coupons', JSON.stringify(coupons));
 }
 
+
+
 function createCoupon() {
   const code = document.getElementById('couponCode').value.trim().toUpperCase();
   const discount = parseInt(document.getElementById('couponDiscount').value);
+  const courseId = document.getElementById('couponCourse').value; // 'all' or specific ID
 
-  if (!code) {
-    showToast('Coupon code is required', 'error');
-    return;
-  }
-  if (isNaN(discount) || discount < 1 || discount > 100) {
-    showToast('Discount must be between 1% and 100%', 'error');
-    return;
-  }
+  if (!code) return showToast('Coupon code is required', 'error');
+  if (isNaN(discount) || discount < 1 || discount > 100) return showToast('Discount must be between 1% and 100%', 'error');
 
   const coupons = getCoupons();
-  
-  // Check for duplicate code
-  if (coupons.some(c => c.code === code)) {
-    showToast(`Coupon code "${code}" already exists`, 'error');
-    return;
-  }
+  if (coupons.some(c => c.code === code)) return showToast(`Coupon "${code}" already exists`, 'error');
 
   const newCoupon = {
     code,
     discount,
+    courseId: courseId, // Save the restricted course
     created: new Date().toISOString(),
     id: Date.now().toString()
   };
@@ -1631,7 +1632,6 @@ function createCoupon() {
   coupons.push(newCoupon);
   saveCoupons(coupons);
   
-  // Clear form
   document.getElementById('couponCode').value = '';
   document.getElementById('couponDiscount').value = '';
   
@@ -1639,16 +1639,13 @@ function createCoupon() {
   renderCouponsList();
 }
 
+
+
 function renderCouponsList() {
   const coupons = getCoupons();
   const container = document.getElementById('couponsList');
-  
   if (coupons.length === 0) {
-    container.innerHTML = `
-      <div class="text-center py-8 text-muted">
-        <p class="text-sm">No coupons created yet.</p>
-        <p class="text-xs mt-1">Create your first coupon using the form on the left.</p>
-      </div>`;
+    container.innerHTML = `<div class="text-center py-8 text-muted"><p class="text-sm">No coupons created yet.</p></div>`;
     return;
   }
 
@@ -1658,16 +1655,17 @@ function renderCouponsList() {
         <div class="flex items-center gap-3">
           <span class="font-bold text-white text-lg">${esc(coupon.code)}</span>
           <span class="badge badge-green">${coupon.discount}% OFF</span>
+          <span class="badge badge-blue ml-1">${coupon.courseId === 'all' || !coupon.courseId ? 'All Courses' : 'Specific Course'}</span>
         </div>
         <p class="text-xs text-muted mt-1">Created ${fmtDate(coupon.created)}</p>
       </div>
-      <button onclick="deleteCoupon('${coupon.id}')" class="text-red-400 hover:text-red-300 text-sm font-bold flex items-center gap-1">
-        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-        Delete
+      <button onclick="deleteCoupon('${coupon.id}')" class="text-red-400 hover:text-red-300 text-sm font-bold flex gap-1">
+        🗑️ Delete
       </button>
     </div>
   `).join('');
 }
+
 
 function deleteCoupon(id) {
   if (!confirm('Are you sure you want to delete this coupon?')) return;
@@ -2572,10 +2570,20 @@ document.querySelector('[data-tab="assignments"]')?.addEventListener('click', ()
 // Initialize coupons list when coupons tab is shown
 document.addEventListener('DOMContentLoaded', () => {
   // Add event listener for coupons tab
-  document.querySelector('[data-tab="coupons"]')?.addEventListener('click', () => {
-    setTimeout(renderCouponsList, 100);
+
+
+document.querySelector('[data-tab="coupons"]')?.addEventListener('click', () => {
+    setTimeout(() => {
+      renderCouponsList();
+      const courseSelect = document.getElementById('couponCourse');
+      if (courseSelect && allCourses) {
+        courseSelect.innerHTML = '<option value="all">All Courses</option>' +
+          allCourses.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('');
+      }
+    }, 100);
   });
-  
+
+
   // Add event listener for feedback tab
   document.querySelector('[data-tab="feedback"]')?.addEventListener('click', () => {
     setTimeout(renderFeedbacksList, 100);
