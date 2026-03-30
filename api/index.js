@@ -1,52 +1,382 @@
-import registerHandler from './_auth/register.js';
-import loginHandler from './_auth/login.js';
-import logoutHandler from './_auth/logout.js';
-import verifyHandler from './_auth/verify.js';
-import forgotPasswordHandler from './_auth/forgot-password.js';
-import resetPasswordHandler from './_auth/reset-password.js';
+/**
+ * DecentraForce — Single Serverless Function
+ * All routes consolidated here to stay within Vercel Hobby (12 function) limit.
+ * Route dispatch is done via req.url path matching.
+ */
 
-import adminInitHandler from './_admin/init.js';
-import adminUsersHandler from './_admin/users.js';
-import adminCoursesHandler from './_admin/courses.js';
-import adminGrantAccessHandler from './_admin/grant-access.js';
-import adminUpdateProfileHandler from './_admin/update-profile.js';
-import adminCouponsHandler from './_admin/coupons.js';
+import { query, getPool } from '../lib/db.js';
+import bcrypt from 'bcrypt';
+import crypto from 'crypto';
+import { v4 as uuidv4 } from 'uuid';
 
-import publicCoursesHandler from './_public/courses.js';
-import publicVerifyCouponHandler from './_public/verify-coupon.js';
-
-export default async function handler(req, res) {
-  // Get the path being requested
-  const path = req.url.split('?')[0];
-
-  // --- AUTH ROUTES ---
-  if (path.includes('/auth/register')) return registerHandler(req, res);
-  if (path.includes('/auth/login')) return loginHandler(req, res);
-  if (path.includes('/auth/logout')) return logoutHandler(req, res);
-  if (path.includes('/auth/verify')) return verifyHandler(req, res);
-  if (path.includes('/auth/forgot-password')) return forgotPasswordHandler(req, res);
-  if (path.includes('/auth/reset-password')) return resetPasswordHandler(req, res);
-
-  // --- ADMIN ROUTES ---
-  if (path.includes('/admin/init')) return adminInitHandler(req, res);
-  if (path.includes('/admin/users')) return adminUsersHandler(req, res);
-  if (path.includes('/admin/courses')) return adminCoursesHandler(req, res);
-  if (path.includes('/admin/grant-access')) return adminGrantAccessHandler(req, res);
-  if (path.includes('/admin/update-profile')) return adminUpdateProfileHandler(req, res);
-  if (path.includes('/admin/coupons')) return adminCouponsHandler(req, res);
-
-  // --- PUBLIC ROUTES ---
-  if (path.includes('/public/courses')) return publicCoursesHandler(req, res);
-  if (path.includes('/public/verify-coupon')) return publicVerifyCouponHandler(req, res);
-
-  return res.status(404).json({ success: false, error: 'API Endpoint not found' });
+// ─── CORS helper ──────────────────────────────────────────────────────────────
+function setCors(res) {
+  res.setHeader('Access-Control-Allow-Credentials', 'true');
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers',
+    'X-CSRF-Token,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Content-Type,Date,X-Api-Version');
 }
 
-// Ensure payload limit is increased to 10mb globally for image uploads
+// ─── Admin session check ──────────────────────────────────────────────────────
+async function requireAdmin(req, res) {
+  const token = req.cookies?.session_token;
+  if (!token) { res.status(401).json({ success: false, error: 'Unauthorized' }); return null; }
+  const r = await query(
+    `SELECT id, email, password_hash FROM users WHERE session_token=$1 AND session_expires>NOW() AND is_admin=TRUE`,
+    [token]
+  );
+  if (!r.rows.length) { res.status(403).json({ success: false, error: 'Forbidden' }); return null; }
+  return r.rows[0];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ROUTE HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════════
+
+// ── PUBLIC: GET /api/_public/courses ─────────────────────────────────────────
+async function publicCourses(req, res) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
+  const r = await query(`
+    SELECT id, title, description,
+      CASE WHEN length(thumbnail_url)>2000000 THEN '' ELSE thumbnail_url END AS thumbnail_url,
+      modules, created_at, price, whatsapp, status, sequence_order
+    FROM courses WHERE is_active=TRUE ORDER BY COALESCE(sequence_order,9999), created_at DESC
+  `);
+  return res.status(200).json({ success: true, courses: r.rows });
+}
+
+// ── PUBLIC: POST /api/_public/verify-coupon ───────────────────────────────────
+async function verifyCoupon(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const { code } = req.body || {};
+  await query(`CREATE TABLE IF NOT EXISTS coupons (id SERIAL PRIMARY KEY, code VARCHAR(50) UNIQUE, discount_percent INT, created_at TIMESTAMP DEFAULT NOW())`);
+  const r = await query('SELECT discount_percent FROM coupons WHERE code=$1', [(code||'').toUpperCase().trim()]);
+  if (r.rows.length) return res.status(200).json({ success: true, discount: r.rows[0].discount_percent });
+  return res.status(400).json({ success: false, error: 'Invalid or expired coupon' });
+}
+
+// ── AUTH: POST /api/auth/register ─────────────────────────────────────────────
+async function authRegister(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const { username, email, password } = req.body || {};
+  if (!username || !email || !password) return res.status(400).json({ success: false, error: 'username, email and password are required' });
+  if (password.length < 8) return res.status(400).json({ success: false, error: 'Password must be at least 8 characters' });
+  if (!/^[a-zA-Z0-9_]{3,20}$/.test(username)) return res.status(400).json({ success: false, error: 'Username must be 3-20 chars (letters, numbers, underscores)' });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ success: false, error: 'Invalid email format' });
+
+  const dup = await query('SELECT id FROM users WHERE email=$1 OR username=$2', [email.toLowerCase().trim(), username.toLowerCase().trim()]);
+  if (dup.rows.length) return res.status(400).json({ success: false, error: 'Email or username already taken' });
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  const verificationToken = uuidv4();
+  const verificationExpires = new Date(Date.now() + 24*60*60*1000);
+
+  const r = await query(
+    `INSERT INTO users (username,email,password_hash,verification_token,verification_expires)
+     VALUES ($1,$2,$3,$4,$5) RETURNING id,username,email,created_at,verified`,
+    [username.toLowerCase().trim(), email.toLowerCase().trim(), passwordHash, verificationToken, verificationExpires]
+  );
+  return res.status(201).json({ success: true, message: 'Registration successful. Please verify your email.', user: r.rows[0] });
+}
+
+// ── AUTH: POST /api/auth/login ────────────────────────────────────────────────
+async function authLogin(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const { email, password } = req.body || {};
+  if (!email || !password) return res.status(400).json({ success: false, error: 'Email and password required' });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ success: false, error: 'Invalid email format' });
+
+  const r = await query(
+    'SELECT id,username,email,created_at,verified,password_hash,is_admin FROM users WHERE email=$1',
+    [email.toLowerCase().trim()]
+  );
+  if (!r.rows.length) return res.status(400).json({ success: false, error: 'Invalid email or password' });
+  const user = r.rows[0];
+
+  const valid = await bcrypt.compare(password, user.password_hash);
+  if (!valid) return res.status(400).json({ success: false, error: 'Invalid email or password' });
+
+  const sessionToken = crypto.randomBytes(32).toString('hex');
+  const sessionExpires = new Date(Date.now() + 30*24*60*60*1000);
+  await query('UPDATE users SET session_token=$1,session_expires=$2 WHERE id=$3', [sessionToken, sessionExpires, user.id]);
+
+  res.setHeader('Set-Cookie', `session_token=${sessionToken}; HttpOnly; Path=/; Max-Age=${30*24*60*60}; SameSite=Strict`);
+  return res.status(200).json({
+    success: true, message: 'Login successful',
+    user: { id: user.id, username: user.username, email: user.email, createdAt: user.created_at, verified: user.verified, isAdmin: user.is_admin === true },
+    redirectUrl: user.is_admin ? '/admin.html' : '/index.html'
+  });
+}
+
+// ── AUTH: POST /api/auth/logout ───────────────────────────────────────────────
+async function authLogout(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const match = (req.headers.cookie || '').match(/session_token=([^;]+)/);
+  if (match) await query('UPDATE users SET session_token=NULL,session_expires=NULL WHERE session_token=$1', [match[1]]);
+  res.setHeader('Set-Cookie', 'session_token=; HttpOnly; Path=/; Max-Age=0; SameSite=Strict');
+  return res.status(200).json({ success: true, message: 'Logout successful', loggedIn: false });
+}
+
+// ── AUTH: GET /api/auth/verify ────────────────────────────────────────────────
+async function authVerify(req, res) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
+  const match = (req.headers.cookie || '').match(/session_token=([^;]+)/);
+  if (!match) return res.status(401).json({ success: false, error: 'No session', loggedIn: false });
+
+  const r = await query(
+    `SELECT id,username,email,created_at,verified,is_admin FROM users WHERE session_token=$1 AND session_expires>NOW()`,
+    [match[1]]
+  );
+  if (!r.rows.length) return res.status(401).json({ success: false, error: 'Invalid or expired session', loggedIn: false });
+  const u = r.rows[0];
+  return res.status(200).json({
+    success: true, loggedIn: true,
+    user: { id: u.id, username: u.username, email: u.email, createdAt: u.created_at, verified: u.verified, isAdmin: u.is_admin === true }
+  });
+}
+
+// ── AUTH: POST /api/auth/forgot-password ──────────────────────────────────────
+async function authForgotPassword(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const { email } = req.body || {};
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return res.status(400).json({ success: false, error: 'Valid email required' });
+
+  const r = await query('SELECT id,username,email FROM users WHERE email=$1', [email.toLowerCase().trim()]);
+  if (!r.rows.length) return res.status(200).json({ success: true, message: 'If an account exists, a reset PIN was sent.' });
+
+  const user = r.rows[0];
+  const pin = Math.floor(100000 + Math.random() * 900000).toString();
+  const pinExpires = new Date(Date.now() + 10*60*1000);
+
+  await query(`CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id SERIAL PRIMARY KEY, user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(255) NOT NULL, expires_at TIMESTAMP NOT NULL, created_at TIMESTAMP DEFAULT NOW())`);
+  await query('DELETE FROM password_reset_tokens WHERE user_id=$1', [user.id]);
+  await query('INSERT INTO password_reset_tokens (user_id,token,expires_at) VALUES ($1,$2,$3)', [user.id, pin, pinExpires]);
+
+  // Send via EmailJS
+  try {
+    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ service_id: 'service_wn7dn1f', template_id: 'template_2067o6n', user_id: 'TxlilKkHJZDum1C5v',
+        template_params: { to_email: email, pin, username: user.username, app_name: 'DecentraForce' } })
+    });
+  } catch(e) { /* silent — still return success */ }
+
+  return res.status(200).json({ success: true, message: 'If an account exists, a reset PIN was sent.' });
+}
+
+// ── AUTH: POST /api/auth/reset-password ───────────────────────────────────────
+async function authResetPassword(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const { email, pin, newPassword } = req.body || {};
+  if (!email || !pin || pin.length !== 6 || !/^\d+$/.test(pin))
+    return res.status(400).json({ success: false, error: 'Valid email and 6-digit PIN required' });
+
+  const ur = await query('SELECT id FROM users WHERE email=$1', [email.toLowerCase().trim()]);
+  if (!ur.rows.length) return res.status(404).json({ success: false, error: 'User not found' });
+  const userId = ur.rows[0].id;
+
+  const pr = await query(
+    `SELECT id FROM password_reset_tokens WHERE user_id=$1 AND token=$2 AND expires_at>NOW() ORDER BY created_at DESC LIMIT 1`,
+    [userId, pin]
+  );
+  if (!pr.rows.length) return res.status(400).json({ success: false, error: 'Invalid or expired PIN' });
+
+  if (newPassword) {
+    if (newPassword.length < 8) return res.status(400).json({ success: false, error: 'Password must be at least 8 characters' });
+    const hash = await bcrypt.hash(newPassword, 10);
+    await query('UPDATE users SET password_hash=$1 WHERE id=$2', [hash, userId]);
+    await query('DELETE FROM password_reset_tokens WHERE id=$1', [pr.rows[0].id]);
+    return res.status(200).json({ success: true, message: 'Password reset successfully.' });
+  }
+  return res.status(200).json({ success: true, verified: true, message: 'PIN verified.' });
+}
+
+// ── AUTH: GET /api/auth/verify-email ─────────────────────────────────────────
+async function authVerifyEmail(req, res) {
+  const { token } = req.query || {};
+  if (!token) return res.status(400).json({ success: false, error: 'Token required' });
+  const r = await query(
+    `UPDATE users SET verified=TRUE,verification_token=NULL WHERE verification_token=$1 AND verification_expires>NOW() RETURNING id`,
+    [token]
+  );
+  if (!r.rows.length) return res.status(400).json({ success: false, error: 'Invalid or expired token' });
+  return res.status(200).json({ success: true, message: 'Email verified.' });
+}
+
+// ── ADMIN: GET /api/admin/init ────────────────────────────────────────────────
+async function adminInit(req, res) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
+  const pool = await getPool();
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE`);
+  await pool.query(`CREATE TABLE IF NOT EXISTS courses (
+    id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT DEFAULT '',
+    thumbnail_url TEXT DEFAULT '', video_url TEXT DEFAULT '', price NUMERIC DEFAULT 0,
+    whatsapp VARCHAR(255), status VARCHAR(50) DEFAULT 'upcoming', sequence_order INT DEFAULT 9999,
+    modules JSONB DEFAULT '{}', is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP)`);
+  await pool.query(`ALTER TABLE courses ADD COLUMN IF NOT EXISTS price NUMERIC DEFAULT 0`);
+  await pool.query(`ALTER TABLE courses ADD COLUMN IF NOT EXISTS whatsapp VARCHAR(255)`);
+  await pool.query(`ALTER TABLE courses ADD COLUMN IF NOT EXISTS status VARCHAR(50) DEFAULT 'upcoming'`);
+  await pool.query(`ALTER TABLE courses ADD COLUMN IF NOT EXISTS sequence_order INT DEFAULT 9999`);
+  await pool.query(`CREATE TABLE IF NOT EXISTS user_courses (
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    granted_by INTEGER REFERENCES users(id),
+    granted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id,course_id))`);
+
+  const ADMIN_EMAIL = 'asikrac@gmail.com', ADMIN_PASS = 'asikasik', ADMIN_NAME = 'Admin';
+  const hash = await bcrypt.hash(ADMIN_PASS, 12);
+  const ex = await pool.query('SELECT id FROM users WHERE email=$1', [ADMIN_EMAIL]);
+  if (ex.rows.length) {
+    await pool.query('UPDATE users SET password_hash=$1,is_admin=TRUE,verified=TRUE,username=$2 WHERE email=$3', [hash, ADMIN_NAME, ADMIN_EMAIL]);
+  } else {
+    await pool.query('INSERT INTO users (username,email,password_hash,is_admin,verified) VALUES ($1,$2,$3,TRUE,TRUE)', [ADMIN_NAME, ADMIN_EMAIL, hash]);
+  }
+  return res.status(200).json({ success: true, message: 'Setup complete. Login: asikrac@gmail.com / asikasik' });
+}
+
+// ── ADMIN: GET/POST/PUT/DELETE /api/admin/courses ─────────────────────────────
+async function adminCourses(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+
+  if (req.method === 'GET') {
+    const r = await query(`
+      SELECT c.id,c.title,c.description,c.video_url,c.modules,c.is_active,c.created_at,
+        c.price,c.whatsapp,c.status,c.sequence_order,
+        CASE WHEN length(c.thumbnail_url)>2000000 THEN '' ELSE c.thumbnail_url END AS thumbnail_url,
+        COUNT(uc.user_id)::int AS enrolled_count
+      FROM courses c LEFT JOIN user_courses uc ON uc.course_id=c.id
+      GROUP BY c.id ORDER BY COALESCE(c.sequence_order,9999),c.created_at DESC`);
+    return res.status(200).json({ success: true, courses: r.rows });
+  }
+  if (req.method === 'POST') {
+    const { title,description,thumbnail_url,video_url,price,whatsapp,modules,is_active,status,sequence_order } = req.body||{};
+    if (!title) return res.status(400).json({ success: false, error: 'Title required' });
+    if (price==null) return res.status(400).json({ success: false, error: 'Price required' });
+    if (!whatsapp) return res.status(400).json({ success: false, error: 'WhatsApp link required' });
+    const r = await query(
+      `INSERT INTO courses (title,description,thumbnail_url,video_url,price,whatsapp,modules,is_active,status,sequence_order)
+       VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,$10) RETURNING *`,
+      [title,description||'',thumbnail_url||'',video_url||'',price,whatsapp,modules||'{}',is_active!==false,status||'upcoming',sequence_order??9999]
+    );
+    return res.status(201).json({ success: true, course: r.rows[0] });
+  }
+  if (req.method === 'PUT') {
+    const { id,title,description,thumbnail_url,video_url,price,whatsapp,modules,is_active,status,sequence_order } = req.body||{};
+    if (!id) return res.status(400).json({ success: false, error: 'ID required' });
+    const r = await query(
+      `UPDATE courses SET title=$1,description=$2,thumbnail_url=$3,video_url=$4,price=$5,whatsapp=$6,
+       modules=$7::jsonb,is_active=$8,status=$9,sequence_order=$10 WHERE id=$11 RETURNING *`,
+      [title,description,thumbnail_url,video_url,price,whatsapp,modules,is_active,status||'upcoming',sequence_order??9999,id]
+    );
+    return res.status(200).json({ success: true, course: r.rows[0] });
+  }
+  if (req.method === 'DELETE') {
+    const { id } = req.body||{};
+    if (!id) return res.status(400).json({ success: false, error: 'ID required' });
+    await query('DELETE FROM courses WHERE id=$1', [id]);
+    return res.status(200).json({ success: true });
+  }
+  return res.status(405).json({ error: 'Method not allowed' });
+}
+
+// ── ADMIN: GET /api/admin/users ───────────────────────────────────────────────
+async function adminUsers(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+  if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
+  const r = await query(`
+    SELECT u.id,u.username,u.email,u.created_at,u.verified,
+      COALESCE(json_agg(json_build_object('course_id',uc.course_id,'title',c.title,'granted_at',uc.granted_at))
+        FILTER (WHERE uc.course_id IS NOT NULL),'[]') AS courses
+    FROM users u
+    LEFT JOIN user_courses uc ON uc.user_id=u.id
+    LEFT JOIN courses c ON c.id=uc.course_id
+    GROUP BY u.id ORDER BY u.created_at DESC`);
+  return res.status(200).json({ success: true, users: r.rows });
+}
+
+// ── ADMIN: POST/DELETE /api/admin/grant-access ────────────────────────────────
+async function adminGrantAccess(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+  const { user_id, course_id } = req.body||{};
+  if (!user_id || !course_id) return res.status(400).json({ success: false, error: 'user_id and course_id required' });
+  if (req.method === 'POST') {
+    await query(`INSERT INTO user_courses (user_id,course_id,granted_by,granted_at) VALUES ($1,$2,$3,NOW())
+      ON CONFLICT (user_id,course_id) DO NOTHING`, [user_id, course_id, admin.id]);
+    return res.status(200).json({ success: true, message: 'Access granted' });
+  }
+  if (req.method === 'DELETE') {
+    await query('DELETE FROM user_courses WHERE user_id=$1 AND course_id=$2', [user_id, course_id]);
+    return res.status(200).json({ success: true, message: 'Access revoked' });
+  }
+  return res.status(405).json({ error: 'Method not allowed' });
+}
+
+// ── ADMIN: POST /api/admin/update-profile ─────────────────────────────────────
+async function adminUpdateProfile(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const admin = await requireAdmin(req, res); if (!admin) return;
+  const { type, newEmail, currentPassword, newPassword } = req.body||{};
+  if (type === 'email') {
+    if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) return res.status(400).json({ success: false, error: 'Valid email required' });
+    const dup = await query('SELECT id FROM users WHERE email=$1 AND id!=$2', [newEmail, admin.id]);
+    if (dup.rows.length) return res.status(400).json({ success: false, error: 'Email already in use' });
+    await query('UPDATE users SET email=$1 WHERE id=$2', [newEmail.toLowerCase().trim(), admin.id]);
+    return res.status(200).json({ success: true, message: 'Email updated' });
+  }
+  if (type === 'password') {
+    if (!currentPassword || !newPassword || newPassword.length < 8)
+      return res.status(400).json({ success: false, error: 'Current password and new password (8+ chars) required' });
+    const valid = await bcrypt.compare(currentPassword, admin.password_hash);
+    if (!valid) return res.status(400).json({ success: false, error: 'Current password incorrect' });
+    await query('UPDATE users SET password_hash=$1 WHERE id=$2', [await bcrypt.hash(newPassword, 12), admin.id]);
+    return res.status(200).json({ success: true, message: 'Password updated' });
+  }
+  return res.status(400).json({ success: false, error: 'Invalid type' });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// MAIN DISPATCHER
+// ═══════════════════════════════════════════════════════════════════════════════
+export default async function handler(req, res) {
+  setCors(res);
+  if (req.method === 'OPTIONS') return res.status(200).end();
+
+  const path = req.url.split('?')[0].replace(/\/$/, '');
+
+  try {
+    // Public
+    if (path.endsWith('/_public/courses')    || path.endsWith('/public/courses'))    return await publicCourses(req, res);
+    if (path.endsWith('/_public/verify-coupon') || path.endsWith('/public/verify-coupon')) return await verifyCoupon(req, res);
+
+    // Auth
+    if (path.endsWith('/auth/register'))       return await authRegister(req, res);
+    if (path.endsWith('/auth/login'))          return await authLogin(req, res);
+    if (path.endsWith('/auth/logout'))         return await authLogout(req, res);
+    if (path.endsWith('/auth/verify'))         return await authVerify(req, res);
+    if (path.endsWith('/auth/forgot-password')) return await authForgotPassword(req, res);
+    if (path.endsWith('/auth/reset-password')) return await authResetPassword(req, res);
+    if (path.endsWith('/auth/verify-email'))   return await authVerifyEmail(req, res);
+
+    // Admin
+    if (path.endsWith('/admin/init'))          return await adminInit(req, res);
+    if (path.endsWith('/admin/courses'))       return await adminCourses(req, res);
+    if (path.endsWith('/admin/users'))         return await adminUsers(req, res);
+    if (path.endsWith('/admin/grant-access'))  return await adminGrantAccess(req, res);
+    if (path.endsWith('/admin/update-profile')) return await adminUpdateProfile(req, res);
+
+    return res.status(404).json({ success: false, error: `No route: ${path}` });
+  } catch (err) {
+    console.error('API Error:', err);
+    return res.status(500).json({ success: false, error: err.message });
+  }
+}
+
 export const config = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
+  api: { bodyParser: { sizeLimit: '10mb' } }
 };
