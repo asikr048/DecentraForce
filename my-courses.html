@@ -1268,7 +1268,7 @@
 
 function getCourseButton(course, type) {
 
-  
+
     const courseId = course.id || '';
     const whatsapp = course.whatsapp || '';
     const status = course.status || 'ongoing'; // Default to ongoing so it's purchasable
@@ -1481,7 +1481,13 @@ function getCourseButton(course, type) {
   }
 
   // Confirm payment - validates, saves to localStorage, and redirects to WhatsApp
-  function confirmPayment() {
+// Confirm payment - validates, saves to localStorage, and redirects to WhatsApp
+  function confirmPayment(e) {
+    if (e) {
+        e.preventDefault();
+        e.stopImmediatePropagation(); // Prevents ux-enhancements.js from bypassing validation
+    }
+
     const paymentMethod = document.getElementById('paymentMethod').value;
     const senderNumber = document.getElementById('senderNumber').value.trim();
     const transactionId = document.getElementById('transactionId').value.trim();
@@ -1490,34 +1496,10 @@ function getCourseButton(course, type) {
     const finalPrice = modal.dataset.currentPrice || modal.dataset.originalPrice;
     const courseId = modal.dataset.courseId || '';
     
-    // Validation
-    if (!paymentMethod) {
-      showError('Please select a payment method');
-      return;
-    }
-    
-    if (!senderNumber) {
-      showError('Please enter your mobile number');
-      return;
-    }
-    
-    if (!transactionId) {
-      showError('Please enter the transaction ID');
-      return;
-    }
-    
-    // Validate sender number format (Bangladeshi mobile numbers)
-    const phoneRegex = /^(\+88)?01[3-9]\d{8}$/;
-    if (!phoneRegex.test(senderNumber)) {
-      showError('Please enter a valid Bangladeshi mobile number (e.g., 01712345678 or +8801712345678)');
-      return;
-    }
-    
-    // Validate transaction ID format
-    if (transactionId.length < 8) {
-      showError('Transaction ID must be at least 8 characters');
-      return;
-    }
+    // Strict Validation
+    if (!paymentMethod) return showError('Please select a payment method');
+    if (!senderNumber) return showError('Please enter your sender mobile number');
+    if (!transactionId) return showError('Please enter the transaction ID');
     
     // Get WhatsApp link from selected course
     const whatsappLink = window.selectedCourse?.whatsapp || '';
@@ -1535,27 +1517,27 @@ function getCourseButton(course, type) {
       timestamp: new Date().toISOString()
     };
     
-    // Save to localStorage
     savePurchaseToLocalStorage(purchase);
     
-    // Show success message
-    showToast('Payment details saved successfully! Redirecting to WhatsApp...', 'success');
+    // UI Feedback
+    const confirmBtn = document.getElementById('modalConfirm');
+    if (window.showButtonLoading) window.showButtonLoading(confirmBtn, 'Processing...');
+    showToast('Payment verified! Redirecting to WhatsApp...', 'success');
     
-    // Close modal after a short delay
+    // Redirect Flow
     setTimeout(() => {
       closeCheckoutModal();
+      if (window.hideButtonLoading) window.hideButtonLoading(confirmBtn);
       
-      // Redirect to WhatsApp group if available
       if (whatsappLink) {
-        // Redirect user to WhatsApp group after submit
-        window.location.href = whatsappLink;
+        window.open(whatsappLink, '_blank'); // Opens WhatsApp safely in a new tab
+        setTimeout(() => window.location.reload(), 500); // Refresh to update UI to pending
       } else {
-        // Fallback: Show alert with instructions
-        alert(`Payment details saved!\n\nCourse: ${courseTitle}\nPayment Method: ${paymentMethod}\nTransaction ID: ${transactionId}\n\nOur team will verify your payment and grant course access within 24 hours.`);
+        alert(`Payment details saved for ${courseTitle}!\n\nOur team will verify your transaction and grant course access shortly.`);
+        window.location.reload();
       }
     }, 1500);
   }
-  
   // Save purchase to localStorage
   function savePurchaseToLocalStorage(purchase) {
     try {
@@ -1661,7 +1643,7 @@ function getCourseButton(course, type) {
         <div class="coupon-message" id="couponMessage"></div>
       </div>
 
-      <div class="payment-instructions">
+   <div class="payment-instructions">
         <h5>Payment Instruction</h5>
         <div class="instructions-content">
           <p><strong>Send Money to +8801302201431 via bKash, Nagad, Rocket, or Upay</strong></p>
@@ -1671,7 +1653,7 @@ function getCourseButton(course, type) {
             <span class="payment-method-tag">Rocket</span>
             <span class="payment-method-tag">Upay</span>
           </div>
-          <p class="instruction-note">After payment, fill in the details below to verify your transaction.</p>
+          <p class="instruction-note">After sending the money, confirm your payment by providing your Sender Number and Transaction ID below to instantly join the Course WhatsApp Group.</p>
         </div>
       </div>
 
