@@ -1619,49 +1619,6 @@ window.addEventListener('storage', (e) => {
         }, 1000);
       });
     }
-    // NEW: Coupon Logic
-    if (applyCouponBtn) {
-      applyCouponBtn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const code = document.getElementById('couponInput').value.trim().toUpperCase();
-        const msgBox = document.getElementById('couponMessage');
-        const priceDisplay = document.getElementById('modalCoursePrice');
-        const originalPrice = parseFloat(activeCourse.price) || 2500;
-
-        if (!code) {
-          msgBox.textContent = 'Please enter a coupon code.';
-          msgBox.style.color = '#ff4d8d';
-          return;
-        }
-
-        // Fetch coupons from Admin panel (localStorage)
-        let coupons = [];
-        try { coupons = JSON.parse(localStorage.getItem('coupons') || '[]'); } catch(e){}
-
-        const matchedCoupon = coupons.find(c => c.code === code);
-        
-        // Apply discount (Uses actual coupons, or a fallback 'DF20' for testing)
-        if (matchedCoupon) {
-          const discountAmt = originalPrice * (matchedCoupon.discount / 100);
-          finalCalculatedPrice = originalPrice - discountAmt;
-          priceDisplay.textContent = `৳${finalCalculatedPrice.toFixed(0)}`;
-          msgBox.textContent = `Success! ${matchedCoupon.discount}% off applied.`;
-          msgBox.style.color = '#00e599';
-        } else if (code === 'DF20') { // Hardcoded test coupon
-          const discountAmt = originalPrice * 0.20;
-          finalCalculatedPrice = originalPrice - discountAmt;
-          priceDisplay.textContent = `৳${finalCalculatedPrice.toFixed(0)}`;
-          msgBox.textContent = `Success! 20% off applied.`;
-          msgBox.style.color = '#00e599';
-        } else {
-          msgBox.textContent = 'Invalid or expired coupon code.';
-          msgBox.style.color = '#ff4d8d';
-          finalCalculatedPrice = originalPrice; // Reset if invalid
-          priceDisplay.textContent = `৳${originalPrice}`;
-        }
-      });
-    }
-
     // Purchase Submission Logic
     if (confirmBtn) {
       confirmBtn.addEventListener('click', (e) => {
