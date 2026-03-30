@@ -752,14 +752,16 @@
         <div class="nav-icon">🏆</div>
         Rewards
       </button>
+
+
       <div class="nav-divider"></div>
-      <button class="nav-item" onclick="showPanel('courses'); setTab('nanodegree')">
+      <button class="nav-item active" onclick="showPanel('courses'); setTab('enrolled')">
         <div class="nav-icon">🎓</div>
-        Available
+        Enrolled
       </button>
-      <button class="nav-item" onclick="showPanel('courses'); setTab('subscription')">
+      <button class="nav-item" onclick="showPanel('courses'); setTab('premium')">
         <div class="nav-icon">💳</div>
-        Purchased
+        Premium
       </button>
       <button class="nav-item" onclick="showPanel('courses'); setTab('free')">
         <div class="nav-icon">🎁</div>
@@ -829,35 +831,36 @@
           <p>Pick up where you left off, or explore something new.</p>
         </div>
 
+
         <div class="tabs">
-          <button class="tab-btn active" onclick="setTab('nanodegree')" id="tab-nanodegree">Available Courses</button>
-          <button class="tab-btn" onclick="setTab('subscription')" id="tab-subscription">Purchased Courses</button>
+          <button class="tab-btn active" onclick="setTab('enrolled')" id="tab-enrolled">Enrolled Courses</button>
+          <button class="tab-btn" onclick="setTab('premium')" id="tab-premium">Premium Courses</button>
           <button class="tab-btn" onclick="setTab('free')" id="tab-free">Free Courses</button>
         </div>
 
-        <div class="tab-panel active" id="panel-nanodegree">
-          <div class="section-label">Available Courses</div>
-          <div class="courses-grid" id="available-courses">
-            <!-- Dynamic courses will be loaded here -->
-            <div class="loading-courses">Loading courses...</div>
+        <div class="tab-panel active" id="panel-enrolled">
+          <div class="section-label">Enrolled Courses</div>
+          <div class="courses-grid" id="enrolled-courses">
+            <div class="loading-courses">Loading enrolled courses...</div>
           </div>
         </div>
 
-        <div class="tab-panel" id="panel-subscription">
-          <div class="section-label">Purchased Courses</div>
-          <div class="courses-grid" id="purchased-courses">
-            <!-- Dynamic purchased courses will be loaded here -->
-            <div class="loading-courses">Loading purchased courses...</div>
+        <div class="tab-panel" id="panel-premium">
+          <div class="section-label">Premium Courses</div>
+          <div class="courses-grid" id="premium-courses">
+            <div class="loading-courses">Loading premium courses...</div>
           </div>
         </div>
 
         <div class="tab-panel" id="panel-free">
           <div class="section-label">Free Courses</div>
           <div class="courses-grid" id="free-courses">
-            <!-- Dynamic free courses will be loaded here -->
             <div class="loading-courses">Loading free courses...</div>
           </div>
         </div>
+
+
+
       </div>
 
       <div id="panel-profile" style="display:none">
@@ -1046,8 +1049,8 @@
     document.getElementById('breadcrumb-label').textContent = labels[name] || 'My Courses';
   }
 
-  function setTab(name) {
-    ['nanodegree','subscription','free'].forEach(t => {
+ function setTab(name) {
+    ['enrolled','premium','free'].forEach(t => {
       document.getElementById('tab-' + t)?.classList.toggle('active', t === name);
       document.getElementById('panel-' + t)?.classList.toggle('active', t === name);
     });
@@ -1070,11 +1073,13 @@
   window.saveProfileData = saveProfileData;
   window.showPanel = showPanel;
   window.setTab = setTab;
-  window.addEventListener('DOMContentLoaded', () => {
+ window.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
-    if (tab === 'nanodegree' || tab === 'subscription' || tab === 'free') {
+    if (tab === 'enrolled' || tab === 'premium' || tab === 'free') {
       setTab(tab);
+    } else {
+      setTab('enrolled');
     }
   });
 
@@ -1117,79 +1122,102 @@
       p.status && p.status.toLowerCase() === 'approved'
     );
   }
-
-  function renderCourses() {
-    // Ensure allCourses is an array
+function renderCourses() {
     const courses = Array.isArray(allCourses) ? allCourses : [];
     
     // Load and filter purchases
     const allPurchases = loadPurchasesFromLocalStorage();
-    const approvedPurchases = filterApprovedPurchases(allPurchases);
+    const approvedPurchases = allPurchases.filter(p => p && p.status === 'approved');
+    const pendingPurchases = allPurchases.filter(p => p && p.status === 'pending');
     
-    // Get course IDs from approved purchases
-    const purchasedCourseIds = approvedPurchases.map(p => p.courseId).filter(id => id);
+    const enrolledCourseIds = approvedPurchases.map(p => p.courseId?.toString());
+    const pendingCourseIds = pendingPurchases.map(p => p.courseId?.toString());
     
-    // Find purchased courses from allCourses
-    const purchasedCourses = courses.filter(course =>
-      purchasedCourseIds.includes(course.id?.toString())
+    // Find enrolled courses (both paid and free that are approved)
+    const enrolledCourses = courses.filter(course =>
+      enrolledCourseIds.includes(course.id?.toString())
     );
 
-    if (courses.length === 0 && purchasedCourses.length === 0) {
-      document.getElementById('available-courses').innerHTML =
-        '<div class="empty-state"><div class="empty-icon">📚</div><h3>No courses available</h3><p>Check back soon for new courses!</p></div>';
-      document.getElementById('purchased-courses').innerHTML =
-        '<div class="empty-state"><div class="empty-icon">🛒</div><h3>No purchased courses</h3><p>Purchase a course to get started.</p></div>';
+    if (courses.length === 0 && enrolledCourses.length === 0) {
+      document.getElementById('enrolled-courses').innerHTML =
+        '<div class="empty-state"><div class="empty-icon">🎓</div><h3>No enrolled courses</h3><p>Enroll in a free course or purchase a premium one to get started.</p></div>';
+      document.getElementById('premium-courses').innerHTML =
+        '<div class="empty-state"><div class="empty-icon">📚</div><h3>No premium courses</h3><p>Check back soon for new premium courses!</p></div>';
       document.getElementById('free-courses').innerHTML =
         '<div class="empty-state"><div class="empty-icon">🎁</div><h3>No free courses</h3><p>Free courses will appear here when available.</p></div>';
       return;
     }
 
-    // Filter courses by type with safe defaults
-    const availableCourses = courses.filter(c => {
+    // Filter Premium courses (Price > 0, not enrolled)
+    const premiumCourses = courses.filter(c => {
       const price = parseFloat(c.price) || 0;
-      return price > 0 && !purchasedCourseIds.includes(c.id?.toString());
+      return price > 0 && !enrolledCourseIds.includes(c.id?.toString());
     });
+    
+    // Filter Free courses (Price == 0, not enrolled)
     const freeCourses = courses.filter(c => {
       const price = parseFloat(c.price) || 0;
-      return price === 0 && !purchasedCourseIds.includes(c.id?.toString());
+      return price === 0 && !enrolledCourseIds.includes(c.id?.toString());
     });
 
-    renderCourseGrid('available-courses', availableCourses, 'Available');
-    renderCourseGrid('purchased-courses', purchasedCourses, 'Purchased');
-    renderCourseGrid('free-courses', freeCourses, 'Free');
+    renderCourseGrid('enrolled-courses', enrolledCourses, 'Enrolled', pendingCourseIds);
+    renderCourseGrid('premium-courses', premiumCourses, 'Premium', pendingCourseIds);
+    renderCourseGrid('free-courses', freeCourses, 'Free', pendingCourseIds);
   }
 
-  function renderCourseGrid(containerId, courses, type) {
+  function enrollFreeCourse(courseId, courseTitle) {
+    const purchase = {
+      courseId: courseId.toString(),
+      courseTitle: courseTitle,
+      price: 0,
+      paymentMethod: 'Free Enrollment',
+      senderNumber: 'N/A',
+      trxId: 'FREE-' + Date.now(),
+      status: "approved", // instantly approved so it shows up in enrolled
+      timestamp: new Date().toISOString(),
+      id: Date.now().toString()
+    };
+    const purchases = loadPurchasesFromLocalStorage();
+    purchases.push(purchase);
+    localStorage.setItem('purchases', JSON.stringify(purchases));
+    
+    showToast(`Successfully enrolled in ${courseTitle}!`, 'success');
+    renderCourses(); // Instantly refresh the grid
+  }
+
+  function renderCourseGrid(containerId, courses, type, pendingCourseIds = []) {
     const container = document.getElementById(containerId);
     
     if (!container) return;
     
     if (!Array.isArray(courses) || courses.length === 0) {
-      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><h3>No ${type.toLowerCase()} courses</h3><p>${type === 'Available' ? 'Check back soon for new courses!' : type === 'Purchased' ? 'Purchase a course to get started.' : 'Free courses will appear here when available.'}</p></div>`;
+      container.innerHTML = `<div class="empty-state"><div class="empty-icon">${type === 'Premium' ? '📚' : type === 'Enrolled' ? '🎓' : '🎁'}</div><h3>No ${type.toLowerCase()} courses</h3><p>${type === 'Premium' ? 'Check back soon for new courses!' : type === 'Enrolled' ? 'Enroll in a course to get started.' : 'Free courses will appear here when available.'}</p></div>`;
       return;
     }
 
     container.innerHTML = courses.map(course => {
-      // Safe defaults for missing data
       const courseId = course.id || Math.random().toString(36).substring(2);
       const title = course.title || 'Untitled Course';
       const description = course.description || 'Learn essential skills in this comprehensive course.';
       const price = parseFloat(course.price) || 0;
       const whatsapp = course.whatsapp || '';
-      const modules = course.modules || '';
+      
+      const isPending = pendingCourseIds.includes(courseId.toString());
       
       // Determine status badge
-      let statusText = 'Available';
+      let statusText = 'Premium';
       let statusClass = 'nano';
-      if (type === 'Free') {
+      if (type === 'Enrolled') {
+        statusText = 'Enrolled';
+        statusClass = 'sub';
+      } else if (type === 'Free') {
         statusText = 'Free';
         statusClass = 'free';
-      } else if (type === 'Purchased') {
-        statusText = 'Purchased';
-        statusClass = 'sub';
+      } else if (isPending) {
+        statusText = 'Pending Approval';
+        statusClass = 'nano';
       }
       
-      // Format price display
       const priceDisplay = price > 0 ? `৳${price}` : 'Free';
       
       return `
@@ -1208,23 +1236,26 @@
           <p class="card-description">${escapeHtml(description.substring(0, 100))}${description.length > 100 ? '...' : ''}</p>
           <div class="card-stats">
             <div class="stat-pill">📦 ${getModuleCount(course)} Lecture</div>
-            ${price > 0 ? `<div class="stat-pill">💰 ${priceDisplay}</div>` : ''}
-            ${whatsapp ? `<div class="stat-pill">💬 WhatsApp Group</div>` : ''}
+            ${price > 0 && type !== 'Enrolled' ? `<div class="stat-pill">💰 ${priceDisplay}</div>` : ''}
+            ${whatsapp && type === 'Enrolled' ? `<div class="stat-pill">💬 WhatsApp Group</div>` : ''}
           </div>
+          ${type === 'Enrolled' ? `
           <div class="card-progress">
             <div class="progress-label"><span>Progress</span><span>0%</span></div>
             <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
           </div>
+          ` : ''}
         </div>
         <div class="card-footer">
           <div class="card-rating"><span class="stars">★★★★★</span> 4.9</div>
-          ${getCourseButton(course, type)}
+          ${getCourseButton(course, type, isPending)}
         </div>
       </div>
-    `}).join('');
+      `
+    }).join('');
 
-    // Attach event listeners to Buy Now buttons
-    if (type === 'Available') {
+    // Attach event listeners
+    if (type === 'Premium') {
       container.querySelectorAll('.buy-now-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -1235,8 +1266,18 @@
       });
     }
     
-    // Attach event listeners to Open Course buttons for purchased and free courses
-    if (type === 'Purchased' || type === 'Free') {
+    if (type === 'Free') {
+      container.querySelectorAll('.enroll-free-btn').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          const courseId = this.dataset.courseId;
+          const course = courses.find(c => (c.id || '').toString() === courseId.toString());
+          if (course) enrollFreeCourse(courseId, course.title);
+        });
+      });
+    }
+    
+    if (type === 'Enrolled') {
       container.querySelectorAll('.open-course-btn').forEach(btn => {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
@@ -1246,22 +1287,39 @@
         });
       });
       
-      // Make entire course card clickable for purchased courses
-      if (type === 'Purchased') {
-        container.querySelectorAll('.course-card').forEach(card => {
-          const courseId = card.querySelector('.open-course-btn')?.dataset.courseId;
-          if (courseId) {
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', function(e) {
-              // Don't trigger if clicking on button or link inside
-              if (e.target.closest('.open-course-btn') || e.target.closest('a')) {
-                return;
-              }
-              const course = courses.find(c => (c.id || '').toString() === courseId.toString());
-              if (course) openCourseContent(courseId, course.title);
-            });
-          }
-        });
+      container.querySelectorAll('.course-card').forEach(card => {
+        const courseId = card.querySelector('.open-course-btn')?.dataset.courseId;
+        if (courseId) {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', function(e) {
+            if (e.target.closest('.open-course-btn') || e.target.closest('a')) return;
+            const course = courses.find(c => (c.id || '').toString() === courseId.toString());
+            if (course) openCourseContent(courseId, course.title);
+          });
+        }
+      });
+    }
+  }
+
+  function getCourseButton(course, type, isPending) {
+    const courseId = course.id || '';
+    const whatsapp = course.whatsapp || '';
+
+    if (type === 'Enrolled') {
+      let buttons = `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">▶ Continue</button>`;
+      if (whatsapp) {
+        buttons += `<a href="${escapeHtml(whatsapp)}" target="_blank" class="continue-btn" style="margin-left:8px; background:#25D366; color:white; border:none; box-shadow:0 0 10px rgba(37,211,102,0.3);">WhatsApp</a>`;
+      }
+      return `<div style="display:flex; justify-content:flex-end;">${buttons}</div>`;
+      
+    } else if (type === 'Free') {
+      return `<button class="continue-btn enroll-free-btn" data-course-id="${courseId}" style="cursor:pointer">🎓 Enroll Now</button>`;
+      
+    } else if (type === 'Premium') {
+      if (isPending) {
+        return `<span class="continue-btn disabled" style="cursor:default; opacity:0.8; background:#fbbf24; color:#000;">⏳ Pending Approval</span>`;
+      } else {
+        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer;">Purchase</button>`;
       }
     }
   }
