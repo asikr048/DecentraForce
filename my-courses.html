@@ -1062,7 +1062,14 @@
       });
     }, 50);
   }
-
+/* ────────────────────────────────────────────────────────
+     GLOBAL EXPORTS FOR HTML ONCLICK HANDLERS
+  ──────────────────────────────────────────────────────── */
+  window.toggleDropdown = toggleDropdown;
+  window.logoutUser = logoutUser;
+  window.saveProfileData = saveProfileData;
+  window.showPanel = showPanel;
+  window.setTab = setTab;
   window.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
     const tab = params.get('tab');
