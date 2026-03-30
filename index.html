@@ -1356,141 +1356,9 @@ window.addEventListener('storage', (e) => {
   });
 
   // Smart Loader for Courses (API first, LocalStorage fallback + Sequence Sort)
-// Smart Loader for Courses (API first, LocalStorage fallback + Sequence Sort)
   document.addEventListener('DOMContentLoaded', async () => {
     
-    // We wrap the entire logic in a setTimeout(..., 0) to yield the main thread.
-    // This fixes the "INP Issue" by letting the browser paint the UI before 
-    // starting heavy data processing.
-    setTimeout(async () => {
-
-      // Fallback: Fetch courses from localStorage
-      function getCoursesFromStorage() {
-        try {
-          const cached = localStorage.getItem('courses');
-          if (!cached) return [];
-          return JSON.parse(cached);
-        } catch (error) {
-          console.error('Error reading courses from localStorage:', error);
-          return [];
-        }
-      }
-
-      // Fetch real courses from the Database via API
-      async function fetchPublicCourses() {
-        try {
-          const res = await fetch('/api/_public/courses');
-          const data = await res.json();
-          if (data.success && data.courses && data.courses.length > 0) {
-            return data.courses;
-          }
-          return [];
-        } catch (error) {
-          console.error('Error fetching courses from API:', error);
-          return [];
-        }
-      }
-
-      // Render course cards into a given container
-      function renderCourseGrid(containerSelector, courses) {
-        const container = document.querySelector(containerSelector);
-        if (!container) return;
-
-        container.innerHTML = '';
-
-        if (courses.length === 0) {
-          container.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted)">No courses available. Check back soon!</div>';
-          return;
-        }
-
-        const banners = ['banner-1', 'banner-2', 'banner-3', 'banner-4'];
-        const emojis = ['⛓️', '📝', '🖼️', '💰', '🚀', '🔗', '⚡', '🎓'];
-        const badges = ['🔥 Bestseller', '⚡ New', '🎨 Popular', '📈 Trending', '⭐ Featured'];
-
-        courses.forEach((course, index) => {
-          const bannerClass = banners[index % banners.length];
-          const emoji = emojis[index % emojis.length];
-          const badge = course.badge || badges[index % badges.length];
-          
-          const priceValue = parseFloat(course.price);
-          const isFree = isNaN(priceValue) || priceValue === 0 || course.price === null || course.price === '0';
-          
-          const price = isFree ? 'Free' : `৳${priceValue || course.price || '2,500'}`;
-          const originalPrice = isFree ? '' : `৳${Math.round((priceValue || 2500) * 1.5)}`;
-          const ratingVal = course.rating || 4.8;
-          const reviewsVal = course.reviews ? (course.reviews >= 1000 ? (course.reviews/1000).toFixed(1)+'k' : course.reviews) : '500+';
-          
-          const priceDisplay = isFree ? '<span style="color:var(--accent);font-weight:700">Free</span>' : `<div class="price"><span>${originalPrice}</span>${price}</div>`;
-          const status = course.status || 'upcoming';
-
-          let categoryTag = 'Blockchain';
-          let levelTag = index % 3 === 0 ? 'Beginner' : index % 3 === 1 ? 'Intermediate' : 'Advanced';
-          try {
-            const modulesObj = typeof course.modules === 'string' ? JSON.parse(course.modules) : course.modules;
-            if (modulesObj && modulesObj.category) categoryTag = modulesObj.category;
-            if (modulesObj && modulesObj.level) levelTag = modulesObj.level;
-          } catch(e) {}
-
-          const bgStyle = course.thumbnail_url ? `style="background-image: url('${course.thumbnail_url}'); background-size: cover; background-position: center;"` : '';
-          const innerEmoji = course.thumbnail_url ? '' : `<span style="z-index:2;position:relative">${emoji}</span>`;
-
-          const card = document.createElement('div');
-          card.className = 'course-card';
-          card.dataset.courseId = course.id;
-          card.innerHTML = `
-            <div class="card-banner ${course.thumbnail_url ? '' : bannerClass}" ${bgStyle}>
-              ${innerEmoji}
-              <span class="banner-badge">${badge}</span>
-            </div>
-            <div class="card-body">
-              <div class="card-meta">
-                <span class="tag tag-blue">${categoryTag}</span>
-                <span class="tag tag-purple">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
-              </div>
-              <h3>${course.title || 'Untitled Course'}</h3>
-              <p>${course.description ? (course.description.length > 100 ? course.description.substring(0, 100) + '...' : course.description) : 'Learn essential skills in this comprehensive course.'}</p>
-              <div class="card-footer">
-                <div class="rating"><span class="stars">★★★★★</span> ${ratingVal} (${reviewsVal})</div>
-                ${priceDisplay}
-              </div>
-            </div>
-          `;
-          container.appendChild(card);
-
-          card.addEventListener('click', function() {
-            if (isFree) {
-              window.location.href = 'my-courses.html?tab=free';
-            } else {
-              openCheckoutModal(course);
-            }
-          });
-        });
-      }
-
-      // Logic execution
-      let courses = await fetchPublicCourses();
-      if (!courses || courses.length === 0) {
-        courses = getCoursesFromStorage();
-      }
-      
-      courses.sort((a, b) => {
-        const seqA = (a.sequence_order !== undefined && a.sequence_order !== null) ? parseInt(a.sequence_order) : 9999;
-        const seqB = (b.sequence_order !== undefined && b.sequence_order !== null) ? parseInt(b.sequence_order) : 9999;
-        return seqA - seqB;
-      });
-      
-      renderCourseGrid('.courses-grid', courses);
-      
-      const freeCourses = courses.filter(course => {
-        const p = parseFloat(course.price);
-        return isNaN(p) || p === 0 || course.price === '0' || course.price === null;
-      });
-      renderCourseGrid('#free-courses-grid', freeCourses);
-
-    }, 0); // 0ms timeout defers execution until after the first paint
-  });
-  
-  // Fallback: Fetch courses from localStorage
+    // Fallback: Fetch courses from localStorage
     function getCoursesFromStorage() {
       try {
         const cached = localStorage.getItem('courses');
@@ -1795,11 +1663,7 @@ window.addEventListener('storage', (e) => {
       if (el1) { const h = r1.map(makeCard).join(''); el1.innerHTML = h + h; } // double for seamless loop
       if (el2) { const h = r2.map(makeCard).join(''); el2.innerHTML = h + h; }
     }
-   if (window.requestIdleCallback) {
-    requestIdleCallback(() => buildMarquee());
-} else {
-    setTimeout(() => buildMarquee(), 150);
-}
+    buildMarquee();
   });
 </script>
 

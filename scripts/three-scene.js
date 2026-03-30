@@ -159,31 +159,33 @@ class BlockchainNetwork {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    // We delay the 3D scene by 300ms so the website buttons respond instantly
-    setTimeout(() => {
-        if (typeof THREE === 'undefined') {
-            console.error('Three.js not loaded');
-            showFallback();
-            return;
-        }
+    // Check if Three.js is available
+    if (typeof THREE === 'undefined') {
+        console.error('Three.js not loaded');
+        showFallback();
+        return;
+    }
 
-        if (!isWebGLAvailable()) {
-            showFallback();
-            return;
-        }
+    // Check WebGL support
+    if (!isWebGLAvailable()) {
+        console.warn('WebGL not supported, falling back to static visualization');
+        showFallback();
+        return;
+    }
 
-        try {
-            const network = new BlockchainNetwork('hero-3d-container');
-            const container = document.getElementById('hero-3d-container');
-            if (container) {
-                const loading = container.querySelector('.loading-fallback');
-                if (loading) loading.style.display = 'none';
-            }
-        } catch (error) {
-            console.error('Failed to initialize 3D scene:', error);
-            showFallback();
+    // Create network visualization in the hero 3d container
+    try {
+        const network = new BlockchainNetwork('hero-3d-container');
+        // Hide loading indicator if any
+        const container = document.getElementById('hero-3d-container');
+        if (container) {
+            const loading = container.querySelector('.loading-fallback');
+            if (loading) loading.style.display = 'none';
         }
-    }, 300); 
+    } catch (error) {
+        console.error('Failed to initialize 3D scene:', error);
+        showFallback();
+    }
 });
 
 function isWebGLAvailable() {
