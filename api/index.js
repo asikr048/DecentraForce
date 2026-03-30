@@ -341,6 +341,161 @@ async function adminUpdateProfile(req, res) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// PUBLIC: MENTORS
+// ═══════════════════════════════════════════════════════════════════════════════
+async function publicMentors(req, res) {
+  if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
+  try {
+    const result = await query(`SELECT * FROM mentors WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC`);
+    return res.status(200).json({ success: true, mentors: result.rows });
+  } catch (error) {
+    console.error('Public Mentors API Error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PUBLIC: TESTIMONIALS
+// ═══════════════════════════════════════════════════════════════════════════════
+async function publicTestimonials(req, res) {
+  if (req.method !== 'GET') return res.status(405).json({ success: false, error: 'Method not allowed' });
+  try {
+    const result = await query(`SELECT * FROM testimonials WHERE is_active = TRUE ORDER BY sort_order ASC, id ASC`);
+    return res.status(200).json({ success: true, testimonials: result.rows });
+  } catch (error) {
+    console.error('Public Testimonials API Error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN: MENTORS
+// ═══════════════════════════════════════════════════════════════════════════════
+async function adminMentors(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+  try {
+    if (req.method === 'GET') {
+      const result = await query(`SELECT * FROM mentors ORDER BY sort_order ASC, id ASC`);
+      return res.status(200).json({ success: true, mentors: result.rows });
+    }
+    if (req.method === 'POST') {
+      const { name_bn, name_en, title_bn, title_en, bio_bn, bio_en, image_url, twitter_url, linkedin_url, github_url, is_active, sort_order } = req.body||{};
+      if (!name_bn || !name_en) return res.status(400).json({ success: false, error: 'name_bn and name_en are required' });
+      let finalSort = sort_order;
+      if (finalSort === undefined || finalSort === null) {
+        const mx = await query('SELECT COALESCE(MAX(sort_order), 0) as m FROM mentors');
+        finalSort = mx.rows[0].m + 1;
+      }
+      const result = await query(
+        `INSERT INTO mentors (name_bn,name_en,title_bn,title_en,bio_bn,bio_en,image_url,twitter_url,linkedin_url,github_url,is_active,sort_order)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12) RETURNING *`,
+        [name_bn,name_en,title_bn||'',title_en||'',bio_bn||'',bio_en||'',image_url||'',twitter_url||'',linkedin_url||'',github_url||'',is_active!==false,finalSort]
+      );
+      return res.status(201).json({ success: true, mentor: result.rows[0] });
+    }
+    if (req.method === 'PUT') {
+      const { id, name_bn, name_en, title_bn, title_en, bio_bn, bio_en, image_url, twitter_url, linkedin_url, github_url, is_active, sort_order } = req.body||{};
+      if (!id) return res.status(400).json({ success: false, error: 'Mentor ID required' });
+      if (!name_bn || !name_en) return res.status(400).json({ success: false, error: 'name_bn and name_en are required' });
+      const result = await query(
+        `UPDATE mentors SET name_bn=$1,name_en=$2,title_bn=$3,title_en=$4,bio_bn=$5,bio_en=$6,
+         image_url=$7,twitter_url=$8,linkedin_url=$9,github_url=$10,is_active=$11,sort_order=$12 WHERE id=$13 RETURNING *`,
+        [name_bn,name_en,title_bn||'',title_en||'',bio_bn||'',bio_en||'',image_url||'',twitter_url||'',linkedin_url||'',github_url||'',is_active!==false,sort_order||0,id]
+      );
+      return res.status(200).json({ success: true, mentor: result.rows[0] });
+    }
+    if (req.method === 'DELETE') {
+      const { id } = req.body||{};
+      if (!id) return res.status(400).json({ success: false, error: 'Mentor ID required' });
+      await query('DELETE FROM mentors WHERE id=$1', [id]);
+      return res.status(200).json({ success: true, message: 'Mentor deleted' });
+    }
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  } catch (error) {
+    console.error('Admin Mentors API Error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN: TESTIMONIALS
+// ═══════════════════════════════════════════════════════════════════════════════
+async function adminTestimonials(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+  try {
+    if (req.method === 'GET') {
+      const result = await query(`SELECT * FROM testimonials ORDER BY sort_order ASC, id ASC`);
+      return res.status(200).json({ success: true, testimonials: result.rows });
+    }
+    if (req.method === 'POST') {
+      const { name_bn, name_en, role_bn, role_en, text_bn, text_en, rating, image_url, is_active, sort_order } = req.body||{};
+      if (!name_bn || !name_en || !text_bn || !text_en) return res.status(400).json({ success: false, error: 'name_bn, name_en, text_bn, text_en are required' });
+      let finalSort = sort_order;
+      if (finalSort === undefined || finalSort === null) {
+        const mx = await query('SELECT COALESCE(MAX(sort_order), 0) as m FROM testimonials');
+        finalSort = mx.rows[0].m + 1;
+      }
+      const result = await query(
+        `INSERT INTO testimonials (name_bn,name_en,role_bn,role_en,text_bn,text_en,rating,image_url,is_active,sort_order)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING *`,
+        [name_bn,name_en,role_bn||'',role_en||'',text_bn,text_en,rating||5,image_url||'',is_active!==false,finalSort]
+      );
+      return res.status(201).json({ success: true, testimonial: result.rows[0] });
+    }
+    if (req.method === 'PUT') {
+      const { id, name_bn, name_en, role_bn, role_en, text_bn, text_en, rating, image_url, is_active, sort_order } = req.body||{};
+      if (!id) return res.status(400).json({ success: false, error: 'Testimonial ID required' });
+      if (!name_bn || !name_en || !text_bn || !text_en) return res.status(400).json({ success: false, error: 'name_bn, name_en, text_bn, text_en are required' });
+      const result = await query(
+        `UPDATE testimonials SET name_bn=$1,name_en=$2,role_bn=$3,role_en=$4,text_bn=$5,text_en=$6,
+         rating=$7,image_url=$8,is_active=$9,sort_order=$10 WHERE id=$11 RETURNING *`,
+        [name_bn,name_en,role_bn||'',role_en||'',text_bn,text_en,rating||5,image_url||'',is_active!==false,sort_order||0,id]
+      );
+      return res.status(200).json({ success: true, testimonial: result.rows[0] });
+    }
+    if (req.method === 'DELETE') {
+      const { id } = req.body||{};
+      if (!id) return res.status(400).json({ success: false, error: 'Testimonial ID required' });
+      await query('DELETE FROM testimonials WHERE id=$1', [id]);
+      return res.status(200).json({ success: true, message: 'Testimonial deleted' });
+    }
+    return res.status(405).json({ success: false, error: 'Method not allowed' });
+  } catch (error) {
+    console.error('Admin Testimonials API Error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN: REORDER
+// ═══════════════════════════════════════════════════════════════════════════════
+async function adminReorder(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+  if (req.method !== 'PUT') return res.status(405).json({ success: false, error: 'Method not allowed' });
+  try {
+    const { type, items } = req.body||{};
+    const allowed = ['courses', 'mentors', 'testimonials'];
+    if (!type || !allowed.includes(type)) return res.status(400).json({ success: false, error: 'Invalid type. Must be: courses, mentors, or testimonials' });
+    if (!Array.isArray(items) || items.length === 0) return res.status(400).json({ success: false, error: 'Items array required' });
+    for (const item of items) {
+      if (item.id === undefined || item.sort_order === undefined)
+        return res.status(400).json({ success: false, error: 'Each item must have id and sort_order' });
+    }
+    await query('BEGIN');
+    try {
+      for (const item of items) {
+        await query(`UPDATE ${type} SET sort_order=$1 WHERE id=$2`, [item.sort_order, item.id]);
+      }
+      await query('COMMIT');
+    } catch (e) { await query('ROLLBACK'); throw e; }
+    return res.status(200).json({ success: true, message: 'Order updated' });
+  } catch (error) {
+    console.error('Admin Reorder API Error:', error);
+    return res.status(500).json({ success: false, error: error.message });
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // MAIN DISPATCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 export default async function handler(req, res) {
@@ -351,8 +506,10 @@ export default async function handler(req, res) {
 
   try {
     // Public
-    if (path.endsWith('/_public/courses')    || path.endsWith('/public/courses'))    return await publicCourses(req, res);
+    if (path.endsWith('/_public/courses')       || path.endsWith('/public/courses'))       return await publicCourses(req, res);
     if (path.endsWith('/_public/verify-coupon') || path.endsWith('/public/verify-coupon')) return await verifyCoupon(req, res);
+    if (path.endsWith('/_public/mentors')       || path.endsWith('/public/mentors'))       return await publicMentors(req, res);
+    if (path.endsWith('/_public/testimonials')  || path.endsWith('/public/testimonials'))  return await publicTestimonials(req, res);
 
     // Auth
     if (path.endsWith('/auth/register'))       return await authRegister(req, res);
@@ -369,6 +526,9 @@ export default async function handler(req, res) {
     if (path.endsWith('/admin/users'))         return await adminUsers(req, res);
     if (path.endsWith('/admin/grant-access'))  return await adminGrantAccess(req, res);
     if (path.endsWith('/admin/update-profile')) return await adminUpdateProfile(req, res);
+    if (path.endsWith('/admin/mentors'))       return await adminMentors(req, res);
+    if (path.endsWith('/admin/testimonials'))  return await adminTestimonials(req, res);
+    if (path.endsWith('/admin/reorder'))       return await adminReorder(req, res);
 
     return res.status(404).json({ success: false, error: `No route: ${path}` });
   } catch (err) {
