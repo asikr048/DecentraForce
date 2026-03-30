@@ -1488,7 +1488,9 @@ window.addEventListener('storage', (e) => {
       renderCourseGrid('#free-courses-grid', freeCourses);
 
     }, 0); // 0ms timeout defers execution until after the first paint
-  });/ Fallback: Fetch courses from localStorage
+  });
+  
+  // Fallback: Fetch courses from localStorage
     function getCoursesFromStorage() {
       try {
         const cached = localStorage.getItem('courses');
