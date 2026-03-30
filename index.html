@@ -1418,20 +1418,17 @@ window.addEventListener('storage', (e) => {
           }
         });
       });
-    }
-// Modal functions// Modal functions
+    }// Modal functions
     let activeCourse = null; 
-    let finalCalculatedPrice = 0; 
-    let basePrice = 0; // Tracks the starting price before coupons
+    let basePrice = 0; // Tracks the final price (discounted or regular)
 
     function openCheckoutModal(course) {
       activeCourse = course; 
       
-      // Determine correct starting price (Discount vs Regular)
+      // Determine correct price
       const regularPrice = parseFloat(course.price) || 0;
       const discountPrice = parseFloat(course.discount_price) || 0;
       basePrice = (discountPrice > 0) ? discountPrice : regularPrice;
-      finalCalculatedPrice = basePrice; 
 
       const modal = document.getElementById('checkoutModal');
       const title = document.getElementById('modalCourseTitle');
@@ -1453,7 +1450,7 @@ window.addEventListener('storage', (e) => {
       }
       
       // Reset Views for Multi-Step Flow
-      document.getElementById('sentMoneyBtn').style.display = 'block';
+      document.getElementById('paymentInstructionsPanel').style.display = 'block'; // Ensure panel is visible
       document.getElementById('paymentDetailsForm').style.display = 'none';
       document.getElementById('modalActionButtons').style.display = 'none';
 
@@ -1461,11 +1458,6 @@ window.addEventListener('storage', (e) => {
       if(document.getElementById('paymentMethod')) document.getElementById('paymentMethod').value = '';
       if(document.getElementById('senderNumber')) document.getElementById('senderNumber').value = '';
       if(document.getElementById('transactionId')) document.getElementById('transactionId').value = '';
-      if(document.getElementById('couponInput')) document.getElementById('couponInput').value = '';
-      if(document.getElementById('couponMessage')) {
-          document.getElementById('couponMessage').textContent = '';
-          document.getElementById('couponMessage').style.color = '';
-      }
 
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -1489,85 +1481,16 @@ window.addEventListener('storage', (e) => {
     if (sentMoneyBtn) {
       sentMoneyBtn.addEventListener('click', (e) => {
         e.preventDefault();
-        sentMoneyBtn.style.display = 'none';
+        // HIDE THE ENTIRE INSTRUCTIONS PANEL (The Phone Number block)
+        document.getElementById('paymentInstructionsPanel').style.display = 'none'; 
+        
+        // SHOW THE FORM
         document.getElementById('paymentDetailsForm').style.display = 'block';
         document.getElementById('modalActionButtons').style.display = 'flex';
       });
     }
 
-    // UNIFIED & FIXED Strict Coupon Logic// ══════════ COUPON & CHECKOUT LOGIC ══════════
-    const applyCouponBtn = document.getElementById('applyCouponBtn');
-    if (applyCouponBtn) {
-      // Clone to safely remove any old duplicate listeners
-      const newApplyBtn = applyCouponBtn.cloneNode(true);
-      applyCouponBtn.parentNode.replaceChild(newApplyBtn, applyCouponBtn);
-      
-      newApplyBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        const code = document.getElementById('couponInput').value.trim().toUpperCase();
-        const msgBox = document.getElementById('couponMessage');
-        const priceDisplay = document.getElementById('modalCoursePrice');
-
-        if (!code) {
-          msgBox.textContent = 'Please enter a coupon code.';
-          msgBox.style.color = '#ff4d8d';
-          return;
-        }
-
-        let discountPercentage = 0;
-        let isSuccess = false;
-
-        // 1. Try to fetch from API (safely checking if discount exists)
-        try {
-          const res = await fetch('/api/_public/verify-coupon', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code })
-          });
-          const data = await res.json();
-          if (data.success && data.discount) {
-            discountPercentage = parseFloat(data.discount);
-            isSuccess = true;
-          }
-        } catch (err) {
-          // Silent catch to allow localStorage fallback
-        }
-
-        // 2. Fallback to localStorage (Admin panel data) if API fails/missing
-        if (!isSuccess) {
-           let coupons = [];
-           try { coupons = JSON.parse(localStorage.getItem('coupons') || '[]'); } catch(err){}
-           const matchedCoupon = coupons.find(c => String(c.code).toUpperCase() === code);
-           
-           if (matchedCoupon) {
-             discountPercentage = parseFloat(matchedCoupon.discount);
-             isSuccess = true;
-           } else if (code === 'DF20') { // Hardcoded fallback test coupon
-             discountPercentage = 20;
-             isSuccess = true;
-           }
-        }
-
-        // 3. Apply the Math
-        if (isSuccess && discountPercentage > 0) {
-          // Calculate percentage off
-          const discountAmt = basePrice * (discountPercentage / 100);
-          finalCalculatedPrice = basePrice - discountAmt;
-          
-          // Visual Update: Show old price crossed out, new price highlighted
-          priceDisplay.innerHTML = `<span style="text-decoration:line-through;color:var(--muted);font-size:0.9rem;margin-right:8px;">৳${basePrice}</span>৳${Math.round(finalCalculatedPrice)}`;
-          msgBox.textContent = `Success! ${discountPercentage}% off applied.`;
-          msgBox.style.color = '#00e599';
-        } else {
-          msgBox.textContent = 'Invalid or expired coupon code.';
-          msgBox.style.color = '#ff4d8d';
-          finalCalculatedPrice = basePrice; // Reset to original base price if invalid
-          priceDisplay.textContent = `৳${basePrice}`;
-        }
-      });
-    }
-
-    // ══════════ PAYMENT SUBMISSION LOGIC ══════════
+    // Purchase Submission Logic
     const confirmBtn = document.getElementById('modalConfirm');
     if (confirmBtn) {
       // Clone & replace to prevent double-firing
@@ -1586,11 +1509,11 @@ window.addEventListener('storage', (e) => {
           return;
         }
 
-        // Create the purchase object using the correctly calculated final price
+        // Create the purchase object (No coupons, so price is just basePrice)
         const purchase = {
           courseId: activeCourse.id,
           courseTitle: activeCourse.title,
-          price: finalCalculatedPrice, 
+          price: basePrice, 
           whatsappLink: activeCourse.whatsapp || '',
           paymentMethod: paymentMethod,
           senderNumber: senderNumber,
@@ -1605,7 +1528,6 @@ window.addEventListener('storage', (e) => {
         localStorage.setItem('purchases', JSON.stringify(purchases));
 
         newConfirmBtn.textContent = 'Processing...';
-        
         setTimeout(() => {
           closeCheckoutModal();
           newConfirmBtn.textContent = 'Submit Payment';
@@ -1809,16 +1731,7 @@ window.addEventListener('storage', (e) => {
         <span id="modalCoursePrice" style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; color:var(--accent); margin:0;">৳2,500</span>
       </div>
 
-      <div style="margin-bottom: 20px;">
-        <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted); display:block;">Have a Coupon?</label>
-        <div style="display: flex; gap: 8px;">
-          <input type="text" id="couponInput" class="feedback-input" placeholder="Enter code" style="padding: 10px 14px; margin: 0; background:var(--surface2); flex: 1;">
-          <button id="applyCouponBtn" class="btn btn-outline" style="padding: 10px 16px; margin: 0; height: auto;">Apply</button>
-        </div>
-        <div id="couponMessage" style="font-size: 0.85rem; margin-top: 6px; min-height: 18px; font-weight: 500;"></div>
-      </div>
-
-     <div id="paymentInstructionsPanel" style="background: rgba(123,92,255,0.08); border: 1px solid rgba(123,92,255,0.2); padding: 16px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
+      <div id="paymentInstructionsPanel" style="background: rgba(123,92,255,0.08); border: 1px solid rgba(123,92,255,0.2); padding: 16px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
         <p style="color: var(--text); font-size: 1.1rem; margin-bottom: 12px;">
           <strong style="color: #00e5ff; font-size: 1.3rem; letter-spacing: 0.5px;">Send Money to : 01302201431</strong>
         </p>
@@ -1840,17 +1753,6 @@ window.addEventListener('storage', (e) => {
             <option value="nagad">Nagad</option>
             <option value="rocket">Rocket</option>
             <option value="upay">Upay</option>
-          </select>
-        </div>
-
-      <div id="paymentDetailsForm" style="display: none; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px;">
-        <div class="form-group" style="margin-bottom: 16px;">
-          <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Payment Method *</label>
-          <select id="paymentMethod" class="feedback-input" style="padding: 12px; margin: 0; background:var(--surface2);">
-            <option value="">Select method...</option>
-            <option value="bkash">bKash</option>
-            <option value="nagad">Nagad</option>
-            <option value="rocket">Rocket</option>
           </select>
         </div>
         

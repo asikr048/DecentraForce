@@ -1618,70 +1618,57 @@ function getCourseButton(course, type) {
 <div class="modal-overlay" id="checkoutModal">
   <div class="modal">
     <div class="modal-header">
-      <h3>Complete Your Purchase</h3>
+      <h3>Complete Purchase</h3>
       <button class="modal-close" id="modalClose">&times;</button>
     </div>
     <div class="modal-body">
-      <div class="course-info-section">
-        <h4 class="modal-course-title" id="modalCourseTitle">Course Title</h4>
-        <p class="modal-course-desc" id="modalCourseDescription">Course description will appear here.</p>
-        <div class="price-section">
-          <div class="original-price" id="modalOriginalPrice">৳99</div>
-          <div class="final-price">
-            <span class="final-price-label">Final Price:</span>
-            <span class="final-price-amount" id="modalFinalPrice">৳99</span>
-          </div>
-        </div>
+      <h4 id="modalCourseTitle" style="font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; color:var(--text); margin-bottom:4px;">Course Title</h4>
+      <p id="modalCourseDesc" style="color:var(--muted); font-size:0.85rem; line-height:1.5; margin-bottom:16px;">Course description will appear here.</p>
+      
+      <div style="background: rgba(0,229,255,0.05); border: 1px solid rgba(0,229,255,0.1); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+        <span style="color: var(--muted); font-size: 0.9rem; font-weight: 500;">Total Price:</span>
+        <span id="modalCoursePrice" style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; color:var(--accent); margin:0;">৳2,500</span>
       </div>
 
-      <div class="coupon-section">
-        <label for="couponInput">Apply Coupon Code</label>
-        <div class="coupon-input-group">
-          <input type="text" id="couponInput" placeholder="Enter coupon code">
-          <button class="btn-coupon" id="applyCouponBtn">Apply</button>
+      <div id="paymentInstructionsPanel" style="background: rgba(123,92,255,0.08); border: 1px solid rgba(123,92,255,0.2); padding: 16px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
+        <p style="color: var(--text); font-size: 1.1rem; margin-bottom: 12px;">
+          <strong style="color: #00e5ff; font-size: 1.3rem; letter-spacing: 0.5px;">Send Money to : 01302201431</strong>
+        </p>
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px;">
+          <span style="padding: 4px 12px; background: rgba(226,19,110,0.15); color: #e2136e; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">bKash</span>
+          <span style="padding: 4px 12px; background: rgba(240,101,34,0.15); color: #f06522; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">Nagad</span>
+          <span style="padding: 4px 12px; background: rgba(140,52,148,0.15); color: #8c3494; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">Rocket</span>
+          <span style="padding: 4px 12px; background: rgba(0,166,81,0.15); color: #00a651; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">Upay</span>
         </div>
-        <div class="coupon-message" id="couponMessage"></div>
+        <button id="sentMoneyBtn" class="btn btn-primary" style="width: 100%; font-size: 1rem; padding: 12px; border-radius: 10px;">I have sent the money</button>
       </div>
 
-   <div class="payment-instructions">
-        <h5>Payment Instruction</h5>
-        <div class="instructions-content">
-          <p><strong>Send Money to +8801302201431 via bKash, Nagad, Rocket, or Upay</strong></p>
-          <div class="payment-methods">
-            <span class="payment-method-tag">bKash</span>
-            <span class="payment-method-tag">Nagad</span>
-            <span class="payment-method-tag">Rocket</span>
-            <span class="payment-method-tag">Upay</span>
-          </div>
-          <p class="instruction-note">After sending the money, confirm your payment by providing your Sender Number and Transaction ID below to instantly join the Course WhatsApp Group.</p>
-        </div>
-      </div>
-
-      <div class="payment-details-form">
-        <h5>Payment Details</h5>
-        <div class="form-group">
-          <label for="paymentMethod">Payment Method *</label>
-          <select id="paymentMethod" required>
-            <option value="">Select payment method</option>
+      <div id="paymentDetailsForm" style="display: none; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px;">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Payment Method *</label>
+          <select id="paymentMethod" class="feedback-input" style="padding: 12px; margin: 0; background:var(--surface2);">
+            <option value="">Select method...</option>
             <option value="bkash">bKash</option>
             <option value="nagad">Nagad</option>
             <option value="rocket">Rocket</option>
             <option value="upay">Upay</option>
           </select>
         </div>
-        <div class="form-group">
-          <label for="senderNumber">Sender Mobile Number *</label>
-          <input type="tel" id="senderNumber" placeholder="+8801XXXXXXXXX" required>
+        
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Sender Number *</label>
+          <input type="text" id="senderNumber" class="feedback-input" placeholder="01XXXXXXXXX" style="padding: 12px; margin: 0; background:var(--surface2);">
         </div>
-        <div class="form-group">
-          <label for="transactionId">Transaction ID *</label>
-          <input type="text" id="transactionId" placeholder="Enter transaction ID" required>
+        
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Transaction ID *</label>
+          <input type="text" id="transactionId" class="feedback-input" placeholder="TrxID" style="padding: 12px; margin: 0; background:var(--surface2);">
         </div>
       </div>
 
-      <div class="modal-actions">
-        <button class="btn btn-ghost" id="modalCancel">Cancel</button>
-        <button class="btn btn-success" id="modalConfirm">Submit Payment Details</button>
+      <div class="modal-actions" id="modalActionButtons" style="display: none;">
+        <button class="btn btn-ghost" id="modalCancel2">Cancel</button>
+        <button class="btn btn-success" id="modalConfirm">Submit Payment</button>
       </div>
     </div>
   </div>
