@@ -1266,36 +1266,38 @@
     }
   }
 
-  function getCourseButton(course, type) {
+function getCourseButton(course, type) {
+
+  
     const courseId = course.id || '';
     const whatsapp = course.whatsapp || '';
-    const status = course.status || 'upcoming';
-    
-    // WhatsApp group link takes priority
-    if (whatsapp) {
-      return `<a href="${escapeHtml(whatsapp)}" target="_blank" class="continue-btn">Join Group</a>`;
-    }
-    
+    const status = course.status || 'ongoing'; // Default to ongoing so it's purchasable
+
     // Determine button based on course type
     if (type === 'Purchased') {
-      return `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">▶ Continue</button>`;
+      // If they already own it, let them continue AND show the WhatsApp link
+      let buttons = `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">▶ Continue</button>`;
+      if (whatsapp) {
+        buttons += `<a href="${escapeHtml(whatsapp)}" target="_blank" class="continue-btn" style="margin-left:8px; background:#25D366; color:white; border:none; box-shadow:0 0 10px rgba(37,211,102,0.3);">WhatsApp</a>`;
+      }
+      return `<div style="display:flex; justify-content:flex-end;">${buttons}</div>`;
+      
     } else if (type === 'Free') {
       return `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">🎓 Enroll Now</button>`;
-    } else { // Available (paid courses)
-      // Show "Buy Now" only if status = Ongoing
+      
+    } else { 
+      // Available (Paid Courses) -> Must click "Purchase"
       if (status === 'ongoing') {
-        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer">Buy Now</button>`;
+        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer;">Purchase</button>`;
       } else if (status === 'completed') {
         return `<span class="continue-btn disabled" style="cursor:default; opacity:0.6">Closed</span>`;
       } else if (status === 'upcoming') {
         return `<span class="continue-btn secondary" style="cursor:default; opacity:0.8">Coming Soon</span>`;
       } else {
-        // Default fallback
-        return `<span class="continue-btn" style="cursor:default">Not Available</span>`;
+        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer;">Purchase</button>`;
       }
     }
   }
-
   // Safe course content opening with validation
   function openCourseContent(courseId, courseTitle = '') {
     if (!courseId) {
