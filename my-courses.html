@@ -1301,11 +1301,13 @@ function renderCourses() {
     }
   }
 
-  function getCourseButton(course, type, isPending) {
+function getCourseButton(course, type, isPending) {
     const courseId = course.id || '';
     const whatsapp = course.whatsapp || '';
+    const status = course.status || 'ongoing'; // Default to ongoing
 
-    if (type === 'Enrolled') {
+    // Determine button based on course type
+    if (type === 'Enrolled' || type === 'Purchased') {
       let buttons = `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">▶ Continue</button>`;
       if (whatsapp) {
         buttons += `<a href="${escapeHtml(whatsapp)}" target="_blank" class="continue-btn" style="margin-left:8px; background:#25D366; color:white; border:none; box-shadow:0 0 10px rgba(37,211,102,0.3);">WhatsApp</a>`;
@@ -1313,49 +1315,28 @@ function renderCourses() {
       return `<div style="display:flex; justify-content:flex-end;">${buttons}</div>`;
       
     } else if (type === 'Free') {
+      // Free courses render the Enroll Now button
       return `<button class="continue-btn enroll-free-btn" data-course-id="${courseId}" style="cursor:pointer">🎓 Enroll Now</button>`;
       
     } else if (type === 'Premium') {
+      // Premium Paid Courses handling
       if (isPending) {
         return `<span class="continue-btn disabled" style="cursor:default; opacity:0.8; background:#fbbf24; color:#000;">⏳ Pending Approval</span>`;
       } else {
-        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer;">Purchase</button>`;
+        if (status === 'completed') {
+          return `<span class="continue-btn disabled" style="cursor:default; opacity:0.6">Closed</span>`;
+        } else if (status === 'upcoming') {
+          return `<span class="continue-btn secondary" style="cursor:default; opacity:0.8">Coming Soon</span>`;
+        } else {
+          return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer;">Purchase</button>`;
+        }
       }
     }
+    return '';
   }
-
-function getCourseButton(course, type) {
-
-
-    const courseId = course.id || '';
-    const whatsapp = course.whatsapp || '';
-    const status = course.status || 'ongoing'; // Default to ongoing so it's purchasable
-
-    // Determine button based on course type
-    if (type === 'Purchased') {
-      // If they already own it, let them continue AND show the WhatsApp link
-      let buttons = `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">▶ Continue</button>`;
-      if (whatsapp) {
-        buttons += `<a href="${escapeHtml(whatsapp)}" target="_blank" class="continue-btn" style="margin-left:8px; background:#25D366; color:white; border:none; box-shadow:0 0 10px rgba(37,211,102,0.3);">WhatsApp</a>`;
-      }
-      return `<div style="display:flex; justify-content:flex-end;">${buttons}</div>`;
-      
-    } else if (type === 'Free') {
-      return `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">🎓 Enroll Now</button>`;
-      
-    } else { 
-      // Available (Paid Courses) -> Must click "Purchase"
-      if (status === 'ongoing') {
-        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer;">Purchase</button>`;
-      } else if (status === 'completed') {
-        return `<span class="continue-btn disabled" style="cursor:default; opacity:0.6">Closed</span>`;
-      } else if (status === 'upcoming') {
-        return `<span class="continue-btn secondary" style="cursor:default; opacity:0.8">Coming Soon</span>`;
-      } else {
-        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer;">Purchase</button>`;
-      }
-    }
-  }
+  
+  
+  
   // Safe course content opening with validation
   function openCourseContent(courseId, courseTitle = '') {
     if (!courseId) {
