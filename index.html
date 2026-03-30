@@ -1419,7 +1419,7 @@ window.addEventListener('storage', (e) => {
         });
       });
     }
-// Modal functions
+// Modal functions// Modal functions
     let activeCourse = null; 
     let finalCalculatedPrice = 0; 
     let basePrice = 0; // Tracks the starting price before coupons
@@ -1495,10 +1495,14 @@ window.addEventListener('storage', (e) => {
       });
     }
 
-    // FIXED Strict Coupon Logic
+    // UNIFIED & FIXED Strict Coupon Logic
     const applyCouponBtn = document.getElementById('applyCouponBtn');
     if (applyCouponBtn) {
-      applyCouponBtn.addEventListener('click', (e) => {
+      // Remove any existing duplicate listeners by cloning and replacing (failsafe)
+      const newApplyBtn = applyCouponBtn.cloneNode(true);
+      applyCouponBtn.parentNode.replaceChild(newApplyBtn, applyCouponBtn);
+      
+      newApplyBtn.addEventListener('click', async (e) => {
         e.preventDefault();
         const code = document.getElementById('couponInput').value.trim().toUpperCase();
         const msgBox = document.getElementById('couponMessage');
@@ -1510,34 +1514,66 @@ window.addEventListener('storage', (e) => {
           return;
         }
 
-        let coupons = [];
-        try { coupons = JSON.parse(localStorage.getItem('coupons') || '[]'); } catch(e){}
+        // Try to fetch from API first (if connected to DB), fallback to localStorage (Admin panel)
+        let discountPercentage = 0;
+        let isSuccess = false;
 
-        const matchedCoupon = coupons.find(c => String(c.code).toUpperCase() === code);
-        
-        if (matchedCoupon) {
-          // Exact Math based on Admin Panel setting applied to basePrice
-          const discountPercentage = parseFloat(matchedCoupon.discount);
+        try {
+          const res = await fetch('/api/_public/verify-coupon', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code })
+          });
+          const data = await res.json();
+          if (data.success) {
+            discountPercentage = data.discount;
+            isSuccess = true;
+          }
+        } catch (err) {
+          // Silent catch to allow localStorage fallback
+        }
+
+        // Fallback to localStorage if API verification fails
+        if (!isSuccess) {
+           let coupons = [];
+           try { coupons = JSON.parse(localStorage.getItem('coupons') || '[]'); } catch(err){}
+           const matchedCoupon = coupons.find(c => String(c.code).toUpperCase() === code);
+           
+           if (matchedCoupon) {
+             discountPercentage = parseFloat(matchedCoupon.discount);
+             isSuccess = true;
+           } else if (code === 'DF20') { // Hardcoded test coupon
+             discountPercentage = 20;
+             isSuccess = true;
+           }
+        }
+
+        if (isSuccess) {
+          // Exact Math applied safely to basePrice
           const discountAmt = basePrice * (discountPercentage / 100);
           finalCalculatedPrice = basePrice - discountAmt;
           
-          // Visual Update: Show old price crossed out, new price highlighted
+          // Visual Update: Show old price crossed out, new price highlighted properly
           priceDisplay.innerHTML = `<span style="text-decoration:line-through;color:var(--muted);font-size:0.9rem;margin-right:8px;">৳${basePrice}</span>৳${finalCalculatedPrice.toFixed(0)}`;
           msgBox.textContent = `Success! ${discountPercentage}% off applied.`;
           msgBox.style.color = '#00e599';
         } else {
           msgBox.textContent = 'Invalid or expired coupon code.';
           msgBox.style.color = '#ff4d8d';
-          finalCalculatedPrice = basePrice; 
+          finalCalculatedPrice = basePrice; // Reset to original if invalid
           priceDisplay.textContent = `৳${basePrice}`;
         }
       });
     }
 
-    // Purchase Submission Logic
+    // UNIFIED Purchase Submission Logic
     const confirmBtn = document.getElementById('modalConfirm');
     if (confirmBtn) {
-      confirmBtn.addEventListener('click', (e) => {
+      // Clone & replace to remove duplicate listeners
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+      newConfirmBtn.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopImmediatePropagation();
 
@@ -1550,6 +1586,7 @@ window.addEventListener('storage', (e) => {
           return;
         }
 
+        // Create the purchase object using the correctly calculated final price
         const purchase = {
           courseId: activeCourse.id,
           courseTitle: activeCourse.title,
@@ -1567,10 +1604,10 @@ window.addEventListener('storage', (e) => {
         purchases.push(purchase);
         localStorage.setItem('purchases', JSON.stringify(purchases));
 
-        confirmBtn.textContent = 'Processing...';
+        newConfirmBtn.textContent = 'Processing...';
         setTimeout(() => {
           closeCheckoutModal();
-          confirmBtn.textContent = 'Submit Payment';
+          newConfirmBtn.textContent = 'Submit Payment';
           
           if (purchase.whatsappLink) {
             window.open(purchase.whatsappLink, '_blank'); 
