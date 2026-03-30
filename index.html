@@ -300,58 +300,86 @@
   /* ══════════ STATS BAR ══════════ */
   .stats-bar {
     position: relative; z-index: 1;
-    background: var(--surface);
+    background: linear-gradient(90deg, rgba(13,22,48,.8), rgba(8,15,34,.95));
     border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-    padding: 28px 5%;
-    display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px;
+    border-bottom: 1px solid rgba(0,229,255,.1);
+    padding: 32px 5%;
+    display: flex; justify-content: space-around; flex-wrap: wrap; gap: 24px;
     animation: fadeUp .9s .3s cubic-bezier(.16,1,.3,1) both;
+    backdrop-filter: blur(10px);
   }
 
-  .stat-item { text-align: center; }
-  .stat-num {
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem;
-    background: linear-gradient(90deg, var(--accent), var(--accent2));
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  .stat-item {
+    text-align: center; position: relative; padding: 0 24px;
   }
-  .stat-label { font-size: .8rem; color: var(--muted); font-weight: 400; margin-top: 2px; }
+  .stat-item:not(:last-child)::after {
+    content: ''; position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+    width: 1px; height: 32px;
+    background: linear-gradient(180deg, transparent, var(--border), transparent);
+  }
+  .stat-num {
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 2rem;
+    background: linear-gradient(135deg, var(--accent), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 0 12px rgba(0,229,255,.2));
+  }
+  .stat-label { font-size: .8rem; color: var(--muted); font-weight: 500; margin-top: 4px; letter-spacing: .03em; }
 
   /* ══════════ COURSES ══════════ */
   section { position: relative; z-index: 1; padding: 90px 5%; }
 
   .section-header { text-align: center; margin-bottom: 56px; }
   .section-tag {
-    display: inline-block;
-    background: rgba(123,92,255,.12); border: 1px solid rgba(123,92,255,.25);
-    color: var(--accent2); font-size: .75rem; font-weight: 600;
-    letter-spacing: .1em; text-transform: uppercase; padding: 5px 14px;
-    border-radius: 100px; margin-bottom: 14px;
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(0,229,255,.07); border: 1px solid rgba(0,229,255,.2);
+    color: var(--accent); font-size: .75rem; font-weight: 700;
+    letter-spacing: .1em; text-transform: uppercase; padding: 6px 16px;
+    border-radius: 100px; margin-bottom: 18px;
+    box-shadow: 0 0 20px rgba(0,229,255,.07);
   }
+  .section-tag::before {
+    content: ''; width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0;
+    background: var(--accent); box-shadow: 0 0 8px var(--accent);
+    animation: tagPulse 2s ease-in-out infinite;
+  }
+  @keyframes tagPulse { 0%,100%{opacity:1;} 50%{opacity:.35;} }
   .section-header h2 {
     font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    letter-spacing: -.03em; margin-bottom: 12px;
+    font-size: clamp(1.9rem, 3.8vw, 3rem);
+    letter-spacing: -.03em; margin-bottom: 14px; line-height: 1.1;
+    background: linear-gradient(160deg, #e8eeff 30%, #7d8fb3 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
   }
-  .section-header h2 em { font-style: normal; color: var(--accent); }
-  .section-header p { color: var(--muted); font-size: 1rem; max-width: 480px; margin: 0 auto; }
+  .section-header h2 em {
+    font-style: normal;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+  }
+  .section-header p { color: var(--muted); font-size: 1rem; max-width: 480px; margin: 0 auto; line-height: 1.7; }
 
   .courses-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fill, minmax(285px, 1fr));
+    gap: 22px;
   }
 
   .course-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 16px; overflow: hidden;
-    transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
-    cursor: pointer;
+    border-radius: 18px; overflow: hidden;
+    transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s ease, border-color .3s ease;
+    cursor: pointer; position: relative;
   }
+  .course-card::before {
+    content:''; position:absolute; inset:0; border-radius:18px; z-index:0; pointer-events:none;
+    background: linear-gradient(135deg, rgba(123,92,255,.04), rgba(0,229,255,.04));
+    opacity:0; transition: opacity .3s;
+  }
+  .course-card:hover::before { opacity:1; }
   .course-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(0,229,255,.15);
-    border-color: rgba(0,229,255,.2);
+    transform: translateY(-8px) scale(1.01);
+    box-shadow: 0 28px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(0,229,255,.18);
+    border-color: rgba(0,229,255,.25);
   }
 
   .card-banner {
@@ -453,57 +481,63 @@
 
   /* ══════════ MENTORS ══════════ */
   .mentors-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-    gap: 20px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+    gap: 22px;
   }
   .mentor-card {
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: 16px; padding: 28px 20px; text-align: center;
-    transition: all .3s;
+    border-radius: 20px; padding: 36px 24px; text-align: center;
+    transition: all .35s cubic-bezier(.16,1,.3,1);
   }
   .mentor-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(0,229,255,.2);
-    box-shadow: 0 20px 50px rgba(0,0,0,.4);
+    transform: translateY(-8px);
+    border-color: rgba(0,229,255,.22);
+    box-shadow: 0 28px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(0,229,255,.1);
   }
   .mentor-avatar {
-    width: 72px; height: 72px; border-radius: 50%; margin: 0 auto 14px;
+    width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 18px;
     background: linear-gradient(135deg, var(--accent2), var(--accent));
     display: flex; align-items: center; justify-content: center;
-    font-size: 1.8rem; font-weight: 800; color: #fff;
-    border: 2px solid var(--border);
-    box-shadow: 0 0 24px rgba(123,92,255,.3);
+    font-size: 1.6rem; font-weight: 900; color: #fff;
+    border: 3px solid rgba(255,255,255,.07);
+    box-shadow: 0 0 0 4px rgba(123,92,255,.15), 0 8px 32px rgba(0,0,0,.4);
+    overflow: hidden; position: relative;
   }
-  .mentor-card h4 { font-family: 'Syne', sans-serif; font-weight: 700; margin-bottom: 4px; }
-  .mentor-card .role { font-size: .8rem; color: var(--accent); margin-bottom: 12px; }
-  .mentor-card .bio { font-size: .82rem; color: var(--muted); line-height: 1.6; margin-bottom: 14px; }
-  .mentor-socials { display: flex; justify-content: center; gap: 10px; }
+  .mentor-card h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.05rem; margin-bottom: 3px; }
+  .mentor-card .role { display: none; } /* replaced by .mentor-badge */
+  .mentor-card .bio { font-size: .82rem; color: var(--muted); line-height: 1.65; margin-bottom: 16px; }
+  .mentor-socials { display: flex; justify-content: center; gap: 8px; }
   .social-btn {
-    width: 30px; height: 30px; border-radius: 6px;
+    width: 32px; height: 32px; border-radius: 8px;
     background: var(--surface2); border: 1px solid var(--border);
     display: grid; place-items: center; font-size: .8rem; cursor: pointer;
     transition: all .2s; text-decoration: none; color: var(--muted);
   }
-  .social-btn:hover { color: var(--accent); border-color: rgba(0,229,255,.3); }
+  .social-btn:hover { color: var(--accent); border-color: rgba(0,229,255,.3); background: rgba(0,229,255,.06); transform: translateY(-1px); }
 
   /* ══════════ CTA ══════════ */
   .cta-section {
-    background: linear-gradient(135deg, rgba(123,92,255,.1), rgba(0,229,255,.06));
-    border: 1px solid var(--border);
-    border-radius: 24px; margin: 0 5% 80px;
-    padding: 70px; text-align: center; position: relative; overflow: hidden; z-index: 1;
+    background: linear-gradient(135deg, rgba(123,92,255,.12), rgba(0,229,255,.07));
+    border: 1px solid rgba(123,92,255,.25);
+    border-radius: 28px; margin: 0 5% 80px;
+    padding: 80px 5%; text-align: center; position: relative; overflow: hidden; z-index: 1;
   }
   .cta-section::before {
     content: ''; position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, rgba(123,92,255,.2), transparent 60%);
+    background: radial-gradient(ellipse at 50% -10%, rgba(123,92,255,.28), transparent 65%);
+  }
+  .cta-section::after {
+    content: ''; position: absolute; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 60%; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent2), transparent);
   }
   .cta-section h2 {
     font-family: 'Syne', sans-serif; font-weight: 800;
-    font-size: clamp(1.8rem, 3.5vw, 2.8rem);
-    letter-spacing: -.03em; margin-bottom: 16px;
+    font-size: clamp(1.9rem, 3.8vw, 3rem);
+    letter-spacing: -.03em; margin-bottom: 18px;
     position: relative;
   }
-  .cta-section p { color: var(--muted); font-size: 1rem; max-width: 480px; margin: 0 auto 32px; position: relative; }
+  .cta-section p { color: var(--muted); font-size: 1rem; max-width: 480px; margin: 0 auto 36px; position: relative; line-height: 1.7; }
   .cta-btns { display: flex; gap: 14px; justify-content: center; position: relative; }
 
   /* ══════════ FOOTER ══════════ */
@@ -666,14 +700,15 @@
   /* ══════════ FLOATING TESTIMONIAL MARQUEE ══════════ */
   .tmarquee-track {
     overflow: hidden;
-    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0%, #000 10%, #000 90%, transparent 100%);
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 8%, #000 92%, transparent 100%);
+    padding: 8px 0;
   }
   .tmarquee-inner {
     display: flex;
-    gap: 18px;
+    gap: 20px;
     width: max-content;
-    animation: marqueeScroll 44s linear infinite;
+    animation: marqueeScroll 50s linear infinite;
   }
   .tmarquee-inner:hover { animation-play-state: paused; }
 
@@ -683,16 +718,16 @@
   }
 
   .tcard {
-    width: 308px;
+    width: 320px;
     flex-shrink: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    padding: 20px 20px 16px;
-    box-shadow: 0 16px 48px rgba(0,0,0,.42);
+    background: linear-gradient(135deg, rgba(13,22,48,.9) 0%, rgba(17,29,58,.9) 100%);
+    border: 1px solid rgba(123,92,255,.15);
+    border-radius: 20px;
+    padding: 22px 22px 18px;
+    box-shadow: 0 12px 40px rgba(0,0,0,.5);
     position: relative;
     overflow: hidden;
-    transition: transform .25s, box-shadow .25s, border-color .25s;
+    transition: transform .3s cubic-bezier(.16,1,.3,1), box-shadow .3s ease, border-color .3s ease;
     cursor: default;
   }
   .tcard::before {
@@ -701,29 +736,28 @@
     background: linear-gradient(90deg, var(--accent2), var(--accent));
     opacity: 0; transition: opacity .3s;
   }
-  .tcard:hover { transform: translateY(-5px) scale(1.015); box-shadow: 0 28px 70px rgba(0,0,0,.55), 0 0 0 1px rgba(123,92,255,.25); border-color: rgba(123,92,255,.3); }
+  .tcard:hover { transform: translateY(-6px) scale(1.012); box-shadow: 0 28px 70px rgba(0,0,0,.6), 0 0 0 1px rgba(123,92,255,.3); border-color: rgba(123,92,255,.35); }
   .tcard:hover::before { opacity: 1; }
 
   .tcard-glow {
     position: absolute; top: -30px; right: -30px;
-    width: 100px; height: 100px; border-radius: 50%;
-    background: radial-gradient(circle, rgba(123,92,255,.2), transparent 70%);
+    width: 110px; height: 110px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(123,92,255,.18), transparent 70%);
     pointer-events: none;
   }
   .tcard-quote {
     font-family: 'Syne', sans-serif;
-    font-size: 3.5rem; line-height: .55;
-    color: var(--accent2); opacity: .35;
+    font-size: 4rem; line-height: .5;
+    color: var(--accent2); opacity: .3;
     font-weight: 900;
-    margin-bottom: 4px;
+    margin-bottom: 6px;
     display: block;
   }
   .tcard-text {
-    font-size: .84rem;
-    color: var(--text);
-    line-height: 1.7;
-    opacity: .9;
-    margin-bottom: 12px;
+    font-size: .85rem;
+    color: rgba(232,238,255,.88);
+    line-height: 1.72;
+    margin-bottom: 14px;
     display: -webkit-box;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
@@ -762,14 +796,25 @@
   .tcard-lang.english { background: rgba(0,229,255,.1); color: var(--accent); border:1px solid rgba(0,229,255,.2); }
 
   /* ══════════ MENTOR CARDS ══════════ */
-  .mentor-card { position: relative; overflow: hidden; }
+  .mentor-card { position: relative; overflow: hidden; text-align:center; padding: 32px 24px; }
+  .mentor-card::before {
+    content: ''; position: absolute; inset: 0; z-index: 0;
+    background: linear-gradient(135deg, rgba(123,92,255,.05) 0%, rgba(0,229,255,.05) 100%);
+    opacity: 0; transition: opacity .3s;
+  }
+  .mentor-card:hover::before { opacity: 1; }
   .mentor-card::after {
     content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
     background: linear-gradient(90deg, var(--accent2), var(--accent));
     opacity: 0; transition: opacity .3s;
   }
   .mentor-card:hover::after { opacity: 1; }
-  .mentor-name-en { font-size: .72rem; color: var(--muted); margin-top: 2px; margin-bottom: 8px; }
+  .mentor-card > * { position: relative; z-index: 1; }
+  .mentor-name-en { font-size: .75rem; color: var(--muted); margin-top: 2px; margin-bottom: 8px; letter-spacing: .03em; }
+  .mentor-badge {
+    display: inline-block; padding: 3px 10px; border-radius: 100px; font-size: .7rem; font-weight: 600;
+    background: rgba(0,229,255,.08); color: var(--accent); border: 1px solid rgba(0,229,255,.2); margin-bottom: 10px;
+  }
 
   /* ══════════ FLOATING FEEDBACK SYSTEM ══════════ */
   .feedback-button {
@@ -906,8 +951,7 @@
     
     <div class="avatar-wrapper" data-auth="protected" style="display: none;">
       <div class="avatar-btn" id="navAvatar" onclick="toggleDropdown(event)">
-        <svg id="navAvatarIcon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-        <span id="navAvatarText" style="display:none;font-size:.85rem;font-weight:800;"></span>
+        <span id="navAvatarText" style="font-size:.82rem;font-weight:800;letter-spacing:.5px;">??</span>
       </div>
       
       <div class="user-dropdown" id="userMenu">
@@ -1032,6 +1076,21 @@
   </div>
 </section>
 
+<!-- TESTIMONIALS SECTION -->
+<section id="testimonials-section" style="padding:80px 0;overflow:hidden;">
+  <div class="section-header" style="padding:0 5%;margin-bottom:48px;">
+    <div class="section-tag">Student Voices</div>
+    <h2>What Our <em>Learners Say</em></h2>
+    <p>Real feedback from our growing community of Web3 professionals across Bangladesh and beyond.</p>
+  </div>
+  <div class="tmarquee-track" style="margin-bottom:20px;">
+    <div class="tmarquee-inner" id="trow1"></div>
+  </div>
+  <div class="tmarquee-track" style="--dir:-1;">
+    <div class="tmarquee-inner" style="animation-direction:reverse;" id="trow2"></div>
+  </div>
+</section>
+
 <section style="background:rgba(13,22,48,.5);">
   <div class="section-header">
     <div class="section-tag">The Process</div>
@@ -1129,6 +1188,31 @@
 <script src="scripts/auth.js"></script>
 <script src="scripts/feedback.js"></script>
 <script src="scripts/floating-feedback.js" defer></script>
+<!-- SECTION ORDER CONTROL -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var DEFAULT_ORDER = ['courses','free-courses','testimonials-section','mentors-section'];
+  try {
+    var stored = localStorage.getItem('homepageSectionOrder');
+    var order = stored ? JSON.parse(stored) : DEFAULT_ORDER;
+    var main = document.querySelector('main') || document.body;
+    var sections = {};
+    order.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) sections[id] = el;
+    });
+    // Reference anchor — the how-it-works section
+    var anchor = document.querySelector('section[style*="rgba(13,22,48"]') || null;
+    order.forEach(function(id) {
+      var el = sections[id];
+      if (el && anchor && anchor.parentNode) {
+        anchor.parentNode.insertBefore(el, anchor);
+      }
+    });
+  } catch(e) {}
+});
+</script>
+
 <script>
 // ==================== DYNAMIC FOOTER RENDERING ====================
 
@@ -1451,10 +1535,14 @@ window.addEventListener('storage', (e) => {
     const emptyState = document.getElementById('mentors-empty');
     if (!container) return;
 
-    const mentors = getMentorsFromStorage();
+    const rawMentors = getMentorsFromStorage();
+    const mentors = rawMentors.sort((a,b) => {
+      const sa = (a.sequence_order != null) ? parseInt(a.sequence_order) : 9999;
+      const sb = (b.sequence_order != null) ? parseInt(b.sequence_order) : 9999;
+      return sa - sb;
+    });
     
     if (mentors.length === 0) {
-      // Show empty state
       if (emptyState) emptyState.style.display = 'block';
       container.innerHTML = `
         <div style="grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted)">
@@ -1466,49 +1554,48 @@ window.addEventListener('storage', (e) => {
       return;
     }
 
-    // Hide empty state
     if (emptyState) emptyState.style.display = 'none';
 
-    // Generate initials from name
+    const GRADIENTS = [
+      'linear-gradient(135deg,#7b5cff,#00e5ff)',
+      'linear-gradient(135deg,#ff4d8d,#7b5cff)',
+      'linear-gradient(135deg,#00e599,#00e5ff)',
+      'linear-gradient(135deg,#fbbf24,#ff4d8d)',
+      'linear-gradient(135deg,#0ea5e9,#7b5cff)',
+      'linear-gradient(135deg,#8b5cf6,#00e5ff)',
+      'linear-gradient(135deg,#ff7b5c,#fbbf24)',
+      'linear-gradient(135deg,#06b6d4,#3b82f6)'
+    ];
+
     function getInitials(name) {
-      return name.split(' ').map(word => word[0]).join('').toUpperCase().substring(0, 2);
+      return (name || 'M').split(/\s+/).map(w => w[0] || '').join('').toUpperCase().substring(0, 2);
     }
 
-    // Generate random gradient
-    function getRandomGradient() {
-      const gradients = [
-        'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-        'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-        'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-        'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-        'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-        'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
-        'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-        'linear-gradient(135deg, #ff9a9e 0%, #fad0c4 100%)'
-      ];
-      return gradients[Math.floor(Math.random() * gradients.length)];
-    }
-
-    const mentorsHTML = mentors.map(mentor => `
-      <div class="mentor-card">
-        <div class="mentor-avatar" style="background:${getRandomGradient()}">
-          ${mentor.imageUrl && mentor.imageUrl !== 'https://via.placeholder.com/150'
-            ? `<img src="${mentor.imageUrl}" alt="${mentor.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none'">`
-            : getInitials(mentor.name)}
+    container.innerHTML = mentors.map((mentor, index) => {
+      const gradient = GRADIENTS[index % GRADIENTS.length];
+      const hasRealImage = mentor.imageUrl && mentor.imageUrl !== 'https://via.placeholder.com/150' && !mentor.imageUrl.includes('ui-avatars.com');
+      const avatarContent = hasRealImage
+        ? `<img src="${mentor.imageUrl}" alt="${mentor.name}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
+        : '';
+      const initialsDiv = `<span style="position:${hasRealImage?'absolute':'relative'};${hasRealImage?'display:none;':''}inset:0;display:flex;align-items:center;justify-content:center;font-size:1.4rem;font-weight:900;color:#fff;">${getInitials(mentor.name)}</span>`;
+      
+      return `
+      <div class="mentor-card" style="cursor:default;">
+        <div class="mentor-avatar" style="background:${gradient};position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.35),0 0 0 3px rgba(255,255,255,.06);">
+          ${avatarContent}
+          ${initialsDiv}
         </div>
-        <h4>${mentor.name}</h4>
+        <h4 style="font-size:1.05rem;">${mentor.name}</h4>
         ${mentor.nameEn && mentor.nameEn !== mentor.name ? `<div class="mentor-name-en">${mentor.nameEn}</div>` : ''}
-        <div class="role">${mentor.title}</div>
+        <div class="mentor-badge">${mentor.title}</div>
         <p class="bio">${mentor.bio || 'Expert in blockchain technology with extensive industry experience.'}</p>
         <div class="mentor-socials">
-          <a href="${mentor.twitter || '#'}" class="social-btn" title="Twitter">𝕏</a>
-          <a href="${mentor.linkedin || '#'}" class="social-btn" title="LinkedIn">in</a>
-          <a href="${mentor.github || '#'}" class="social-btn" title="GitHub">⬡</a>
+          ${mentor.twitter && mentor.twitter !== '#' ? `<a href="${mentor.twitter}" class="social-btn" title="Twitter" target="_blank" rel="noopener">𝕏</a>` : `<span class="social-btn" style="opacity:.3" title="Twitter">𝕏</span>`}
+          ${mentor.linkedin && mentor.linkedin !== '#' ? `<a href="${mentor.linkedin}" class="social-btn" title="LinkedIn" target="_blank" rel="noopener">in</a>` : `<span class="social-btn" style="opacity:.3" title="LinkedIn">in</span>`}
+          ${mentor.github && mentor.github !== '#' ? `<a href="${mentor.github}" class="social-btn" title="GitHub" target="_blank" rel="noopener">⬡</a>` : `<span class="social-btn" style="opacity:.3" title="GitHub">⬡</span>`}
         </div>
       </div>
-    `).join('');
-
-    container.innerHTML = mentorsHTML;
+    `}).join('');
   }
 
   // Initialize mentors section

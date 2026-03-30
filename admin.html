@@ -160,6 +160,10 @@
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
         FOOTER SETTINGS
       </button>
+      <button onclick="showTab('section-order')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="section-order">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+        SECTION ORDER
+      </button>
       <button onclick="showTab('assignments')" class="tab-btn w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="assignments">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
         ASSIGNMENTS
@@ -375,6 +379,70 @@
           <button type="button" onclick="saveCourse()" class="btn-gold w-full py-4 rounded-lg text-sm tracking-wider shadow-lg">
             ADD COURSE
           </button>
+        </div>
+      </div>
+
+      <!-- ══ SECTION ORDER TAB ══ -->
+      <div id="tab-section-order" class="hidden">
+        <h1 class="text-2xl font-bold text-white mb-2" style="font-family: 'Syne', sans-serif;">Homepage Section Order</h1>
+        <p class="text-muted mb-8 text-sm">Drag the sections below or use ↑↓ buttons to control the display order on the homepage. Changes take effect immediately.</p>
+
+        <div class="grid grid-cols-2 gap-8">
+          <!-- Homepage Sections -->
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"/></svg>
+              Homepage Section Sequence
+            </h2>
+            <p class="text-xs text-muted mb-4">Sections are saved in localStorage and applied on the homepage.</p>
+            <div id="sectionOrderList" class="space-y-2 mb-6"></div>
+            <div class="flex gap-3">
+              <button onclick="saveSectionOrder()" class="flex-1 bg-gradient-to-r from-accent2 to-accent text-white py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
+                💾 Save Section Order
+              </button>
+              <button onclick="resetSectionOrder()" class="px-4 bg-surface2 border border-border text-muted rounded-lg text-sm hover:text-white transition-colors">
+                Reset
+              </button>
+            </div>
+          </div>
+
+          <!-- Course Sequence -->
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+              Course Display Order
+            </h2>
+            <p class="text-xs text-muted mb-4">Reorder courses in localStorage. Also editable per-course via sequence_order.</p>
+            <div id="courseOrderList" class="space-y-2 mb-6 max-h-72 overflow-y-auto pr-1"></div>
+            <button onclick="saveCourseOrder()" class="w-full bg-gradient-to-r from-accent2 to-accent text-white py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
+              💾 Save Course Order
+            </button>
+          </div>
+        </div>
+
+        <!-- Mentor & Feedback quick-reorder -->
+        <div class="grid grid-cols-2 gap-8 mt-8">
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              Mentor Display Order
+            </h2>
+            <div id="mentorOrderList" class="space-y-2 mb-4 max-h-64 overflow-y-auto pr-1"></div>
+            <button onclick="saveMentorOrder()" class="w-full bg-gradient-to-r from-accent2 to-accent text-white py-2.5 rounded-lg font-bold text-sm hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
+              💾 Save Mentor Order
+            </button>
+          </div>
+
+          <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+            <h2 class="text-lg font-semibold text-white mb-4 flex items-center gap-3">
+              <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+              Feedback Display Order
+            </h2>
+            <div id="feedbackOrderList" class="space-y-2 mb-4 max-h-64 overflow-y-auto pr-1"></div>
+            <button onclick="saveFeedbackOrder()" class="w-full bg-gradient-to-r from-accent2 to-accent text-white py-2.5 rounded-lg font-bold text-sm hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
+              💾 Save Feedback Order
+            </button>
+          </div>
         </div>
       </div>
 
@@ -600,65 +668,74 @@
           <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
             <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
               <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-              Add New Feedback
+              <span id="fbFormTitle">Add New Feedback</span>
             </h2>
-
-            <div class="space-y-6">
+            <input type="hidden" id="feedbackEditId">
+            <div class="space-y-4">
               <div>
-                <label class="block text-sm font-medium text-white mb-2">Student Name</label>
-                <input type="text" id="feedbackName" placeholder="e.g., John Doe" class="admin-input">
+                <label class="block text-sm font-medium text-white mb-2">Student Name <span style="color:var(--accent3)">*</span></label>
+                <input type="text" id="feedbackName" placeholder="e.g., আহমেদ রহমান / Ahmed Rahman" class="admin-input w-full">
               </div>
-
               <div>
-                <label class="block text-sm font-medium text-white mb-2">Feedback Text</label>
-                <textarea id="feedbackText" placeholder="What did the student say?" class="admin-input" rows="4"></textarea>
+                <label class="block text-sm font-medium text-white mb-2">Role / Title</label>
+                <input type="text" id="feedbackRole" placeholder="e.g., Web3 Developer / ব্লকচেইন ডেভেলপার" class="admin-input w-full">
               </div>
-
               <div>
-                <label class="block text-sm font-medium text-white mb-2">Language</label>
-                <select id="feedbackLanguage" class="admin-input">
-                  <option value="English">English</option>
-                  <option value="Bangla">Bangla</option>
-                </select>
+                <label class="block text-sm font-medium text-white mb-2">Feedback Text <span style="color:var(--accent3)">*</span></label>
+                <textarea id="feedbackText" placeholder="What did the student say?" class="admin-input w-full" rows="4"></textarea>
               </div>
-
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">Language</label>
+                  <select id="feedbackLanguage" class="admin-input w-full">
+                    <option value="English">English</option>
+                    <option value="Bangla">Bangla</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-white mb-2">Rating (1–5)</label>
+                  <select id="feedbackRating" class="admin-input w-full">
+                    <option value="5">★★★★★ (5)</option>
+                    <option value="4">★★★★☆ (4)</option>
+                    <option value="3">★★★☆☆ (3)</option>
+                    <option value="2">★★☆☆☆ (2)</option>
+                    <option value="1">★☆☆☆☆ (1)</option>
+                  </select>
+                </div>
+              </div>
               <div>
                 <label class="block text-sm font-medium text-white mb-2">Profile Image URL</label>
-                <input type="url" id="feedbackImageUrl" placeholder="https://example.com/avatar.jpg" class="admin-input">
+                <input type="url" id="feedbackImageUrl" placeholder="https://example.com/avatar.jpg" class="admin-input w-full">
                 <p class="text-xs text-muted mt-1">Leave empty for auto-generated avatar</p>
               </div>
-
-              <button onclick="addNewFeedback()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all mt-4">
-                Add Feedback
-              </button>
+              <div class="flex gap-3 pt-2">
+                <button onclick="addNewFeedback()" id="fbSubmitBtn" class="flex-1 bg-gradient-to-r from-accent2 to-accent text-white py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
+                  Add Feedback
+                </button>
+                <button onclick="resetFeedbackForm()" class="px-4 bg-surface2 border border-border text-muted rounded-lg text-sm hover:text-white transition-colors">
+                  Clear
+                </button>
+              </div>
             </div>
           </div>
 
           <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
             <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
               <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-              All Feedbacks
+              All Feedbacks <span class="text-muted text-sm font-normal ml-1">(drag ↕ to reorder)</span>
             </h2>
-
-            <div class="space-y-4">
-              <div class="flex items-center justify-between mb-4">
-                <p class="text-sm text-muted">Manage student testimonials</p>
-                <button onclick="refreshFeedbacks()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                  Refresh
-                </button>
-              </div>
-
-              <div id="feedbacksList" class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                <div class="text-center py-8 text-muted">
-                  <p class="text-sm">No feedbacks yet.</p>
-                  <p class="text-xs mt-1">Add your first feedback using the form on the left.</p>
-                </div>
-              </div>
-
-              <div class="text-xs text-muted border-t border-border pt-4 mt-4">
-                <p>Feedbacks are stored in localStorage and will appear on the homepage.</p>
-              </div>
+            <div class="flex items-center justify-between mb-4">
+              <p class="text-xs text-muted">Use ↑↓ to change display order on homepage</p>
+              <button onclick="refreshFeedbacks()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                Refresh
+              </button>
+            </div>
+            <div id="feedbacksList" class="space-y-2 max-h-96 overflow-y-auto pr-1">
+              <div class="text-center py-8 text-muted"><p class="text-sm">Loading...</p></div>
+            </div>
+            <div class="text-xs text-muted border-t border-border pt-4 mt-4">
+              <p>Feedbacks stored in localStorage · appear as marquee on homepage</p>
             </div>
           </div>
 
@@ -742,6 +819,10 @@ document.addEventListener('DOMContentLoaded', async () => {
   if (!ok) return;
   await Promise.all([loadUsers(), loadCourses()]);
   renderOverview();
+  // Initialize mock data for feedback and mentors
+  if (typeof initDefaultFeedbacks === 'function') initDefaultFeedbacks();
+  if (typeof initDefaultMentors === 'function') initDefaultMentors();
+  if (typeof initDefaultCourses === 'function') initDefaultCourses();
 });
 
 async function checkAdminAuth() {
@@ -771,12 +852,16 @@ async function logout() {
    TAB NAVIGATION
 ──────────────────────────────────────────────────────── */
 function showTab(name) {
-  ['overview','users','courses','add-course','coupons','purchases','feedback','mentors','footer','profile'].forEach(t => {
+  ['overview','users','courses','add-course','coupons','purchases','feedback','mentors','footer','section-order','profile','assignments'].forEach(t => {
     document.getElementById(`tab-${t}`)?.classList.add('hidden');
     document.querySelector(`[data-tab="${t}"]`)?.classList.remove('active');
   });
   document.getElementById(`tab-${name}`)?.classList.remove('hidden');
   document.querySelector(`[data-tab="${name}"]`)?.classList.add('active');
+  // Load data for relevant tabs
+  if (name === 'feedback') { if (typeof initDefaultFeedbacks === 'function') initDefaultFeedbacks(); renderFeedbacksList(); refreshUserFeedbacks(); }
+  if (name === 'mentors') { renderMentorsList(); }
+  if (name === 'section-order') { renderSectionOrderList(); renderCourseOrderList(); renderMentorOrderList(); renderFeedbackOrderList(); }
 }
 
 /* ────────────────────────────────────────────────────────
@@ -1020,30 +1105,79 @@ function renderCoursesGrid() {
               <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
                 <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
                   <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-                  Add New Mentor
+                  <span id="mentorFormTitle">Add New Mentor</span>
                 </h2>
-    
-                <div class="space-y-6">
-                  <div>
-                    <label class="block text-sm font-medium text-white mb-2">Mentor Name</label>
-                    <input type="text" id="mentorName" placeholder="e.g., John Doe" class="admin-input">
+                <input type="hidden" id="mentorEditId">
+                <div class="space-y-4">
+                  <div class="grid grid-cols-2 gap-3">
+                    <div>
+                      <label class="block text-sm font-medium text-white mb-2">Bangla Name <span style="color:var(--accent3)">*</span></label>
+                      <input type="text" id="mentorName" placeholder="e.g., রিফাত করিম" class="admin-input w-full">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-white mb-2">English Name</label>
+                      <input type="text" id="mentorNameEn" placeholder="e.g., Rifat Karim" class="admin-input w-full">
+                    </div>
                   </div>
-    
                   <div>
-                    <label class="block text-sm font-medium text-white mb-2">Title / Expertise</label>
-                    <input type="text" id="mentorTitle" placeholder="e.g., Senior Blockchain Developer" class="admin-input">
+                    <label class="block text-sm font-medium text-white mb-2">Title / Expertise <span style="color:var(--accent3)">*</span></label>
+                    <input type="text" id="mentorTitle" placeholder="e.g., Senior Blockchain Developer" class="admin-input w-full">
                   </div>
-    
                   <div>
-                    <label class="block text-sm font-medium text-white mb-2">Image URL</label>
-                    <input type="url" id="mentorImageUrl" placeholder="https://example.com/avatar.jpg" class="admin-input">
+                    <label class="block text-sm font-medium text-white mb-2">Bio</label>
+                    <textarea id="mentorBio" placeholder="Short bio about the mentor..." class="admin-input w-full" rows="3"></textarea>
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-white mb-2">Profile Image URL</label>
+                    <input type="url" id="mentorImageUrl" placeholder="https://example.com/avatar.jpg" class="admin-input w-full">
                     <p class="text-xs text-muted mt-1">Leave empty for auto-generated avatar</p>
                   </div>
-    
-                  <button onclick="addNewMentor()" class="bg-gradient-to-r from-accent2 to-accent text-white w-full py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all mt-4">
-                    Add Mentor
+                  <div class="grid grid-cols-3 gap-3">
+                    <div>
+                      <label class="block text-sm font-medium text-white mb-2">Twitter URL</label>
+                      <input type="url" id="mentorTwitter" placeholder="https://twitter.com/..." class="admin-input w-full">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-white mb-2">LinkedIn URL</label>
+                      <input type="url" id="mentorLinkedin" placeholder="https://linkedin.com/..." class="admin-input w-full">
+                    </div>
+                    <div>
+                      <label class="block text-sm font-medium text-white mb-2">GitHub URL</label>
+                      <input type="url" id="mentorGithub" placeholder="https://github.com/..." class="admin-input w-full">
+                    </div>
+                  </div>
+                  <div class="flex gap-3 pt-2">
+                    <button onclick="addNewMentor()" id="mentorSubmitBtn" class="flex-1 bg-gradient-to-r from-accent2 to-accent text-white py-3 rounded-lg font-bold hover:shadow-[0_0_15px_rgba(0,229,255,0.3)] transition-all">
+                      Add Mentor
+                    </button>
+                    <button onclick="resetMentorForm()" class="px-4 bg-surface2 border border-border text-muted rounded-lg text-sm hover:text-white transition-colors">
+                      Clear
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="bg-surface rounded-xl shadow-lg border border-border p-8">
+                <h2 class="text-lg font-semibold text-white mb-6 flex items-center gap-3">
+                  <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                  All Mentors <span class="text-muted text-sm font-normal ml-1">(↑↓ to reorder)</span>
+                </h2>
+                <div class="flex items-center justify-between mb-4">
+                  <p class="text-xs text-muted">Order controls the display on homepage</p>
+                  <button onclick="refreshMentors()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                    Refresh
                   </button>
                 </div>
+                <div id="mentorsList" class="space-y-2 max-h-[500px] overflow-y-auto pr-1">
+                  <div class="text-center py-8 text-muted"><p class="text-sm">Loading...</p></div>
+                </div>
+                <div class="text-xs text-muted border-t border-border pt-4 mt-4">
+                  <p>Mentors stored in localStorage · appear on homepage</p>
+                </div>
+              </div>
+            </div>
+          </div>
           
                 <div id="tab-footer" class="hidden">
                   <h1 class="text-2xl font-bold text-white mb-8" style="font-family: 'Syne', sans-serif;">Footer Settings</h1>
@@ -1138,30 +1272,6 @@ function renderCoursesGrid() {
                   <svg class="w-5 h-5 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                   All Mentors
                 </h2>
-    
-                <div class="space-y-4">
-                  <div class="flex items-center justify-between mb-4">
-                    <p class="text-sm text-muted">Manage mentors list</p>
-                    <button onclick="refreshMentors()" class="text-accent text-sm font-bold flex items-center gap-1 hover:underline">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
-                      Refresh
-                    </button>
-                  </div>
-    
-                  <div id="mentorsList" class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                    <div class="text-center py-8 text-muted">
-                      <p class="text-sm">No mentors yet.</p>
-                      <p class="text-xs mt-1">Add your first mentor using the form on the left.</p>
-                    </div>
-                  </div>
-    
-                  <div class="text-xs text-muted border-t border-border pt-4 mt-4">
-                    <p>Mentors are stored in localStorage with key "mentors" and will appear on the homepage.</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
     
         </div>
         <div class="flex gap-3">
@@ -1723,192 +1833,110 @@ function loadPurchases() {
 /* ────────────────────────────────────────────────────────
    FEEDBACK MANAGEMENT
 ──────────────────────────────────────────────────────── */
+/* ── FEEDBACK ADMIN FUNCTIONS ── */
 function addNewFeedback() {
+  const editId = document.getElementById('feedbackEditId').value;
   const name = document.getElementById('feedbackName').value.trim();
   const text = document.getElementById('feedbackText').value.trim();
   const language = document.getElementById('feedbackLanguage').value;
   const imageUrl = document.getElementById('feedbackImageUrl').value.trim();
+  const role = document.getElementById('feedbackRole').value.trim();
+  const rating = parseInt(document.getElementById('feedbackRating').value) || 5;
 
-  if (!name || !text) {
-    showToast('Name and feedback text are required', 'error');
-    return;
-  }
+  if (!name || !text) { showToast('Name and feedback text are required', 'error'); return; }
 
-  try {
-    // Use the function from feedback.js
-    if (typeof addFeedback === 'function') {
-      addFeedback({ name, text, language, imageUrl });
-      showToast('Feedback added successfully!', 'success');
-      
-      // Clear form
-      document.getElementById('feedbackName').value = '';
-      document.getElementById('feedbackText').value = '';
-      document.getElementById('feedbackLanguage').value = 'en';
-      document.getElementById('feedbackImageUrl').value = '';
-      
-      renderFeedbacksList();
-    } else {
-      showToast('Feedback functions not loaded. Please refresh the page.', 'error');
-    }
-  } catch (error) {
-    console.error('Error adding feedback:', error);
-    showToast('Failed to add feedback', 'error');
+  if (editId) {
+    updateFeedback(editId, { name, text, language, imageUrl, role, rating });
+    showToast('Feedback updated!', 'success');
+    resetFeedbackForm();
+  } else {
+    addFeedback({ name, text, language, imageUrl, role, rating });
+    showToast('Feedback added!', 'success');
+    resetFeedbackForm();
   }
+  renderFeedbacksList();
+}
+
+function resetFeedbackForm() {
+  document.getElementById('feedbackEditId').value = '';
+  document.getElementById('feedbackName').value = '';
+  document.getElementById('feedbackText').value = '';
+  document.getElementById('feedbackRole').value = '';
+  document.getElementById('feedbackLanguage').value = 'English';
+  document.getElementById('feedbackRating').value = '5';
+  document.getElementById('feedbackImageUrl').value = '';
+  document.getElementById('fbFormTitle').textContent = 'Add New Feedback';
+  document.getElementById('fbSubmitBtn').textContent = 'Add Feedback';
 }
 
 function renderFeedbacksList() {
-  try {
-    const feedbacks = getAllFeedbacks();
-    const container = document.getElementById('feedbacksList');
-    
-    if (!feedbacks || feedbacks.length === 0) {
-      container.innerHTML = `
-        <div class="text-center py-8 text-muted">
-          <p class="text-sm">No feedback entries yet.</p>
-          <p class="text-xs mt-1">Add your first feedback using the form on the left.</p>
-        </div>`;
-      return;
-    }
-
-    container.innerHTML = feedbacks.map(feedback => `
-      <div class="bg-surface2 border border-border rounded-lg p-4">
-        <div class="flex items-start gap-4">
-          <img src="${esc(feedback.imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(feedback.name)}&background=0D1630&color=00E5FF&bold=true`)}"
-               alt="${esc(feedback.name)}"
-               class="w-12 h-12 rounded-full object-cover border-2 border-accent">
-          <div class="flex-1">
-            <div class="flex items-center justify-between mb-2">
-              <div class="flex items-center gap-3">
-                <h4 class="font-bold text-white">${esc(feedback.name)}</h4>
-                <span class="badge ${feedback.language === 'bn' ? 'badge-blue' : 'badge-green'}">
-                  ${feedback.language === 'bn' ? 'Bangla' : 'English'}
-                </span>
-              </div>
-              <div class="flex items-center gap-2">
-                <button onclick="editFeedbackUI('${feedback.id}')" class="text-accent hover:text-accent2 text-sm font-bold flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
-                  Edit
-                </button>
-                <button onclick="deleteFeedbackUI('${feedback.id}')" class="text-red-400 hover:text-red-300 text-sm font-bold flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
-                  Delete
-                </button>
-              </div>
-            </div>
-            <p class="text-sm text-gray-300 mb-2">${esc(feedback.text)}</p>
-            <p class="text-xs text-muted">Added ${fmtDate(feedback.createdAt)}</p>
-          </div>
-        </div>
-      </div>
-    `).join('');
-  } catch (error) {
-    console.error('Error rendering feedbacks:', error);
-    const container = document.getElementById('feedbacksList');
-    container.innerHTML = `
-      <div class="text-center py-8 text-muted">
-        <p class="text-sm text-red-400">Error loading feedbacks</p>
-        <p class="text-xs mt-1">${esc(error.message)}</p>
-      </div>`;
+  if (typeof initDefaultFeedbacks === 'function') initDefaultFeedbacks();
+  const feedbacks = getAllFeedbacks();
+  const container = document.getElementById('feedbacksList');
+  if (!container) return;
+  if (!feedbacks.length) {
+    container.innerHTML = '<div class="text-center py-8 text-muted"><p class="text-sm">No feedbacks yet.</p></div>';
+    return;
   }
+  container.innerHTML = feedbacks.map((fb, idx) => `
+    <div class="flex items-center gap-2 bg-surface2 rounded-lg p-3 border border-border hover:border-accent/30 transition-colors">
+      <div class="flex flex-col gap-1">
+        <button onclick="adminMoveFeedback(${fb.id},'up')" class="text-muted hover:text-accent transition-colors p-0.5 ${idx===0?'opacity-30 pointer-events-none':''}" title="Move up">▲</button>
+        <button onclick="adminMoveFeedback(${fb.id},'down')" class="text-muted hover:text-accent transition-colors p-0.5 ${idx===feedbacks.length-1?'opacity-30 pointer-events-none':''}" title="Move down">▼</button>
+      </div>
+      <span class="text-xs text-muted w-5 text-center font-bold">${idx+1}</span>
+      <img src="${esc(fb.imageUrl||'')}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent((fb.name||'U').substring(0,2))}&background=7b5cff&color=fff&size=40&bold=true'" class="w-9 h-9 rounded-full object-cover flex-shrink-0">
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-semibold text-white truncate">${esc(fb.name)}</span>
+          <span class="text-xs px-1.5 py-0.5 rounded" style="background:${fb.language==='Bangla'?'rgba(0,229,153,.15)':'rgba(0,229,255,.1)'};color:${fb.language==='Bangla'?'#00e599':'var(--accent)'}">${fb.language||'English'}</span>
+        </div>
+        <p class="text-xs text-muted truncate">${esc(fb.role||'')} · ${'★'.repeat(fb.rating||5)}</p>
+      </div>
+      <div class="flex gap-1.5 flex-shrink-0">
+        <button onclick="editFeedbackUI(${fb.id})" class="text-accent hover:text-white p-1.5 rounded-md hover:bg-surface transition-colors" title="Edit">✏️</button>
+        <button onclick="deleteFeedbackUI(${fb.id})" class="text-red-400 hover:text-red-300 p-1.5 rounded-md hover:bg-surface transition-colors" title="Delete">🗑️</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function adminMoveFeedback(id, dir) {
+  if (typeof moveFeedback === 'function') { moveFeedback(id, dir); renderFeedbacksList(); }
 }
 
 function editFeedbackUI(id) {
-  const feedbacks = getAllFeedbacks();
-  const feedback = feedbacks.find(f => f.id === id);
-  
-  if (!feedback) {
-    showToast('Feedback not found', 'error');
-    return;
-  }
-
-  // Populate form with feedback data
-  document.getElementById('feedbackName').value = feedback.name;
-  document.getElementById('feedbackText').value = feedback.text;
-  document.getElementById('feedbackLanguage').value = feedback.language;
-  document.getElementById('feedbackImageUrl').value = feedback.imageUrl || '';
-  
-  // Change button to update mode
-  const form = document.querySelector('#tab-feedback form');
-  const submitBtn = form.querySelector('button[type="button"]');
-  submitBtn.textContent = 'Update Feedback';
-  submitBtn.onclick = function() { updateExistingFeedback(id); };
-  
-  showToast('Editing feedback. Update the fields and click "Update Feedback".', 'info');
-}
-
-function updateExistingFeedback(id) {
-  const name = document.getElementById('feedbackName').value.trim();
-  const text = document.getElementById('feedbackText').value.trim();
-  const language = document.getElementById('feedbackLanguage').value;
-  const imageUrl = document.getElementById('feedbackImageUrl').value.trim();
-
-  if (!name || !text) {
-    showToast('Name and feedback text are required', 'error');
-    return;
-  }
-
-  try {
-    if (typeof updateFeedback === 'function') {
-      updateFeedback(id, { name, text, language, imageUrl });
-      showToast('Feedback updated successfully!', 'success');
-      
-      // Reset form
-      document.getElementById('feedbackName').value = '';
-      document.getElementById('feedbackText').value = '';
-      document.getElementById('feedbackLanguage').value = 'en';
-      document.getElementById('feedbackImageUrl').value = '';
-      
-      // Reset button to add mode
-      const submitBtn = document.querySelector('#tab-feedback button[type="button"]');
-      submitBtn.textContent = 'Add Feedback';
-      submitBtn.onclick = addNewFeedback;
-      
-      renderFeedbacksList();
-    } else {
-      showToast('Update function not available', 'error');
-    }
-  } catch (error) {
-    console.error('Error updating feedback:', error);
-    showToast('Failed to update feedback', 'error');
-  }
+  const fb = getAllFeedbacks().find(f => f.id == id);
+  if (!fb) { showToast('Feedback not found', 'error'); return; }
+  document.getElementById('feedbackEditId').value = id;
+  document.getElementById('feedbackName').value = fb.name;
+  document.getElementById('feedbackText').value = fb.text;
+  document.getElementById('feedbackRole').value = fb.role || '';
+  document.getElementById('feedbackLanguage').value = fb.language || 'English';
+  document.getElementById('feedbackRating').value = fb.rating || 5;
+  document.getElementById('feedbackImageUrl').value = fb.imageUrl || '';
+  document.getElementById('fbFormTitle').textContent = 'Edit Feedback';
+  document.getElementById('fbSubmitBtn').textContent = 'Update Feedback';
+  showToast('Editing feedback — update fields and click Update.', 'info');
 }
 
 function deleteFeedbackUI(id) {
-  if (!confirm('Are you sure you want to delete this feedback?')) return;
-  
-  try {
-    if (typeof deleteFeedback === 'function') {
-      deleteFeedback(id);
-      showToast('Feedback deleted successfully', 'success');
-      renderFeedbacksList();
-    } else {
-      showToast('Delete function not available', 'error');
-    }
-  } catch (error) {
-    console.error('Error deleting feedback:', error);
-    showToast('Failed to delete feedback', 'error');
-  }
-}
-
-function refreshFeedbacks() {
+  if (!confirm('Delete this feedback?')) return;
+  deleteFeedback(id);
+  showToast('Feedback deleted', 'success');
   renderFeedbacksList();
-  showToast('Feedbacks list refreshed', 'info');
 }
 
-// User Feedback Inbox Functions
-function refreshUserFeedbacks() {
-  renderUserFeedbacksList();
-  showToast('User feedbacks refreshed', 'info');
-}
+function refreshFeedbacks() { renderFeedbacksList(); showToast('Refreshed', 'info'); }
+
+/* ── USER FEEDBACK INBOX ── */
+function refreshUserFeedbacks() { renderUserFeedbacksList(); }
 
 function renderUserFeedbacksList() {
   const container = document.getElementById('userFeedbacksList');
   const unreadCountEl = document.getElementById('unreadCount');
   const totalCountEl = document.getElementById('totalCount');
-  
   if (!container) return;
-  
-  // Check if FloatingFeedback functions are available
   if (typeof window.FloatingFeedback === 'undefined') {
     container.innerHTML = `
       <div class="text-center py-8 text-muted">
@@ -2078,180 +2106,245 @@ function initDefaultMentors() {
   console.log('Default mentors initialized');
 }
 
+/* ── MENTOR ADMIN FUNCTIONS ── */
 function addNewMentor() {
+  const editId = document.getElementById('mentorEditId').value;
   const name = document.getElementById('mentorName').value.trim();
+  const nameEn = document.getElementById('mentorNameEn').value.trim();
   const title = document.getElementById('mentorTitle').value.trim();
+  const bio = document.getElementById('mentorBio').value.trim();
   const imageUrl = document.getElementById('mentorImageUrl').value.trim();
+  const twitter = document.getElementById('mentorTwitter').value.trim() || '#';
+  const linkedin = document.getElementById('mentorLinkedin').value.trim() || '#';
+  const github = document.getElementById('mentorGithub').value.trim() || '#';
 
-  if (!name || !title) {
-    showToast('Name and Title/Expertise are required', 'error');
-    return;
-  }
+  if (!name || !title) { showToast('Name and Title are required', 'error'); return; }
 
   const mentors = getMentors();
-  const newMentor = {
-    id: Date.now().toString(),
-    name,
-    title,
-    imageUrl: imageUrl || 'https://via.placeholder.com/150',
-    createdAt: new Date().toISOString()
-  };
-
-  mentors.push(newMentor);
-  saveMentors(mentors);
-  
-  // Clear form
-  document.getElementById('mentorName').value = '';
-  document.getElementById('mentorTitle').value = '';
-  document.getElementById('mentorImageUrl').value = '';
-  
-  showToast('Mentor added successfully!', 'success');
+  if (editId) {
+    const idx = mentors.findIndex(m => String(m.id) === String(editId));
+    if (idx !== -1) {
+      mentors[idx] = { ...mentors[idx], name, nameEn, title, bio, imageUrl: imageUrl || mentors[idx].imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name.substring(0,2))}&background=7b5cff&color=fff&size=128&bold=true`, twitter, linkedin, github };
+      saveMentors(mentors);
+      showToast('Mentor updated!', 'success');
+    }
+  } else {
+    const newMentor = { id: Date.now(), name, nameEn, title, bio, imageUrl: imageUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(name.substring(0,2))}&background=7b5cff&color=fff&size=128&bold=true`, twitter, linkedin, github, createdAt: new Date().toISOString(), sequence_order: mentors.length };
+    mentors.push(newMentor);
+    saveMentors(mentors);
+    showToast('Mentor added!', 'success');
+  }
+  resetMentorForm();
   renderMentorsList();
+}
+
+function resetMentorForm() {
+  document.getElementById('mentorEditId').value = '';
+  document.getElementById('mentorName').value = '';
+  document.getElementById('mentorNameEn').value = '';
+  document.getElementById('mentorTitle').value = '';
+  document.getElementById('mentorBio').value = '';
+  document.getElementById('mentorImageUrl').value = '';
+  document.getElementById('mentorTwitter').value = '';
+  document.getElementById('mentorLinkedin').value = '';
+  document.getElementById('mentorGithub').value = '';
+  document.getElementById('mentorFormTitle').textContent = 'Add New Mentor';
+  document.getElementById('mentorSubmitBtn').textContent = 'Add Mentor';
 }
 
 function renderMentorsList() {
   const container = document.getElementById('mentorsList');
   if (!container) return;
-  
-  // Initialize default mentors if empty
   initDefaultMentors();
-  
-  const mentors = getMentors();
-  
-  if (mentors.length === 0) {
-    container.innerHTML = `
-      <div class="text-center py-8 text-muted">
-        <svg class="w-12 h-12 mx-auto mb-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
-        </svg>
-        <p class="text-sm">No mentors added yet.</p>
-        <p class="text-xs opacity-70 mt-1">Add your first mentor using the form on the left.</p>
-      </div>
-    `;
+  const mentors = getMentors().sort((a,b) => ((a.sequence_order??9999)-(b.sequence_order??9999)));
+  if (!mentors.length) {
+    container.innerHTML = '<div class="text-center py-8 text-muted"><p class="text-sm">No mentors yet.</p></div>';
     return;
   }
-  
-  container.innerHTML = mentors.map(mentor => `
-    <div class="bg-surface2 rounded-lg p-4 border border-border hover:border-accent/30 transition-colors">
-      <div class="flex items-start gap-4">
-        <div class="flex-shrink-0">
-          <img src="${mentor.imageUrl}" alt="${mentor.name}" class="w-14 h-14 rounded-full object-cover border-2 border-accent/20">
-        </div>
-        <div class="flex-1 min-w-0">
-          <div class="flex items-start justify-between">
-            <div>
-              <h4 class="font-semibold text-white truncate">${mentor.name}</h4>
-              <p class="text-sm text-muted mt-1">${mentor.title}</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <button onclick="editMentorUI('${mentor.id}')" class="text-accent hover:text-white transition-colors p-1" title="Edit">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
-                </svg>
-              </button>
-              <button onclick="deleteMentorUI('${mentor.id}')" class="text-red-400 hover:text-red-300 transition-colors p-1" title="Delete">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-                </svg>
-              </button>
-            </div>
-          </div>
-          <div class="mt-3 text-xs text-muted flex items-center gap-2">
-            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-            </svg>
-            <span>Added ${new Date(mentor.createdAt).toLocaleDateString()}</span>
-          </div>
-        </div>
+  container.innerHTML = mentors.map((m, idx) => `
+    <div class="flex items-center gap-2 bg-surface2 rounded-lg p-3 border border-border hover:border-accent/30 transition-colors">
+      <div class="flex flex-col gap-1">
+        <button onclick="adminMoveMentor(${m.id},'up')" class="text-muted hover:text-accent transition-colors p-0.5 ${idx===0?'opacity-30 pointer-events-none':''}" title="Move up">▲</button>
+        <button onclick="adminMoveMentor(${m.id},'down')" class="text-muted hover:text-accent transition-colors p-0.5 ${idx===mentors.length-1?'opacity-30 pointer-events-none':''}" title="Move down">▼</button>
+      </div>
+      <span class="text-xs text-muted w-5 text-center font-bold">${idx+1}</span>
+      <img src="${esc(m.imageUrl||'')}" onerror="this.src='https://ui-avatars.com/api/?name=${encodeURIComponent((m.name||'M').substring(0,2))}&background=7b5cff&color=fff&size=40&bold=true'" class="w-9 h-9 rounded-full object-cover flex-shrink-0 border border-accent/20">
+      <div class="flex-1 min-w-0">
+        <div class="font-semibold text-white text-sm truncate">${esc(m.name)}${m.nameEn&&m.nameEn!==m.name?` <span class="text-muted font-normal">(${esc(m.nameEn)})</span>`:''}</div>
+        <p class="text-xs text-muted truncate">${esc(m.title)}</p>
+      </div>
+      <div class="flex gap-1.5 flex-shrink-0">
+        <button onclick="editMentorUI(${m.id})" class="text-accent hover:text-white p-1.5 rounded-md hover:bg-surface transition-colors" title="Edit">✏️</button>
+        <button onclick="deleteMentorUI(${m.id})" class="text-red-400 hover:text-red-300 p-1.5 rounded-md hover:bg-surface transition-colors" title="Delete">🗑️</button>
       </div>
     </div>
   `).join('');
 }
 
-function editMentorUI(id) {
-  const mentors = getMentors();
-  const mentor = mentors.find(m => m.id === id);
-  
-  if (!mentor) {
-    showToast('Mentor not found', 'error');
-    return;
-  }
-
-  // Populate form with mentor data
-  document.getElementById('mentorName').value = mentor.name;
-  document.getElementById('mentorTitle').value = mentor.title;
-  document.getElementById('mentorImageUrl').value = mentor.imageUrl;
-  
-  // Change button to update mode
-  const form = document.querySelector('#tab-mentors form');
-  const submitBtn = form.querySelector('button[type="button"]');
-  submitBtn.textContent = 'Update Mentor';
-  submitBtn.onclick = function() { updateExistingMentor(id); };
-  
-  showToast('Editing mentor. Update the fields and click "Update Mentor".', 'info');
+function adminMoveMentor(id, dir) {
+  const mentors = getMentors().sort((a,b) => ((a.sequence_order??9999)-(b.sequence_order??9999)));
+  const idx = mentors.findIndex(m => m.id == id);
+  const swap = dir === 'up' ? idx-1 : idx+1;
+  if (swap < 0 || swap >= mentors.length) return;
+  [mentors[idx], mentors[swap]] = [mentors[swap], mentors[idx]];
+  mentors.forEach((m,i) => { m.sequence_order = i; });
+  saveMentors(mentors);
+  renderMentorsList();
 }
 
-function updateExistingMentor(id) {
-  const name = document.getElementById('mentorName').value.trim();
-  const title = document.getElementById('mentorTitle').value.trim();
-  const imageUrl = document.getElementById('mentorImageUrl').value.trim();
-
-  if (!name || !title) {
-    showToast('Name and Title/Expertise are required', 'error');
-    return;
-  }
-
-  const mentors = getMentors();
-  const index = mentors.findIndex(m => m.id === id);
-  
-  if (index === -1) {
-    showToast('Mentor not found', 'error');
-    return;
-  }
-  
-  mentors[index] = {
-    ...mentors[index],
-    name,
-    title,
-    imageUrl: imageUrl || 'https://via.placeholder.com/150'
-  };
-  
-  saveMentors(mentors);
-  showToast('Mentor updated successfully!', 'success');
-  
-  // Reset form
-  document.getElementById('mentorName').value = '';
-  document.getElementById('mentorTitle').value = '';
-  document.getElementById('mentorImageUrl').value = '';
-  
-  // Reset button to add mode
-  const submitBtn = document.querySelector('#tab-mentors button[type="button"]');
-  submitBtn.textContent = 'Add Mentor';
-  submitBtn.onclick = addNewMentor;
-  
-  renderMentorsList();
+function editMentorUI(id) {
+  const m = getMentors().find(m => m.id == id);
+  if (!m) { showToast('Mentor not found', 'error'); return; }
+  document.getElementById('mentorEditId').value = id;
+  document.getElementById('mentorName').value = m.name || '';
+  document.getElementById('mentorNameEn').value = m.nameEn || '';
+  document.getElementById('mentorTitle').value = m.title || '';
+  document.getElementById('mentorBio').value = m.bio || '';
+  document.getElementById('mentorImageUrl').value = m.imageUrl || '';
+  document.getElementById('mentorTwitter').value = m.twitter === '#' ? '' : (m.twitter||'');
+  document.getElementById('mentorLinkedin').value = m.linkedin === '#' ? '' : (m.linkedin||'');
+  document.getElementById('mentorGithub').value = m.github === '#' ? '' : (m.github||'');
+  document.getElementById('mentorFormTitle').textContent = 'Edit Mentor';
+  document.getElementById('mentorSubmitBtn').textContent = 'Update Mentor';
+  showToast('Editing mentor — update fields and click Update.', 'info');
 }
 
 function deleteMentorUI(id) {
-  if (!confirm('Are you sure you want to delete this mentor?')) return;
-  
-  const mentors = getMentors();
-  const filtered = mentors.filter(m => m.id !== id);
-  
-  if (filtered.length === mentors.length) {
-    showToast('Mentor not found', 'error');
-    return;
-  }
-  
-  saveMentors(filtered);
-  showToast('Mentor deleted successfully', 'success');
+  if (!confirm('Delete this mentor?')) return;
+  saveMentors(getMentors().filter(m => m.id != id));
+  showToast('Mentor deleted', 'success');
   renderMentorsList();
 }
 
-function refreshMentors() {
-  renderMentorsList();
-  showToast('Mentors list refreshed', 'info');
+function refreshMentors() { renderMentorsList(); showToast('Refreshed', 'info'); }
+
+/* ── SECTION ORDER FUNCTIONS ── */
+const DEFAULT_SECTION_ORDER = ['courses','free-courses','testimonials-section','mentors-section'];
+const SECTION_LABELS = { 'courses':'📚 Courses', 'free-courses':'🆓 Free Courses', 'testimonials-section':'💬 Testimonials', 'mentors-section':'👨‍🏫 Mentors' };
+
+function getSectionOrder() {
+  try { const s = localStorage.getItem('homepageSectionOrder'); return s ? JSON.parse(s) : [...DEFAULT_SECTION_ORDER]; } catch(e) { return [...DEFAULT_SECTION_ORDER]; }
 }
+
+function renderSectionOrderList() {
+  const container = document.getElementById('sectionOrderList');
+  if (!container) return;
+  const order = getSectionOrder();
+  container.innerHTML = order.map((id, idx) => `
+    <div class="flex items-center gap-2 bg-surface2 rounded-lg p-3 border border-border">
+      <div class="flex flex-col gap-0.5">
+        <button onclick="moveSectionItem('${id}','up')" class="text-muted hover:text-accent p-0.5 ${idx===0?'opacity-30 pointer-events-none':''}" title="Up">▲</button>
+        <button onclick="moveSectionItem('${id}','down')" class="text-muted hover:text-accent p-0.5 ${idx===order.length-1?'opacity-30 pointer-events-none':''}" title="Down">▼</button>
+      </div>
+      <span class="text-xs text-muted w-5 text-center font-bold">${idx+1}</span>
+      <span class="flex-1 text-sm font-semibold text-white">${SECTION_LABELS[id]||id}</span>
+      <span class="text-xs text-muted">${id}</span>
+    </div>
+  `).join('');
+}
+
+function moveSectionItem(id, dir) {
+  const order = getSectionOrder();
+  const idx = order.indexOf(id);
+  const swap = dir === 'up' ? idx-1 : idx+1;
+  if (swap < 0 || swap >= order.length) return;
+  [order[idx], order[swap]] = [order[swap], order[idx]];
+  localStorage.setItem('homepageSectionOrder', JSON.stringify(order));
+  renderSectionOrderList();
+}
+
+function saveSectionOrder() {
+  showToast('Section order saved! Refresh homepage to see changes.', 'success');
+}
+
+function resetSectionOrder() {
+  localStorage.setItem('homepageSectionOrder', JSON.stringify(DEFAULT_SECTION_ORDER));
+  renderSectionOrderList();
+  showToast('Section order reset to default', 'info');
+}
+
+function renderCourseOrderList() {
+  const container = document.getElementById('courseOrderList');
+  if (!container) return;
+  let courses = [];
+  try { courses = JSON.parse(localStorage.getItem('courses')||'[]'); } catch(e){}
+  courses.sort((a,b) => ((a.sequence_order??9999)-(b.sequence_order??9999)));
+  if (!courses.length) { container.innerHTML = '<p class="text-xs text-muted text-center py-4">No courses in localStorage yet.</p>'; return; }
+  container.innerHTML = courses.map((c, idx) => `
+    <div class="flex items-center gap-2 bg-surface2 rounded-lg p-2.5 border border-border">
+      <div class="flex flex-col gap-0.5">
+        <button onclick="moveCourseOrder(${c.id},'up')" class="text-muted hover:text-accent p-0.5 text-xs ${idx===0?'opacity-30 pointer-events-none':''}">▲</button>
+        <button onclick="moveCourseOrder(${c.id},'down')" class="text-muted hover:text-accent p-0.5 text-xs ${idx===courses.length-1?'opacity-30 pointer-events-none':''}">▼</button>
+      </div>
+      <span class="text-xs text-muted w-4 font-bold">${idx+1}</span>
+      <span class="flex-1 text-xs font-medium text-white truncate">${esc(c.title||'Untitled')}</span>
+    </div>
+  `).join('');
+}
+
+function moveCourseOrder(id, dir) {
+  let courses = [];
+  try { courses = JSON.parse(localStorage.getItem('courses')||'[]'); } catch(e) {}
+  courses.sort((a,b) => ((a.sequence_order??9999)-(b.sequence_order??9999)));
+  const idx = courses.findIndex(c => c.id == id);
+  const swap = dir === 'up' ? idx-1 : idx+1;
+  if (swap < 0 || swap >= courses.length) return;
+  [courses[idx], courses[swap]] = [courses[swap], courses[idx]];
+  courses.forEach((c,i) => { c.sequence_order = i; });
+  localStorage.setItem('courses', JSON.stringify(courses));
+  renderCourseOrderList();
+}
+
+function saveCourseOrder() { showToast('Course order saved! Refresh homepage to see changes.', 'success'); }
+
+function renderMentorOrderList() {
+  const container = document.getElementById('mentorOrderList');
+  if (!container) return;
+  const mentors = getMentors().sort((a,b) => ((a.sequence_order??9999)-(b.sequence_order??9999)));
+  if (!mentors.length) { container.innerHTML = '<p class="text-xs text-muted text-center py-4">No mentors yet.</p>'; return; }
+  container.innerHTML = mentors.map((m, idx) => `
+    <div class="flex items-center gap-2 bg-surface2 rounded-lg p-2.5 border border-border">
+      <div class="flex flex-col gap-0.5">
+        <button onclick="adminMoveMentor2(${m.id},'up','mentorOrderList')" class="text-muted hover:text-accent p-0.5 text-xs ${idx===0?'opacity-30 pointer-events-none':''}">▲</button>
+        <button onclick="adminMoveMentor2(${m.id},'down','mentorOrderList')" class="text-muted hover:text-accent p-0.5 text-xs ${idx===mentors.length-1?'opacity-30 pointer-events-none':''}">▼</button>
+      </div>
+      <span class="text-xs text-muted w-4 font-bold">${idx+1}</span>
+      <span class="flex-1 text-xs font-medium text-white truncate">${esc(m.name)}</span>
+    </div>
+  `).join('');
+}
+
+function adminMoveMentor2(id, dir, listId) {
+  adminMoveMentor(id, dir);
+  renderMentorOrderList();
+}
+
+function saveMentorOrder() { showToast('Mentor order saved! Refresh homepage to see changes.', 'success'); }
+
+function renderFeedbackOrderList() {
+  const container = document.getElementById('feedbackOrderList');
+  if (!container) return;
+  const fbs = getAllFeedbacks();
+  if (!fbs.length) { container.innerHTML = '<p class="text-xs text-muted text-center py-4">No feedbacks yet.</p>'; return; }
+  container.innerHTML = fbs.map((fb, idx) => `
+    <div class="flex items-center gap-2 bg-surface2 rounded-lg p-2.5 border border-border">
+      <div class="flex flex-col gap-0.5">
+        <button onclick="adminMoveFeedback2(${fb.id},'up')" class="text-muted hover:text-accent p-0.5 text-xs ${idx===0?'opacity-30 pointer-events-none':''}">▲</button>
+        <button onclick="adminMoveFeedback2(${fb.id},'down')" class="text-muted hover:text-accent p-0.5 text-xs ${idx===fbs.length-1?'opacity-30 pointer-events-none':''}">▼</button>
+      </div>
+      <span class="text-xs text-muted w-4 font-bold">${idx+1}</span>
+      <span class="flex-1 text-xs font-medium text-white truncate">${esc(fb.name)}</span>
+      <span class="text-xs px-1 rounded" style="background:${fb.language==='Bangla'?'rgba(0,229,153,.15)':'rgba(0,229,255,.1)'};color:${fb.language==='Bangla'?'#00e599':'var(--accent)'}">${(fb.language||'EN').substring(0,2)}</span>
+    </div>
+  `).join('');
+}
+
+function adminMoveFeedback2(id, dir) {
+  adminMoveFeedback(id, dir);
+  renderFeedbackOrderList();
+}
+
+function saveFeedbackOrder() { showToast('Feedback order saved! Refresh homepage to see changes.', 'success'); }
 
 /* ────────────────────────────────────────────────────────
    ASSIGNMENT MANAGEMENT

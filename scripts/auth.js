@@ -100,6 +100,28 @@ class AuthManager {
 
       // Show protected elements
       toggleVisibility(authElements.protected, true);
+
+      // Update avatar initials (2 letters)
+      const avatarEl = document.getElementById('navAvatarText');
+      if (avatarEl && this.currentUser && this.currentUser.username) {
+        const parts = this.currentUser.username.trim().split(/\s+/);
+        const initials = parts.length >= 2
+          ? (parts[0][0] + parts[1][0]).toUpperCase()
+          : this.currentUser.username.substring(0, 2).toUpperCase();
+        avatarEl.textContent = initials;
+      }
+
+      // Show/hide admin-only elements
+      const adminEls = document.querySelectorAll('.admin-only');
+      const isAdmin = this.currentUser && this.currentUser.isAdmin;
+      adminEls.forEach(el => {
+        if (isAdmin) {
+          el.classList.add('show');
+          el.style.removeProperty('display');
+        } else {
+          el.classList.remove('show');
+        }
+      });
     } else {
       // User is not logged in
       toggleVisibility(authElements.login, true);
@@ -111,6 +133,11 @@ class AuthManager {
       
       // Hide protected elements
       toggleVisibility(authElements.protected, false);
+
+      // Always hide admin-only when logged out
+      document.querySelectorAll('.admin-only').forEach(el => {
+        el.classList.remove('show');
+      });
     }
   }
 
