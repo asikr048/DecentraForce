@@ -591,107 +591,58 @@
   }
 
   /* ══════════ CHECKOUT MODAL ══════════ */
+/* ══════════ CHECKOUT MODAL ══════════ */
   .modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.75);
-    backdrop-filter: blur(8px);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    padding: 20px;
+    position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px); display: none; align-items: center;
+    justify-content: center; z-index: 1000; padding: 20px;
   }
-  .modal-overlay.open {
-    display: flex;
-  }
+  .modal-overlay.open { display: flex; }
+  
   .modal {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 20px;
-    width: 100%;
-    max-width: 480px;
-    overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 20px; width: 100%; max-width: 440px;
     box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6);
     animation: modalFadeIn 0.3s ease-out;
+    /* NEW: Prevent overflowing off screen */
+    max-height: 90vh; 
+    display: flex; flex-direction: column;
   }
+  
   @keyframes modalFadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
   }
+  
   .modal-header {
-    padding: 24px 28px 20px;
-    border-bottom: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
+    padding: 20px 24px; border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    flex-shrink: 0; /* Keeps header fixed */
   }
-  .modal-header h3 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 1.3rem;
-    color: var(--text);
-  }
+  .modal-header h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.2rem; color: var(--text); }
+  
   .modal-close {
-    width: 36px;
-    height: 36px;
-    border-radius: 10px;
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    display: grid;
-    place-items: center;
-    cursor: pointer;
-    color: var(--muted);
-    font-size: 1.2rem;
-    transition: all 0.2s;
+    width: 32px; height: 32px; border-radius: 8px; background: var(--surface2);
+    border: 1px solid var(--border); display: grid; place-items: center;
+    cursor: pointer; color: var(--muted); font-size: 1.2rem; transition: all 0.2s;
   }
-  .modal-close:hover {
-    color: var(--accent);
-    border-color: var(--accent);
-  }
+  .modal-close:hover { color: var(--accent); border-color: var(--accent); }
+  
   .modal-body {
-    padding: 28px;
-  }
-  .modal-course-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 1.2rem;
-    margin-bottom: 8px;
-    color: var(--text);
-  }
-  .modal-course-desc {
-    color: var(--muted);
-    font-size: 0.9rem;
-    line-height: 1.6;
-    margin-bottom: 20px;
-  }
-  .modal-price {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 2rem;
-    color: var(--accent);
-    margin-bottom: 24px;
-    text-align: center;
-  }
-  .modal-actions {
-    display: flex;
-    gap: 12px;
-  }
-  .modal-actions .btn {
+    padding: 24px; 
+    overflow-y: auto; /* NEW: Makes the inside scrollable */
     flex: 1;
-    padding: 14px;
-    font-size: 0.95rem;
-    font-weight: 600;
   }
-  .btn-success {
-    background: linear-gradient(135deg, #00e599, #00e5ff);
-    color: #fff;
-    border: none;
-  }
-  .btn-success:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(0, 229, 153, 0.4);
-  }
+  
+  /* Custom Scrollbar for Modal */
+  .modal-body::-webkit-scrollbar { width: 6px; }
+  .modal-body::-webkit-scrollbar-track { background: transparent; }
+  .modal-body::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.2); border-radius: 10px; }
+  
+  .modal-actions { display: flex; gap: 12px; margin-top: 10px; }
+  .modal-actions .btn { flex: 1; padding: 12px; font-size: 0.95rem; font-weight: 600; }
+  .btn-success { background: linear-gradient(135deg, #00e599, #00e5ff); color: #111; border: none; }
+  .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(0, 229, 153, 0.4); }
 
   /* ══════════ ADMIN-ONLY ══════════ */
   .admin-only { display: none !important; }
@@ -1356,6 +1307,7 @@ window.addEventListener('storage', (e) => {
   });
 
   // Smart Loader for Courses (API first, LocalStorage fallback + Sequence Sort)
+// Smart Loader for Courses (API first, LocalStorage fallback + Sequence Sort)
   document.addEventListener('DOMContentLoaded', async () => {
     
     // Fallback: Fetch courses from localStorage
@@ -1465,7 +1417,10 @@ window.addEventListener('storage', (e) => {
     }
 
     // Modal functions
+    let activeCourse = null; // Store the course being purchased
+
     function openCheckoutModal(course) {
+      activeCourse = course; // Save the course data
       const modal = document.getElementById('checkoutModal');
       const title = document.getElementById('modalCourseTitle');
       const desc = document.getElementById('modalCourseDesc');
@@ -1474,6 +1429,15 @@ window.addEventListener('storage', (e) => {
       if (title) title.textContent = course.title || 'Untitled Course';
       if (desc) desc.textContent = course.description || 'Learn essential skills in this comprehensive course.';
       if (price) price.textContent = (course.price && course.price !== '0' && course.price !== 0) ? `৳${course.price}` : 'Free';
+      
+      // Reset form fields safely
+      const paymentMethodEl = document.getElementById('paymentMethod');
+      const senderNumberEl = document.getElementById('senderNumber');
+      const transactionIdEl = document.getElementById('transactionId');
+      
+      if(paymentMethodEl) paymentMethodEl.value = '';
+      if(senderNumberEl) senderNumberEl.value = '';
+      if(transactionIdEl) transactionIdEl.value = '';
 
       modal.classList.add('open');
       document.body.style.overflow = 'hidden';
@@ -1483,17 +1447,69 @@ window.addEventListener('storage', (e) => {
       const modal = document.getElementById('checkoutModal');
       modal.classList.remove('open');
       document.body.style.overflow = '';
+      activeCourse = null;
     }
 
     const modalClose = document.getElementById('modalClose');
     const modalOverlay = document.getElementById('checkoutModal');
     const cancelBtn = document.getElementById('modalCancel');
+    const confirmBtn = document.getElementById('modalConfirm'); // Get the submit button
 
     if (modalClose) modalClose.addEventListener('click', closeCheckoutModal);
     if (modalOverlay) modalOverlay.addEventListener('click', (e) => {
       if (e.target === modalOverlay) closeCheckoutModal();
     });
     if (cancelBtn) cancelBtn.addEventListener('click', closeCheckoutModal);
+
+    // Purchase Submission Logic
+    if (confirmBtn) {
+      confirmBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const senderNumber = document.getElementById('senderNumber').value.trim();
+        const transactionId = document.getElementById('transactionId').value.trim();
+        
+        if (!paymentMethod || !senderNumber || !transactionId) {
+          alert('Please fill out all fields: Payment Method, Sender Number, and Transaction ID.');
+          return;
+        }
+
+        // Create the purchase object
+        const purchase = {
+          courseId: activeCourse.id,
+          courseTitle: activeCourse.title,
+          price: activeCourse.price,
+          whatsappLink: activeCourse.whatsapp || '',
+          paymentMethod: paymentMethod,
+          senderNumber: senderNumber,
+          trxId: transactionId,
+          status: "pending",
+          timestamp: new Date().toISOString()
+        };
+
+        // Save to localStorage so my-courses.html knows they bought it
+        const purchases = JSON.parse(localStorage.getItem('purchases') || '[]');
+        purchases.push(purchase);
+        localStorage.setItem('purchases', JSON.stringify(purchases));
+
+        // Alert user and redirect
+        confirmBtn.textContent = 'Processing...';
+        setTimeout(() => {
+          closeCheckoutModal();
+          confirmBtn.textContent = 'Submit Payment';
+          
+          if (purchase.whatsappLink) {
+            window.open(purchase.whatsappLink, '_blank'); // Open WhatsApp in new tab
+            window.location.href = 'my-courses.html'; // Send them to dashboard
+          } else {
+            alert(`Payment submitted successfully for ${activeCourse.title}!\nOur team will verify your transaction shortly.`);
+            window.location.href = 'my-courses.html';
+          }
+        }, 1000);
+      });
+    }
 
     // Initialize courses dynamically from the API, fallback to localStorage if needed
     let courses = await fetchPublicCourses();
@@ -1518,7 +1534,6 @@ window.addEventListener('storage', (e) => {
     });
     renderCourseGrid('#free-courses-grid', freeCourses);
   });
-
   // Mentor Management Functions for Frontend
   function getMentorsFromStorage() {
     try {
@@ -1670,16 +1685,52 @@ window.addEventListener('storage', (e) => {
 <div class="modal-overlay" id="checkoutModal">
   <div class="modal">
     <div class="modal-header">
-      <h3>Checkout</h3>
+      <h3>Complete Purchase</h3>
       <button class="modal-close" id="modalClose">&times;</button>
     </div>
     <div class="modal-body">
-      <h4 class="modal-course-title" id="modalCourseTitle">Course Title</h4>
-      <p class="modal-course-desc" id="modalCourseDesc">Course description will appear here.</p>
-      <div class="modal-price" id="modalCoursePrice">৳2,500</div>
+      <h4 id="modalCourseTitle" style="font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; color:var(--text); margin-bottom:4px;">Course Title</h4>
+      <p id="modalCourseDesc" style="color:var(--muted); font-size:0.85rem; line-height:1.5; margin-bottom:16px;">Course description will appear here.</p>
+      
+      <div style="background: rgba(0,229,255,0.05); border: 1px solid rgba(0,229,255,0.1); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <span style="color: var(--muted); font-size: 0.9rem; font-weight: 500;">Total Price:</span>
+        <span id="modalCoursePrice" style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; color:var(--accent); margin:0;">৳2,500</span>
+      </div>
+
+      <div style="background: rgba(123,92,255,0.08); border: 1px solid rgba(123,92,255,0.2); padding: 16px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
+        <p style="color: var(--text); font-size: 1.1rem; margin-bottom: 12px;">
+          <strong style="color: #00e5ff; font-size: 1.3rem; letter-spacing: 0.5px;">Send Money : 01302201431</strong>
+        </p>
+        <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;">
+          <span style="padding: 4px 12px; background: rgba(226,19,110,0.15); color: #e2136e; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">bKash</span>
+          <span style="padding: 4px 12px; background: rgba(240,101,34,0.15); color: #f06522; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">Nagad</span>
+          <span style="padding: 4px 12px; background: rgba(140,52,148,0.15); color: #8c3494; border-radius: 6px; font-size: 0.8rem; font-weight: 700;">Rocket</span>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Payment Method *</label>
+        <select id="paymentMethod" class="feedback-input" style="padding: 12px; margin: 0; background:var(--surface2);">
+          <option value="">Select method...</option>
+          <option value="bkash">bKash</option>
+          <option value="nagad">Nagad</option>
+          <option value="rocket">Rocket</option>
+        </select>
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 16px;">
+        <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Sender Number *</label>
+        <input type="text" id="senderNumber" class="feedback-input" placeholder="01XXXXXXXXX" style="padding: 12px; margin: 0; background:var(--surface2);">
+      </div>
+      
+      <div class="form-group" style="margin-bottom: 24px;">
+        <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Transaction ID *</label>
+        <input type="text" id="transactionId" class="feedback-input" placeholder="TrxID" style="padding: 12px; margin: 0; background:var(--surface2);">
+      </div>
+
       <div class="modal-actions">
         <button class="btn btn-ghost" id="modalCancel">Cancel</button>
-        <button class="btn btn-success" id="modalConfirm">Proceed to Payment</button>
+        <button class="btn btn-success" id="modalConfirm">Submit Payment</button>
       </div>
     </div>
   </div>
