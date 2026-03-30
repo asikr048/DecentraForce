@@ -925,490 +925,46 @@
   </main>
 </div>
 
-<script type="module">
-  import { getCourses, refreshCourses, getCacheStatus } from './scripts/course-cache.js';
-  
-  let currentUser = null;
-  let allCourses = [];
-  // Global storage for selected course in checkout
-  window.selectedCourse = null;
+// Checkout Modal Functions
+  let activeCourse = null; 
+  let basePrice = 0; 
 
-  /* ────────────────────────────────────────────────────────
-     INITIALIZATION & USER DATA
-   ──────────────────────────────────────────────────────── */
-  async function initApp() {
-    try {
-      const res = await fetch('/api/auth/verify', { credentials: 'include' });
-      const data = await res.json();
-      
-      if (data.success && data.user) {
-        currentUser = data.user;
-        
-        // Load courses after authentication
-        loadAllCourses();
-        
-        // Populate Dropdown
-        document.getElementById('dropName').textContent = currentUser.username;
-        document.getElementById('dropEmail').textContent = currentUser.email;
-        
-        // Populate Profile Tab
-        document.getElementById('profileBigName').textContent = currentUser.username;
-        document.getElementById('profileBigId').textContent = `Student ID: DF-${currentUser.id.toString().padStart(6, '0')}`;
-        document.getElementById('topbarStudentId').textContent = `DF-${currentUser.id.toString().padStart(6, '0')}`;
-        
-        document.getElementById('editUsername').value = currentUser.username;
-        document.getElementById('editEmail').value = currentUser.email;
-        
-        // Set initials for avatars
-        const initials = currentUser.username.substring(0, 2).toUpperCase();
-        document.getElementById('navAvatar').textContent = initials;
-        document.getElementById('profileBigAvatar').textContent = initials;
-        
-      } else {
-        // If not logged in, redirect to login
-        window.location.href = 'login.html';
-      }
-    } catch(e) {
-      console.error('Auth verify failed:', e);
-      window.location.href = 'login.html';
-    }
-  }
-  
-  document.addEventListener('DOMContentLoaded', initApp);
-
-  /* ────────────────────────────────────────────────────────
-     DROPDOWN LOGIC
-  ──────────────────────────────────────────────────────── */
-  function toggleDropdown(e) {
-    e.stopPropagation();
-    document.getElementById('userMenu').classList.toggle('show');
-  }
-
-  // Close dropdown when clicking outside
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.avatar-wrapper')) {
-      document.getElementById('userMenu').classList.remove('show');
-    }
-  });
-
-  async function logoutUser() {
-    try {
-      await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' });
-      window.location.href = 'login.html';
-    } catch(e) {
-      console.error('Logout error', e);
-    }
-  }
-
-  /* ────────────────────────────────────────────────────────
-     PROFILE EDIT LOGIC
-  ──────────────────────────────────────────────────────── */
-  async function saveProfileData() {
-    const newUsername = document.getElementById('editUsername').value.trim();
-    const newEmail = document.getElementById('editEmail').value.trim();
-    const currentPass = document.getElementById('editCurrentPass').value;
-    const newPass = document.getElementById('editNewPass').value;
-
-    if(!newUsername || !newEmail) {
-      alert("Name and Email cannot be empty.");
-      return;
-    }
-
-    // In a real application, you would send this to a dedicated endpoint like `/api/auth/update-profile`
-    // For now, we simulate the save and alert the user.
-    alert(`Account Settings Update Triggered!\n\nName: ${newUsername}\nEmail: ${newEmail}\nPassword Update: ${newPass ? 'Yes' : 'No'}\n\n(Requires backend endpoint to process updates).`);
-    
-    // Optimistically update UI
-    document.getElementById('profileBigName').textContent = newUsername;
-    document.getElementById('dropName').textContent = newUsername;
-    document.getElementById('dropEmail').textContent = newEmail;
-    
-    const initials = newUsername.substring(0, 2).toUpperCase();
-    document.getElementById('navAvatar').textContent = initials;
-    document.getElementById('profileBigAvatar').textContent = initials;
-    
-    // Clear password fields
-    document.getElementById('editCurrentPass').value = '';
-    document.getElementById('editNewPass').value = '';
-  }
-
-  /* ────────────────────────────────────────────────────────
-     PANEL & TAB NAVIGATION LOGIC
-  ──────────────────────────────────────────────────────── */
-  function showPanel(name) {
-    ['courses','profile','rewards'].forEach(p => {
-      const el = document.getElementById('panel-' + p);
-      if (el) el.style.display = (p === name) ? '' : 'none';
-    });
-    // Update sidebar active state
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    const labels = { courses: 'My Courses', profile: 'Profile', rewards: 'Rewards' };
-    document.getElementById('breadcrumb-label').textContent = labels[name] || 'My Courses';
-  }
-
-  function setTab(name) {
-    ['nanodegree','subscription','free'].forEach(t => {
-      document.getElementById('tab-' + t)?.classList.toggle('active', t === name);
-      document.getElementById('panel-' + t)?.classList.toggle('active', t === name);
-    });
-    // Animate progress bars
-    setTimeout(() => {
-      document.querySelectorAll('.progress-fill').forEach(fill => {
-        const w = fill.style.width;
-        fill.style.width = '0%';
-        requestAnimationFrame(() => {
-          requestAnimationFrame(() => { fill.style.width = w; });
-        });
-      });
-    }, 50);
-  }
-/* ────────────────────────────────────────────────────────
-     GLOBAL EXPORTS FOR HTML ONCLICK HANDLERS
-  ──────────────────────────────────────────────────────── */
-  window.toggleDropdown = toggleDropdown;
-  window.logoutUser = logoutUser;
-  window.saveProfileData = saveProfileData;
-  window.showPanel = showPanel;
-  window.setTab = setTab;
-  window.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab');
-    if (tab === 'nanodegree' || tab === 'subscription' || tab === 'free') {
-      setTab(tab);
-    }
-  });
-
-  /* ────────────────────────────────────────────────────────
-     COURSE LOADING & DISPLAY
-   ──────────────────────────────────────────────────────── */
-  async function loadAllCourses() {
-    try {
-      allCourses = await getCourses();
-    } catch (error) {
-      console.error('Failed to load courses:', error);
-      showToast('Failed to load courses. Using cached data if available.', 'error');
-      // Ensure allCourses is an empty array to show empty state
-      allCourses = [];
-    }
-    renderCourses();
-  }
-
-  // Load purchases from localStorage
-  function loadPurchasesFromLocalStorage() {
-    try {
-      const purchasesJson = localStorage.getItem('purchases');
-      if (!purchasesJson) return [];
-      
-      const purchases = JSON.parse(purchasesJson);
-      if (!Array.isArray(purchases)) return [];
-      
-      return purchases;
-    } catch (error) {
-      console.error('Error loading purchases from localStorage:', error);
-      return [];
-    }
-  }
-
-  // Filter purchases by status "approved"
-  function filterApprovedPurchases(purchases) {
-    if (!Array.isArray(purchases)) return [];
-    return purchases.filter(p =>
-      p && typeof p === 'object' &&
-      p.status && p.status.toLowerCase() === 'approved'
-    );
-  }
-
-  function renderCourses() {
-    // Ensure allCourses is an array
-    const courses = Array.isArray(allCourses) ? allCourses : [];
-    
-    // Load and filter purchases
-    const allPurchases = loadPurchasesFromLocalStorage();
-    const approvedPurchases = filterApprovedPurchases(allPurchases);
-    
-    // Get course IDs from approved purchases
-    const purchasedCourseIds = approvedPurchases.map(p => p.courseId).filter(id => id);
-    
-    // Find purchased courses from allCourses
-    const purchasedCourses = courses.filter(course =>
-      purchasedCourseIds.includes(course.id?.toString())
-    );
-
-    if (courses.length === 0 && purchasedCourses.length === 0) {
-      document.getElementById('available-courses').innerHTML =
-        '<div class="empty-state"><div class="empty-icon">📚</div><h3>No courses available</h3><p>Check back soon for new courses!</p></div>';
-      document.getElementById('purchased-courses').innerHTML =
-        '<div class="empty-state"><div class="empty-icon">🛒</div><h3>No purchased courses</h3><p>Purchase a course to get started.</p></div>';
-      document.getElementById('free-courses').innerHTML =
-        '<div class="empty-state"><div class="empty-icon">🎁</div><h3>No free courses</h3><p>Free courses will appear here when available.</p></div>';
-      return;
-    }
-
-    // Filter courses by type with safe defaults
-    const availableCourses = courses.filter(c => {
-      const price = parseFloat(c.price) || 0;
-      return price > 0 && !purchasedCourseIds.includes(c.id?.toString());
-    });
-    const freeCourses = courses.filter(c => {
-      const price = parseFloat(c.price) || 0;
-      return price === 0 && !purchasedCourseIds.includes(c.id?.toString());
-    });
-
-    renderCourseGrid('available-courses', availableCourses, 'Available');
-    renderCourseGrid('purchased-courses', purchasedCourses, 'Purchased');
-    renderCourseGrid('free-courses', freeCourses, 'Free');
-  }
-
-  function renderCourseGrid(containerId, courses, type) {
-    const container = document.getElementById(containerId);
-    
-    if (!container) return;
-    
-    if (!Array.isArray(courses) || courses.length === 0) {
-      container.innerHTML = `<div class="empty-state"><div class="empty-icon">📚</div><h3>No ${type.toLowerCase()} courses</h3><p>${type === 'Available' ? 'Check back soon for new courses!' : type === 'Purchased' ? 'Purchase a course to get started.' : 'Free courses will appear here when available.'}</p></div>`;
-      return;
-    }
-
-    container.innerHTML = courses.map(course => {
-      // Safe defaults for missing data
-      const courseId = course.id || Math.random().toString(36).substring(2);
-      const title = course.title || 'Untitled Course';
-      const description = course.description || 'Learn essential skills in this comprehensive course.';
-      const price = parseFloat(course.price) || 0;
-      const whatsapp = course.whatsapp || '';
-      const modules = course.modules || '';
-      
-      // Determine status badge
-      let statusText = 'Available';
-      let statusClass = 'nano';
-      if (type === 'Free') {
-        statusText = 'Free';
-        statusClass = 'free';
-      } else if (type === 'Purchased') {
-        statusText = 'Purchased';
-        statusClass = 'sub';
-      }
-      
-      // Format price display
-      const priceDisplay = price > 0 ? `৳${price}` : 'Free';
-      
-      return `
-      <div class="course-card" style="animation-delay:.05s">
-        <div class="card-thumbnail">
-          <div class="thumb-placeholder thumb-bg-${Math.floor(Math.random() * 3) + 1}">
-            ${getEmojiForCourse(title)}
-          </div>
-          <div class="thumb-glow"></div>
-          <span class="card-badge badge-${statusClass}">
-            ${statusText}
-          </span>
-        </div>
-        <div class="card-body">
-          <div class="card-title">${escapeHtml(title)}</div>
-          <p class="card-description">${escapeHtml(description.substring(0, 100))}${description.length > 100 ? '...' : ''}</p>
-          <div class="card-stats">
-            <div class="stat-pill">📦 ${getModuleCount(course)} Lecture</div>
-            ${price > 0 ? `<div class="stat-pill">💰 ${priceDisplay}</div>` : ''}
-            ${whatsapp ? `<div class="stat-pill">💬 WhatsApp Group</div>` : ''}
-          </div>
-          <div class="card-progress">
-            <div class="progress-label"><span>Progress</span><span>0%</span></div>
-            <div class="progress-track"><div class="progress-fill" style="width:0%"></div></div>
-          </div>
-        </div>
-        <div class="card-footer">
-          <div class="card-rating"><span class="stars">★★★★★</span> 4.9</div>
-          ${getCourseButton(course, type)}
-        </div>
-      </div>
-    `}).join('');
-
-    // Attach event listeners to Buy Now buttons
-    if (type === 'Available') {
-      container.querySelectorAll('.buy-now-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const courseId = this.dataset.courseId;
-          const course = courses.find(c => (c.id || '').toString() === courseId.toString());
-          if (course) openCheckoutModal(course);
-        });
-      });
-    }
-    
-    // Attach event listeners to Open Course buttons for purchased and free courses
-    if (type === 'Purchased' || type === 'Free') {
-      container.querySelectorAll('.open-course-btn').forEach(btn => {
-        btn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          const courseId = this.dataset.courseId;
-          const course = courses.find(c => (c.id || '').toString() === courseId.toString());
-          if (course) openCourseContent(courseId, course.title);
-        });
-      });
-      
-      // Make entire course card clickable for purchased courses
-      if (type === 'Purchased') {
-        container.querySelectorAll('.course-card').forEach(card => {
-          const courseId = card.querySelector('.open-course-btn')?.dataset.courseId;
-          if (courseId) {
-            card.style.cursor = 'pointer';
-            card.addEventListener('click', function(e) {
-              // Don't trigger if clicking on button or link inside
-              if (e.target.closest('.open-course-btn') || e.target.closest('a')) {
-                return;
-              }
-              const course = courses.find(c => (c.id || '').toString() === courseId.toString());
-              if (course) openCourseContent(courseId, course.title);
-            });
-          }
-        });
-      }
-    }
-  }
-
-function getCourseButton(course, type) {
-
-
-    const courseId = course.id || '';
-    const whatsapp = course.whatsapp || '';
-    const status = course.status || 'ongoing'; // Default to ongoing so it's purchasable
-
-    // Determine button based on course type
-    if (type === 'Purchased') {
-      // If they already own it, let them continue AND show the WhatsApp link
-      let buttons = `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">▶ Continue</button>`;
-      if (whatsapp) {
-        buttons += `<a href="${escapeHtml(whatsapp)}" target="_blank" class="continue-btn" style="margin-left:8px; background:#25D366; color:white; border:none; box-shadow:0 0 10px rgba(37,211,102,0.3);">WhatsApp</a>`;
-      }
-      return `<div style="display:flex; justify-content:flex-end;">${buttons}</div>`;
-      
-    } else if (type === 'Free') {
-      return `<button class="continue-btn open-course-btn" data-course-id="${courseId}" style="cursor:pointer">🎓 Enroll Now</button>`;
-      
-    } else { 
-      // Available (Paid Courses) -> Must click "Purchase"
-      if (status === 'ongoing') {
-        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer;">Purchase</button>`;
-      } else if (status === 'completed') {
-        return `<span class="continue-btn disabled" style="cursor:default; opacity:0.6">Closed</span>`;
-      } else if (status === 'upcoming') {
-        return `<span class="continue-btn secondary" style="cursor:default; opacity:0.8">Coming Soon</span>`;
-      } else {
-        return `<button class="continue-btn buy-now-btn" data-course-id="${courseId}" style="cursor:pointer;">Purchase</button>`;
-      }
-    }
-  }
-  // Safe course content opening with validation
-  function openCourseContent(courseId, courseTitle = '') {
-    if (!courseId) {
-      showToast('Course ID is missing', 'error');
-      return;
-    }
-    
-    // Validate course exists in available courses
-    const courseExists = allCourses.some(c => (c.id || '').toString() === courseId.toString());
-    
-    if (!courseExists) {
-      showToast('Course not found or no longer available', 'error');
-      return;
-    }
-    
-    // For purchased courses, verify purchase status
-    if (courseId) {
-      const purchases = loadPurchasesFromLocalStorage();
-      const approvedPurchases = filterApprovedPurchases(purchases);
-      const hasApprovedPurchase = approvedPurchases.some(p => p.courseId === courseId.toString());
-      
-      // Allow access if course is free or user has approved purchase
-      const course = allCourses.find(c => (c.id || '').toString() === courseId.toString());
-      const isFreeCourse = course && parseFloat(course.price || 0) === 0;
-      
-      if (!isFreeCourse && !hasApprovedPurchase) {
-        showToast('You need to purchase this course to access content', 'error');
-        return;
-      }
-    }
-    
-    // Safe navigation with encoded parameters
-    const encodedId = encodeURIComponent(courseId);
-    const encodedTitle = encodeURIComponent(courseTitle || '');
-    window.location.href = `video-course.html?courseId=${encodedId}&title=${encodedTitle}`;
-  }
-
-  function getEmojiForCourse(title) {
-    if (title.toLowerCase().includes('blockchain')) return '⛓️';
-    if (title.toLowerCase().includes('defi')) return '💰';
-    if (title.toLowerCase().includes('web3')) return '🌐';
-    if (title.toLowerCase().includes('solidity')) return '📝';
-    return '📚';
-  }
-
-  function getModuleCount(course) {
-    try {
-      if (course.modules && typeof course.modules === 'string') {
-        const parsed = JSON.parse(course.modules);
-        if (Array.isArray(parsed)) return parsed.length;
-      } else if (Array.isArray(course.modules)) {
-        return course.modules.length;
-      }
-    } catch (e) {}
-    return 0;
-  }
-
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
-  }
-
-  function showToast(message, type = 'info') {
-    // Simple toast implementation
-    const toast = document.createElement('div');
-    toast.className = `toast toast-${type}`;
-    toast.textContent = message;
-    toast.style.cssText = `
-      position: fixed; top: 20px; right: 20px; padding: 12px 20px;
-      background: var(--surface); border: 1px solid var(--border);
-      border-radius: 8px; z-index: 1000; color: var(--text);
-      box-shadow: 0 4px 20px rgba(0,0,0,.3);
-    `;
-    document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 3000);
-  }
-
-  // Checkout Modal Functions
   function openCheckoutModal(course) {
+    activeCourse = course; 
+    
+    // Determine correct price
+    const regularPrice = parseFloat(course.price) || 0;
+    const discountPrice = parseFloat(course.discount_price) || 0;
+    basePrice = (discountPrice > 0) ? discountPrice : regularPrice;
+
     const modal = document.getElementById('checkoutModal');
     const title = document.getElementById('modalCourseTitle');
-    const description = document.getElementById('modalCourseDescription');
-    const originalPrice = document.getElementById('modalOriginalPrice');
-    const finalPrice = document.getElementById('modalFinalPrice');
+    const desc = document.getElementById('modalCourseDesc');
+    const priceEl = document.getElementById('modalCoursePrice');
 
     if (title) title.textContent = course.title || 'Untitled Course';
-    if (description) description.textContent = course.description || 'No description available.';
+    if (desc) desc.textContent = course.description || '';
     
-    const price = course.price || 0;
-    const originalPriceValue = price > 0 ? price : 99; // Default original price
-    const finalPriceValue = price > 0 ? price : 99;
+    // Show admin discount in modal if it exists
+    if (priceEl) {
+      if (basePrice === 0) {
+         priceEl.textContent = 'Free';
+      } else if (discountPrice > 0) {
+         priceEl.innerHTML = `<span style="text-decoration:line-through;color:var(--muted);font-size:0.9rem;margin-right:8px;">৳${regularPrice}</span>৳${basePrice}`;
+      } else {
+         priceEl.textContent = `৳${basePrice}`;
+      }
+    }
     
-    if (originalPrice) originalPrice.textContent = `৳${originalPriceValue}`;
-    if (finalPrice) finalPrice.textContent = `৳${finalPriceValue}`;
-    
-    // Reset coupon and form fields
-    document.getElementById('couponInput').value = '';
-    document.getElementById('couponMessage').textContent = '';
-    document.getElementById('couponMessage').className = 'coupon-message';
-    document.getElementById('paymentMethod').value = '';
-    document.getElementById('senderNumber').value = '';
-    document.getElementById('transactionId').value = '';
-    
-    // Store current course price for coupon calculations
-    modal.dataset.originalPrice = originalPriceValue;
-    modal.dataset.currentPrice = finalPriceValue;
-    modal.dataset.courseId = course.id || '';
+    // Reset Views for Multi-Step Flow
+    document.getElementById('paymentInstructionsPanel').style.display = 'block';
+    document.getElementById('paymentDetailsForm').style.display = 'none';
+    document.getElementById('modalActionButtons').style.display = 'none';
 
-    // Store selected course globally for later use
-    window.selectedCourse = course;
+    // Reset Inputs
+    if(document.getElementById('paymentMethod')) document.getElementById('paymentMethod').value = '';
+    if(document.getElementById('senderNumber')) document.getElementById('senderNumber').value = '';
+    if(document.getElementById('transactionId')) document.getElementById('transactionId').value = '';
 
     modal.classList.add('open');
     document.body.style.overflow = 'hidden';
@@ -1416,200 +972,90 @@ function getCourseButton(course, type) {
 
   function closeCheckoutModal() {
     const modal = document.getElementById('checkoutModal');
-    modal.classList.remove('open');
+    if(modal) modal.classList.remove('open');
     document.body.style.overflow = '';
+    activeCourse = null;
   }
 
-  // Global openCheckout function (alias for openCheckoutModal)
+  // Global openCheckout function
   window.openCheckout = function(course) {
     openCheckoutModal(course);
   };
 
-  // Helper function to get coupons from localStorage
-  function getCouponsFromStorage() {
-    try {
-      const stored = localStorage.getItem('coupons');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  }
-
-  // Apply coupon logic
-  function applyCoupon() {
-    const couponInput = document.getElementById('couponInput');
-    const couponMessage = document.getElementById('couponMessage');
-    const finalPriceElement = document.getElementById('modalFinalPrice');
-    const modal = document.getElementById('checkoutModal');
-    
-    const couponCode = couponInput.value.trim().toUpperCase();
-    const originalPrice = parseFloat(modal.dataset.originalPrice || 99);
-    
-    if (!couponCode) {
-      couponMessage.textContent = 'Please enter a coupon code';
-      couponMessage.className = 'coupon-message error';
-      return;
-    }
-    
-    // Get coupons from localStorage
-    const coupons = getCouponsFromStorage();
-    
-    // Find matching coupon
-    const matchedCoupon = coupons.find(c => c.code === couponCode);
-    
-    if (matchedCoupon) {
-      const discountPercent = matchedCoupon.discount;
-      const discountRate = discountPercent / 100;
-      const discountAmount = originalPrice * discountRate;
-      const finalPrice = originalPrice - discountAmount;
-      
-      // Update final price (use Bangladeshi Taka symbol)
-      finalPriceElement.textContent = `৳${finalPrice.toFixed(0)}`;
-      modal.dataset.currentPrice = finalPrice;
-      
-      // Show success message
-      couponMessage.textContent = `Coupon applied! You saved ৳${discountAmount.toFixed(0)} (${discountPercent}% off)`;
-      couponMessage.className = 'coupon-message success';
-      
-      // Store applied coupon info for later use
-      modal.dataset.appliedCoupon = couponCode;
-      modal.dataset.appliedDiscount = discountPercent;
-    } else {
-      couponMessage.textContent = 'Invalid coupon code. Please try again.';
-      couponMessage.className = 'coupon-message error';
-    }
-  }
-
-  // Confirm payment - validates, saves to localStorage, and redirects to WhatsApp
-// Confirm payment - validates, saves to localStorage, and redirects to WhatsApp
-  function confirmPayment(e) {
-    if (e) {
-        e.preventDefault();
-        e.stopImmediatePropagation(); // Prevents ux-enhancements.js from bypassing validation
-    }
-
-    const paymentMethod = document.getElementById('paymentMethod').value;
-    const senderNumber = document.getElementById('senderNumber').value.trim();
-    const transactionId = document.getElementById('transactionId').value.trim();
-    const modal = document.getElementById('checkoutModal');
-    const courseTitle = document.getElementById('modalCourseTitle').textContent;
-    const finalPrice = modal.dataset.currentPrice || modal.dataset.originalPrice;
-    const courseId = modal.dataset.courseId || '';
-    
-    // Strict Validation
-    if (!paymentMethod) return showError('Please select a payment method');
-    if (!senderNumber) return showError('Please enter your sender mobile number');
-    if (!transactionId) return showError('Please enter the transaction ID');
-    
-    // Get WhatsApp link from selected course
-    const whatsappLink = window.selectedCourse?.whatsapp || '';
-    
-    // Create purchase object
-    const purchase = {
-      courseTitle: courseTitle,
-      paymentMethod: paymentMethod,
-      senderNumber: senderNumber,
-      trxId: transactionId,
-      status: "pending",
-      whatsappLink: whatsappLink,
-      courseId: courseId,
-      price: finalPrice,
-      timestamp: new Date().toISOString()
-    };
-    
-    savePurchaseToLocalStorage(purchase);
-    
-    // UI Feedback
-    const confirmBtn = document.getElementById('modalConfirm');
-    if (window.showButtonLoading) window.showButtonLoading(confirmBtn, 'Processing...');
-    showToast('Payment verified! Redirecting to WhatsApp...', 'success');
-    
-    // Redirect Flow
-    setTimeout(() => {
-      closeCheckoutModal();
-      if (window.hideButtonLoading) window.hideButtonLoading(confirmBtn);
-      
-      if (whatsappLink) {
-        window.open(whatsappLink, '_blank'); // Opens WhatsApp safely in a new tab
-        setTimeout(() => window.location.reload(), 500); // Refresh to update UI to pending
-      } else {
-        alert(`Payment details saved for ${courseTitle}!\n\nOur team will verify your transaction and grant course access shortly.`);
-        window.location.reload();
-      }
-    }, 1500);
-  }
-  // Save purchase to localStorage
-  function savePurchaseToLocalStorage(purchase) {
-    try {
-      // Get existing purchases
-      const purchases = JSON.parse(localStorage.getItem('purchases') || '[]');
-      
-      // Add new purchase
-      purchases.push(purchase);
-      
-      // Save back to localStorage
-      localStorage.setItem('purchases', JSON.stringify(purchases));
-      
-      console.log('Purchase saved to localStorage:', purchase);
-    } catch (error) {
-      console.error('Failed to save purchase to localStorage:', error);
-      // Fallback: Store in sessionStorage or variable
-      window.lastPurchase = purchase;
-    }
-  }
-  
-  // Helper function to show error messages
-  function showError(message) {
-    // Create or update error display
-    let errorEl = document.getElementById('paymentError');
-    if (!errorEl) {
-      errorEl = document.createElement('div');
-      errorEl.id = 'paymentError';
-      errorEl.className = 'payment-error';
-      const form = document.querySelector('.payment-details-form');
-      if (form) {
-        form.insertBefore(errorEl, form.firstChild);
-      }
-    }
-    
-    errorEl.textContent = message;
-    errorEl.style.display = 'block';
-    
-    // Scroll to error
-    errorEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    
-    // Auto-hide after 5 seconds
-    setTimeout(() => {
-      errorEl.style.display = 'none';
-    }, 5000);
-  }
-
   // Initialize modal event listeners when DOM is loaded
   document.addEventListener('DOMContentLoaded', () => {
     const modalClose = document.getElementById('modalClose');
+    const modalCancel2 = document.getElementById('modalCancel2');
     const modalOverlay = document.getElementById('checkoutModal');
-    const cancelBtn = document.getElementById('modalCancel');
-    const applyCouponBtn = document.getElementById('applyCouponBtn');
+    const sentMoneyBtn = document.getElementById('sentMoneyBtn');
     const confirmBtn = document.getElementById('modalConfirm');
 
     if (modalClose) modalClose.addEventListener('click', closeCheckoutModal);
+    if (modalCancel2) modalCancel2.addEventListener('click', closeCheckoutModal);
     if (modalOverlay) modalOverlay.addEventListener('click', (e) => {
-      if (e.target === modalOverlay) closeCheckoutModal();
+      if (e.target.id === 'checkoutModal') closeCheckoutModal();
     });
-    if (cancelBtn) cancelBtn.addEventListener('click', closeCheckoutModal);
-    
-    if (applyCouponBtn) applyCouponBtn.addEventListener('click', applyCoupon);
-    
-    // Allow pressing Enter in coupon input to apply
-    const couponInput = document.getElementById('couponInput');
-    if (couponInput) {
-      couponInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') applyCoupon();
+
+    // "I have sent the money" Toggle
+    if (sentMoneyBtn) {
+      sentMoneyBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        // Hide instructions, show form
+        document.getElementById('paymentInstructionsPanel').style.display = 'none'; 
+        document.getElementById('paymentDetailsForm').style.display = 'block';
+        document.getElementById('modalActionButtons').style.display = 'flex';
       });
     }
-    
+
+    // Purchase Submission Logic
     if (confirmBtn) {
-      confirmBtn.addEventListener('click', confirmPayment);
+      // Clone & replace to prevent double-firing
+      const newConfirmBtn = confirmBtn.cloneNode(true);
+      confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+      newConfirmBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const senderNumber = document.getElementById('senderNumber').value.trim();
+        const transactionId = document.getElementById('transactionId').value.trim();
+        
+        if (!paymentMethod || !senderNumber || !transactionId) {
+          alert('Please fill out all fields: Payment Method, Sender Number, and Transaction ID.');
+          return;
+        }
+
+        const purchase = {
+          courseId: activeCourse.id,
+          courseTitle: activeCourse.title,
+          price: basePrice, 
+          whatsappLink: activeCourse.whatsapp || '',
+          paymentMethod: paymentMethod,
+          senderNumber: senderNumber,
+          trxId: transactionId,
+          status: "pending",
+          timestamp: new Date().toISOString(),
+          id: Date.now().toString()
+        };
+
+        const purchases = JSON.parse(localStorage.getItem('purchases') || '[]');
+        purchases.push(purchase);
+        localStorage.setItem('purchases', JSON.stringify(purchases));
+
+        newConfirmBtn.textContent = 'Processing...';
+        setTimeout(() => {
+          closeCheckoutModal();
+          newConfirmBtn.textContent = 'Submit Payment';
+          
+          if (purchase.whatsappLink) {
+            window.open(purchase.whatsappLink, '_blank'); 
+            window.location.reload(); 
+          } else {
+            alert(`Payment submitted successfully for ${activeCourse.title}!\nOur team will verify your transaction shortly.`);
+            window.location.reload();
+          }
+        }, 1000);
+      });
     }
   });
 </script>
