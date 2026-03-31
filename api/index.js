@@ -147,6 +147,18 @@ async function userPurchases(req, res) {
 async function adminPurchases(req, res) {
   const admin = await requireAdmin(req, res); if (!admin) return;
 
+  // Ensure purchases table exists (self-healing — no need to visit /api/admin/init first)
+  await query(`CREATE TABLE IF NOT EXISTS purchases (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    sender_number VARCHAR(50) NOT NULL,
+    transaction_id VARCHAR(100) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   if (req.method === 'GET') {
     // Fetch purchases and join with course and user tables to get titles and names
     const r = await query(`
