@@ -545,7 +545,8 @@
     opacity: 1;
   }
 
-  .control-group { display: flex; align-items: center; gap: 12px; }
+  /* REDUCED GAP TO ENSURE ICONS DONT PUSH INTO CC BUTTON */
+  .control-group { display: flex; align-items: center; gap: 8px; }
 
   .control-btn {
     background: transparent; border: none; color: var(--text);
@@ -612,7 +613,10 @@
     font-family: 'DM Sans', monospace; min-width: 45px;
     text-align: center; font-variant-numeric: tabular-nums;
   }
-  .volume-slider-container { display: flex; align-items: center; gap: 8px; width: 80px; }
+  
+  /* REDUCED WIDTH TO FIX CC BUTTON OVERLAP */
+  .volume-slider-container { display: flex; align-items: center; gap: 8px; width: 50px; }
+  
   .control-btn.fullscreen { margin-left: auto; }
 
   /* Meta under video */
