@@ -493,6 +493,56 @@
     .student-id-badge { display: none; }
     .course-header h1 { font-size: 1.25rem; }
   }
+
+  /* ─── VIDEO LECTURES ─── */
+  .lecture-video {
+    margin-top: 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+  }
+  .lectures-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .video-container {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+  }
+  .video-container iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+  .lecture-meta {
+    padding: 12px 16px;
+    border-top: 1px solid var(--border2);
+    font-size: .85rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .lecture-title {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .lecture-duration {
+    background: rgba(0,229,255,.1);
+    color: var(--accent);
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: .75rem;
+    font-weight: 600;
+  }
 </style>
 </head>
 <body>
@@ -841,30 +891,97 @@
       return;
     }
     container.innerHTML = curriculum.map((mod, i) => {
+      // Determine module title
+      const moduleTitle = mod.moduleTitle || mod.title || `Module ${i+1}`;
+      // Determine lectures (new structure) and topics (old structure)
+      const lectures = Array.isArray(mod.lectures) ? mod.lectures : [];
       const topics = Array.isArray(mod.topics) ? mod.topics
                    : (typeof mod.topics === 'string' && mod.topics ? [mod.topics] : []);
-      const topicsHTML = topics.length
-        ? `<ul class="topic-list">${topics.map((t, j) => `
+      
+      // Build lectures HTML (video embeds)
+      let lecturesHTML = '';
+      if (lectures.length > 0) {
+        lecturesHTML = lectures.map(lec => {
+          const title = lec.title || '';
+          const url = lec.url || '';
+          const duration = lec.duration || '';
+          const videoId = extractYouTubeVideoId(url);
+          if (videoId) {
+            return embedYouTube(url, title, duration);
+          } else if (url) {
+            // Non-YouTube video link (fallback)
+            return `
+              <div class="lecture-video">
+                <div class="video-container">
+                  <iframe src="${escapeHtml(url)}" title="${escapeHtml(title)}" allowfullscreen></iframe>
+                </div>
+                <div class="lecture-meta">
+                  <div>
+                    <div class="lecture-title">${escapeHtml(title)}</div>
+                    <div>External Video</div>
+                  </div>
+                  ${duration ? `<span class="lecture-duration">${escapeHtml(duration)}</span>` : ''}
+                </div>
+              </div>`;
+          } else {
+            // No URL, treat as topic
+            return `
+              <div class="topic-item">
+                <div class="topic-icon">${getTopicIcon(title, 0)}</div>
+                <span>${escapeHtml(title)}</span>
+              </div>`;
+          }
+        }).join('');
+      }
+      
+      // Build topics HTML (old style)
+      let topicsHTML = '';
+      if (topics.length > 0) {
+        topicsHTML = `<ul class="topic-list">${topics.map((t, j) => `
             <li class="topic-item">
               <div class="topic-icon">${getTopicIcon(t, j)}</div>
               <span>${escapeHtml(t)}</span>
-            </li>`).join('')}</ul>`
-        : `<p style="color:var(--muted);font-size:.85rem;margin-top:12px;">Topics will be listed here shortly.</p>`;
-
+            </li>`).join('')}</ul>`;
+      }
+      
+      // Combine lectures and topics
+      let bodyHTML = '';
+      if (lecturesHTML) {
+        bodyHTML += `<div class="lectures-container">${lecturesHTML}</div>`;
+      }
+      if (topicsHTML) {
+        bodyHTML += topicsHTML;
+      }
+      if (!bodyHTML) {
+        bodyHTML = `<p style="color:var(--muted);font-size:.85rem;margin-top:12px;">Content will be added soon.</p>`;
+      }
+      
+      // Counts for subtitle
+      const lectureCount = lectures.length;
+      const topicCount = topics.length;
+      const totalItems = lectureCount + topicCount;
       const duration = mod.duration ? `· ${escapeHtml(mod.duration)}` : '';
-      const topicCount = topics.length ? `${topics.length} topic${topics.length !== 1 ? 's' : ''} ${duration}` : `No topics listed ${duration}`;
+      let subtitle = '';
+      if (totalItems === 0) {
+        subtitle = `No content ${duration}`;
+      } else {
+        const parts = [];
+        if (lectureCount > 0) parts.push(`${lectureCount} lecture${lectureCount !== 1 ? 's' : ''}`);
+        if (topicCount > 0) parts.push(`${topicCount} topic${topicCount !== 1 ? 's' : ''}`);
+        subtitle = parts.join(', ') + ` ${duration}`;
+      }
 
       return `
         <div class="module-card" id="mod-${i}">
           <div class="module-header" onclick="toggleModule(${i})">
             <div class="module-num">${i+1}</div>
             <div class="module-info">
-              <div class="module-title">${escapeHtml(mod.title || `Module ${i+1}`)}</div>
-              <div class="module-subtitle">${topicCount}</div>
+              <div class="module-title">${escapeHtml(moduleTitle)}</div>
+              <div class="module-subtitle">${subtitle}</div>
             </div>
             <div class="module-toggle">▼</div>
           </div>
-          <div class="module-body">${topicsHTML}</div>
+          <div class="module-body">${bodyHTML}</div>
         </div>`;
     }).join('');
 
@@ -892,6 +1009,45 @@
     return icons[idx % icons.length];
   }
 
+  // ── VIDEO HELPERS ─────────────────────────────────────────────────────
+  function extractYouTubeVideoId(url) {
+    if (!url) return null;
+    // Match YouTube URL patterns
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/v\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11}))/,
+    ];
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match) return match[1];
+    }
+    return null;
+  }
+
+  function embedYouTube(url, title = '', duration = '') {
+    const videoId = extractYouTubeVideoId(url);
+    if (!videoId) {
+      return `<div class="lecture-video">
+                <p style="padding:16px;color:var(--muted);">Invalid or unsupported video URL</p>
+              </div>`;
+    }
+    const embedUrl = `https://www.youtube.com/embed/${videoId}`;
+    return `
+      <div class="lecture-video">
+        <div class="video-container">
+          <iframe src="${embedUrl}" title="${escapeHtml(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="lecture-meta">
+          <div>
+            <div class="lecture-title">${escapeHtml(title)}</div>
+            <div>YouTube Unlisted Video</div>
+          </div>
+          ${duration ? `<span class="lecture-duration">${escapeHtml(duration)}</span>` : ''}
+        </div>
+      </div>`;
+  }
+
   // ── ASSIGNMENT TAB ─────────────────────────────────────────────────────
   function renderAssignments(count, content, curriculum) {
     const container = document.getElementById('assignmentsList');
@@ -904,7 +1060,7 @@
         topics.forEach(t => {
           const lower = (t || '').toLowerCase();
           if (lower.includes('assignment') || lower.includes('project') || lower.includes('exercise') || lower.includes('task')) {
-            tasks.push({ title: t, module: mod.title, badge: 'open' });
+            tasks.push({ title: t, module: mod.moduleTitle || mod.title, badge: 'open' });
           }
         });
       });
