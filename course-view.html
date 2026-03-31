@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+<link rel="icon" type="image/png" href="/assets/favicon.png">
+<link rel="apple-touch-icon" href="/assets/favicon-180x180.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course — DecentraForce</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #050a18;
+    --bg2: #080f22;
+    --surface: #0d1630;
+    --surface2: #111d3a;
+    --surface3: #162040;
+    --accent: #00e5ff;
+    --accent2: #7b5cff;
+    --accent3: #ff4d8d;
+    --text: #e8eeff;
+    --muted: #7d8fb3;
+    --border: rgba(0, 229, 255, 0.12);
+    --border2: rgba(255,255,255,0.06);
+    --glow: rgba(0, 229, 255, 0.15);
+    --sidebar-w: 240px;
+  }
+
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Grid bg */
+  body::after {
+    content: '';
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(0,229,255,.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,.025) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+
+  /* Blobs */
+  .blob { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: 0; }
+  .blob-1 { width: 500px; height: 500px; background: rgba(123,92,255,.1); top: -150px; right: -100px; }
+  .blob-2 { width: 400px; height: 400px; background: rgba(0,229,255,.06); bottom: 0; left: 200px; }
+
+  /* ─── LAYOUT ─── */
+  .app-shell { display: flex; min-height: 100vh; position: relative; z-index: 1; }
+
+  /* ─── SIDEBAR ─── */
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0; background: var(--surface);
+    border-right: 1px solid var(--border); display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 50;
+  }
+
+  .sidebar-logo {
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.15rem;
+    color: var(--text); text-decoration: none; letter-spacing: -.5px;
+    padding: 22px 22px 20px; border-bottom: 1px solid var(--border);
+  }
+  .logo-icon {
+    width: 32px; height: 32px;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border-radius: 7px; display: grid; place-items: center;
+    font-size: .72rem; font-weight: 900; color: #fff;
+    box-shadow: 0 0 16px rgba(123,92,255,.5); flex-shrink: 0;
+  }
+  .sidebar-logo span { color: var(--accent); }
+  .sidebar-logo .tagline {
+    font-family: 'DM Sans', sans-serif; font-weight: 300;
+    font-size: .6rem; color: var(--muted); letter-spacing: .08em;
+    text-transform: uppercase; display: block; margin-top: 2px;
+  }
+
+  .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
+
+  /* Course info in sidebar */
+  .sidebar-course-info {
+    padding: 16px; margin: 0 12px 12px; border-radius: 12px;
+    background: rgba(0,229,255,.05); border: 1px solid var(--border);
+  }
+  .sidebar-course-info .course-thumb {
+    width: 100%; aspect-ratio: 16/9; border-radius: 8px; overflow: hidden;
+    background: var(--surface2); margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center; font-size: 2rem;
+  }
+  .sidebar-course-info .course-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .sidebar-course-title {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: .8rem;
+    color: var(--text); margin-bottom: 8px; line-height: 1.3;
+  }
+  .sidebar-progress-wrap { margin-top: 4px; }
+  .progress-label { display: flex; justify-content: space-between; font-size: .7rem; color: var(--muted); margin-bottom: 5px; }
+  .progress-track { height: 4px; background: var(--surface2); border-radius: 2px; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 1s cubic-bezier(.16,1,.3,1); }
+
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 10px;
+    font-size: .88rem; font-weight: 500; color: var(--muted);
+    text-decoration: none; cursor: pointer; border: none;
+    background: transparent; width: 100%; transition: all .2s; position: relative;
+  }
+  .nav-item:hover { color: var(--text); background: var(--surface2); }
+  .nav-item.active {
+    color: var(--accent); background: rgba(0,229,255,.08);
+    border: 1px solid rgba(0,229,255,.15);
+  }
+  .nav-item.active::before {
+    content: ''; position: absolute; left: 0; top: 6px; bottom: 6px;
+    width: 3px; border-radius: 0 2px 2px 0; background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .nav-icon {
+    width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+    display: grid; place-items: center; font-size: .95rem;
+    background: var(--surface2);
+  }
+  .nav-item.active .nav-icon { background: rgba(0,229,255,.12); }
+
+  .nav-divider { height: 1px; background: var(--border); margin: 8px 14px; }
+  .nav-section-label { font-size: .68rem; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); padding: 4px 14px 2px; }
+
+  .sidebar-footer { padding: 16px 12px; border-top: 1px solid var(--border); }
+  .back-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 10px 14px; border-radius: 10px;
+    font-size: .85rem; color: var(--muted);
+    text-decoration: none; transition: all .2s;
+    border: 1px solid var(--border2);
+  }
+  .back-btn:hover { color: var(--text); border-color: var(--border); background: var(--surface2); }
+
+  /* ─── MAIN CONTENT ─── */
+  .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
+
+  /* ─── TOP BAR ─── */
+  .topbar {
+    height: 66px; background: rgba(5,10,24,.88); backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+    padding: 0 32px; position: sticky; top: 0; z-index: 60;
+  }
+
+  .topbar-left { display: flex; align-items: center; gap: 10px; }
+  .topbar-breadcrumb { font-size: .85rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
+  .topbar-breadcrumb a { color: var(--muted); text-decoration: none; transition: color .2s; }
+  .topbar-breadcrumb a:hover { color: var(--accent); }
+  .topbar-breadcrumb span { color: var(--text); font-weight: 500; }
+  .chevron { color: var(--muted); font-size: .8rem; }
+
+  .topbar-right { display: flex; align-items: center; gap: 16px; }
+  .student-id-badge {
+    display: flex; align-items: center; gap: 7px;
+    background: var(--surface2); border: 1px solid var(--border);
+    padding: 6px 14px; border-radius: 8px; font-size: .8rem;
+  }
+  .student-id-badge .label { color: var(--muted); }
+  .student-id-badge .id { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); letter-spacing: .05em; }
+
+  /* Avatar & dropdown */
+  .avatar-wrapper { position: relative; }
+  .avatar-btn {
+    width: 38px; height: 38px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    border: 2px solid var(--border); display: grid; place-items: center;
+    font-size: .85rem; font-weight: 800; color: #fff; cursor: pointer;
+    box-shadow: 0 0 16px rgba(123,92,255,.35); transition: transform 0.2s;
+  }
+  .avatar-btn:hover { transform: scale(1.05); }
+
+  .user-dropdown {
+    position: absolute; top: 120%; right: 0; width: 230px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,.6);
+    overflow: hidden; z-index: 100; opacity: 0; visibility: hidden;
+    transform: translateY(-10px); transition: all .2s ease;
+  }
+  .user-dropdown.show { opacity: 1; visibility: visible; transform: translateY(0); }
+  .dropdown-header { padding: 14px 16px; border-bottom: 1px solid var(--border); background: var(--surface2); }
+  .dropdown-header h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text); margin-bottom: 2px; }
+  .dropdown-header p { font-size: .75rem; color: var(--muted); }
+  .dropdown-footer { padding: 8px; }
+  .dropdown-item {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+    padding: 10px 12px; border-radius: 8px; border: none;
+    background: transparent; color: var(--text); font-size: .88rem;
+    font-weight: 500; cursor: pointer; transition: background .2s; text-align: left;
+  }
+  .dropdown-item:hover { background: var(--surface2); color: var(--accent); }
+  .dropdown-item.logout { color: var(--accent3); }
+  .dropdown-item.logout:hover { background: rgba(255,77,141,.1); }
+
+  /* ─── PAGE BODY ─── */
+  .page-body { padding: 0; flex: 1; }
+
+  /* ─── COURSE HEADER BANNER ─── */
+  .course-header {
+    background: linear-gradient(135deg, var(--surface), var(--surface2));
+    border-bottom: 1px solid var(--border);
+    padding: 28px 36px 24px;
+    position: relative; overflow: hidden;
+    animation: fadeUp .5s cubic-bezier(.16,1,.3,1) both;
+  }
+  .course-header::before {
+    content: ''; position: absolute; top: -60px; right: -60px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(123,92,255,.12), transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .course-header-inner { position: relative; z-index: 1; }
+
+  .course-status-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .status-chip {
+    padding: 3px 12px; border-radius: 100px; font-size: .72rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .06em;
+  }
+  .status-chip.ongoing { background: rgba(0,229,255,.12); color: var(--accent); border: 1px solid rgba(0,229,255,.2); }
+  .status-chip.upcoming { background: rgba(123,92,255,.12); color: var(--accent2); border: 1px solid rgba(123,92,255,.2); }
+  .status-chip.completed { background: rgba(0,229,153,.1); color: #00e599; border: 1px solid rgba(0,229,153,.2); }
+  .status-chip.enrolled { background: rgba(0,229,153,.1); color: #00e599; border: 1px solid rgba(0,229,153,.2); }
+
+  .course-header h1 {
+    font-family: 'Syne', sans-serif; font-weight: 800;
+    font-size: 1.6rem; letter-spacing: -.02em; line-height: 1.2;
+    margin-bottom: 8px; color: var(--text);
+  }
+  .course-header-meta {
+    display: flex; align-items: center; gap: 20px; flex-wrap: wrap;
+    font-size: .85rem; color: var(--muted); margin-bottom: 18px;
+  }
+  .course-header-meta span { display: flex; align-items: center; gap: 5px; }
+
+  .course-header-progress { max-width: 520px; }
+  .ch-progress-label { display: flex; justify-content: space-between; font-size: .78rem; color: var(--muted); margin-bottom: 6px; }
+  .ch-progress-track { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; border: 1px solid var(--border2); }
+  .ch-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent)); box-shadow: 0 0 10px rgba(0,229,255,.3); transition: width 1.2s cubic-bezier(.16,1,.3,1); }
+
+  /* ─── TAB BAR ─── */
+  .tab-nav {
+    display: flex; align-items: stretch; gap: 0;
+    border-bottom: 1px solid var(--border);
+    background: rgba(5,10,24,.6); backdrop-filter: blur(10px);
+    padding: 0 36px;
+    position: sticky; top: 66px; z-index: 40;
+    overflow-x: auto;
+  }
+  .tab-nav::-webkit-scrollbar { display: none; }
+
+  .tab-btn {
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 20px; height: 52px;
+    font-size: .88rem; font-weight: 500; color: var(--muted);
+    cursor: pointer; border: none; background: transparent;
+    border-bottom: 3px solid transparent;
+    transition: all .2s; white-space: nowrap; position: relative;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); font-weight: 600; }
+  .tab-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 18px; height: 18px; padding: 0 5px;
+    background: var(--accent2); color: #fff;
+    border-radius: 100px; font-size: .65rem; font-weight: 700;
+  }
+  .tab-btn.active .tab-badge { background: var(--accent); color: #000; }
+
+  /* ─── CONTENT AREA ─── */
+  .content-area { display: none; padding: 32px 36px 60px; max-width: 900px; }
+  .content-area.active { display: block; animation: fadeUp .4s cubic-bezier(.16,1,.3,1) both; }
+
+  /* ─── MODULE TAB ─── */
+  .modules-list { display: flex; flex-direction: column; gap: 14px; }
+
+  .module-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .module-card:hover { border-color: rgba(0,229,255,.2); box-shadow: 0 4px 20px rgba(0,0,0,.3); }
+
+  .module-header {
+    display: flex; align-items: center; gap: 16px;
+    padding: 18px 22px; cursor: pointer;
+    user-select: none;
+  }
+  .module-num {
+    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: grid; place-items: center;
+    font-family: 'Syne', sans-serif; font-weight: 800; font-size: .85rem; color: #fff;
+    box-shadow: 0 0 12px rgba(123,92,255,.3);
+  }
+  .module-info { flex: 1; }
+  .module-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .98rem; color: var(--text); margin-bottom: 2px; }
+  .module-subtitle { font-size: .78rem; color: var(--muted); }
+  .module-toggle {
+    width: 28px; height: 28px; border-radius: 8px;
+    background: var(--surface2); border: 1px solid var(--border2);
+    display: grid; place-items: center; color: var(--muted);
+    font-size: .8rem; transition: all .2s; flex-shrink: 0;
+  }
+  .module-card.open .module-toggle { background: rgba(0,229,255,.1); color: var(--accent); border-color: rgba(0,229,255,.2); transform: rotate(180deg); }
+
+  .module-body {
+    display: none; border-top: 1px solid var(--border2);
+    padding: 0 22px 20px;
+  }
+  .module-card.open .module-body { display: block; }
+
+  .topic-list { list-style: none; margin-top: 14px; }
+  .topic-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 9px;
+    font-size: .88rem; color: var(--muted);
+    transition: background .2s; cursor: default;
+    border: 1px solid transparent;
+  }
+  .topic-item:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
+  .topic-icon { width: 28px; height: 28px; border-radius: 7px; background: var(--surface2); display: grid; place-items: center; font-size: .85rem; flex-shrink: 0; }
+
+  .module-empty {
+    text-align: center; padding: 50px 20px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  }
+  .module-empty .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+  .module-empty h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
+  .module-empty p { color: var(--muted); font-size: .9rem; }
+
+  /* ─── ASSIGNMENT TAB ─── */
+  .assignment-header { margin-bottom: 24px; }
+  .stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 20px; text-align: center;
+  }
+  .stat-card .num { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.8rem; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .stat-card .lbl { font-size: .78rem; color: var(--muted); margin-top: 2px; }
+
+  .assignment-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px; margin-bottom: 14px;
+    transition: border-color .2s;
+  }
+  .assignment-card:hover { border-color: rgba(123,92,255,.2); }
+  .assignment-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+  .assignment-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .98rem; color: var(--text); }
+  .assignment-badge { padding: 4px 10px; border-radius: 6px; font-size: .7rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+  .badge-pending { background: rgba(251,191,36,.1); color: #fbbf24; border: 1px solid rgba(251,191,36,.2); }
+  .badge-open { background: rgba(0,229,255,.1); color: var(--accent); border: 1px solid rgba(0,229,255,.15); }
+  .badge-done { background: rgba(0,229,153,.1); color: #00e599; border: 1px solid rgba(0,229,153,.15); }
+  .assignment-desc { color: var(--muted); font-size: .88rem; line-height: 1.6; }
+
+  /* ─── RESOURCES TAB ─── */
+  .resources-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
+  .resource-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 22px; display: flex; flex-direction: column; gap: 12px;
+    transition: border-color .2s, transform .2s;
+  }
+  .resource-card:hover { border-color: rgba(0,229,255,.2); transform: translateY(-2px); }
+  .resource-icon { width: 44px; height: 44px; border-radius: 12px; display: grid; place-items: center; font-size: 1.3rem; }
+  .resource-icon.cyan { background: rgba(0,229,255,.1); }
+  .resource-icon.purple { background: rgba(123,92,255,.1); }
+  .resource-icon.green { background: rgba(0,229,153,.1); }
+  .resource-icon.pink { background: rgba(255,77,141,.1); }
+  .resource-card h4 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .95rem; color: var(--text); }
+  .resource-card p { font-size: .84rem; color: var(--muted); line-height: 1.55; }
+  .resource-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: .82rem; color: var(--accent); font-weight: 600;
+    text-decoration: none; margin-top: auto;
+    transition: gap .2s;
+  }
+  .resource-link:hover { gap: 10px; }
+
+  /* ─── LEADER BOARD TAB ─── */
+  .leaderboard-header {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px; margin-bottom: 20px;
+    text-align: center;
+  }
+  .leaderboard-header h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 6px; }
+  .leaderboard-header p { color: var(--muted); font-size: .88rem; }
+
+  .leaderboard-table { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+  .lb-row {
+    display: flex; align-items: center; gap: 16px;
+    padding: 14px 20px; border-bottom: 1px solid var(--border2);
+    transition: background .2s;
+  }
+  .lb-row:last-child { border-bottom: none; }
+  .lb-row:hover { background: var(--surface2); }
+  .lb-row.me { background: rgba(0,229,255,.05); border-left: 3px solid var(--accent); }
+  .lb-rank {
+    width: 32px; text-align: center; font-family: 'Syne', sans-serif;
+    font-weight: 800; font-size: .95rem;
+  }
+  .lb-rank.gold { color: #fbbf24; }
+  .lb-rank.silver { color: #94a3b8; }
+  .lb-rank.bronze { color: #b45309; }
+  .lb-rank.other { color: var(--muted); }
+  .lb-avatar {
+    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    display: grid; place-items: center; font-size: .8rem; font-weight: 800; color: #fff;
+  }
+  .lb-name { flex: 1; font-weight: 500; font-size: .9rem; }
+  .lb-score { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; color: var(--accent); }
+  .lb-bar-wrap { width: 100px; height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+  .lb-bar { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent2), var(--accent)); }
+  .lb-coming-soon {
+    text-align: center; padding: 50px 20px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  }
+  .lb-coming-soon .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+  .lb-coming-soon h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
+  .lb-coming-soon p { color: var(--muted); font-size: .88rem; }
+
+  /* ─── ANNOUNCEMENTS TAB ─── */
+  .announcement-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+    padding: 24px; margin-bottom: 16px;
+    position: relative; overflow: hidden;
+    transition: border-color .2s;
+  }
+  .announcement-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: linear-gradient(180deg, var(--accent2), var(--accent));
+  }
+  .announcement-card:hover { border-color: rgba(123,92,255,.2); }
+  .announcement-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .announcement-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; color: var(--text); }
+  .announcement-date { font-size: .74rem; color: var(--muted); white-space: nowrap; flex-shrink: 0; margin-top: 2px; }
+  .announcement-body { color: #a4b5d6; font-size: .9rem; line-height: 1.7; white-space: pre-wrap; }
+  .announcement-tag {
+    display: inline-block; padding: 3px 9px; border-radius: 5px;
+    font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    margin-top: 14px;
+  }
+  .tag-info { background: rgba(0,229,255,.1); color: var(--accent); border: 1px solid rgba(0,229,255,.15); }
+  .tag-update { background: rgba(123,92,255,.1); color: var(--accent2); border: 1px solid rgba(123,92,255,.15); }
+  .tag-important { background: rgba(255,77,141,.1); color: var(--accent3); border: 1px solid rgba(255,77,141,.15); }
+
+  .no-announcement {
+    text-align: center; padding: 60px 20px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  }
+  .no-announcement .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+  .no-announcement h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
+  .no-announcement p { color: var(--muted); font-size: .88rem; }
+
+  /* ─── SECTION HEADER ─── */
+  .section-header { margin-bottom: 22px; }
+  .section-header h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.25rem; margin-bottom: 4px; }
+  .section-header h2 em { font-style: normal; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+  .section-header p { font-size: .88rem; color: var(--muted); }
+
+  /* ─── LOADING ─── */
+  .loader {
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px; padding: 60px; color: var(--muted); font-size: .9rem;
+  }
+  .spin {
+    width: 22px; height: 22px; border-radius: 50%;
+    border: 2px solid var(--border); border-top-color: var(--accent);
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* ─── RESPONSIVE ─── */
+  @media (max-width: 768px) {
+    :root { --sidebar-w: 0px; }
+    .sidebar { display: none; }
+    .main { margin-left: 0; }
+    .course-header { padding: 20px 20px 18px; }
+    .tab-nav { padding: 0 16px; }
+    .content-area { padding: 24px 20px 50px; }
+    .stat-cards { grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .resources-grid { grid-template-columns: 1fr; }
+    .topbar { padding: 0 16px; }
+    .student-id-badge { display: none; }
+    .course-header h1 { font-size: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div class="app-shell">
+
+  <!-- ─── SIDEBAR ─── -->
+  <aside class="sidebar">
+    <a href="index.html" class="sidebar-logo">
+      <div class="logo-icon">DF</div>
+      <div>
+        Decentra<span>Force</span>
+        <span class="tagline">Your Web3 University</span>
+      </div>
+    </a>
+
+    <div style="padding: 14px 12px 0;">
+      <div class="sidebar-course-info" id="sidebarCourseInfo" style="display:none;">
+        <div class="course-thumb" id="sidebarThumb">🎓</div>
+        <div class="sidebar-course-title" id="sidebarCourseTitle">Loading...</div>
+        <div class="sidebar-progress-wrap">
+          <div class="progress-label"><span>Progress</span><span id="sidebarPct">0%</span></div>
+          <div class="progress-track"><div class="progress-fill" id="sidebarFill" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label" style="margin-top:6px;">Navigate</div>
+      <button class="nav-item active" id="sideNavModule" onclick="switchTab('module')">
+        <div class="nav-icon">📚</div>
+        Module
+      </button>
+      <button class="nav-item" id="sideNavAssignment" onclick="switchTab('assignment')">
+        <div class="nav-icon">📝</div>
+        Assignment
+      </button>
+      <button class="nav-item" id="sideNavResources" onclick="switchTab('resources')">
+        <div class="nav-icon">🔗</div>
+        Resources
+      </button>
+      <button class="nav-item" id="sideNavLeaderboard" onclick="switchTab('leaderboard')">
+        <div class="nav-icon">🏆</div>
+        Leader Board
+      </button>
+      <button class="nav-item" id="sideNavAnnouncements" onclick="switchTab('announcements')">
+        <div class="nav-icon">📢</div>
+        Announcements
+        <span class="tab-badge" id="sideAnnounceBadge" style="display:none;margin-left:auto;"></span>
+      </button>
+
+      <div class="nav-divider"></div>
+      <a href="my-courses.html" class="nav-item">
+        <div class="nav-icon">⊞</div>
+        My Courses
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <a href="my-courses.html" class="back-btn">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+        Back to My Courses
+      </a>
+    </div>
+  </aside>
+
+  <!-- ─── MAIN ─── -->
+  <main class="main">
+
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <div class="topbar-breadcrumb">
+          <a href="my-courses.html">My Courses</a>
+          <span class="chevron">›</span>
+          <span id="topbarTitle">Loading...</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="student-id-badge">
+          <span class="label">Student ID:</span>
+          <span class="id" id="topbarStudentId">DF-LOADING</span>
+        </div>
+        <div class="avatar-wrapper">
+          <div class="avatar-btn" id="navAvatar" onclick="toggleDropdown(event)">…</div>
+          <div class="user-dropdown" id="userMenu">
+            <div class="dropdown-header">
+              <h4 id="dropName">Loading...</h4>
+              <p id="dropEmail">loading@email.com</p>
+            </div>
+            <div class="dropdown-footer">
+              <a href="my-courses.html" class="dropdown-item">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                My Courses
+              </a>
+              <button class="dropdown-item logout" onclick="logoutUser()">
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="page-body">
+
+      <!-- Loading state -->
+      <div class="loader" id="pageLoader">
+        <div class="spin"></div>
+        Loading course...
+      </div>
+
+      <!-- Course Header Banner (hidden until loaded) -->
+      <div class="course-header" id="courseHeader" style="display:none;">
+        <div class="course-header-inner">
+          <div class="course-status-row">
+            <span class="status-chip enrolled" id="headerStatus">Enrolled</span>
+            <span class="status-chip ongoing" id="courseStatusChip" style="display:none;"></span>
+          </div>
+          <h1 id="headerTitle">Course Title</h1>
+          <div class="course-header-meta">
+            <span>🎓 <span id="headerInstructor">DecentraForce</span></span>
+            <span>📦 <span id="headerModules">0</span> Modules</span>
+            <span>🎥 <span id="headerLectures">0</span> Lectures</span>
+            <span>⚡ <span id="headerExercises">0</span> Exercises</span>
+          </div>
+          <div class="course-header-progress">
+            <div class="ch-progress-label">
+              <span>Your Progress</span>
+              <span id="headerPct" style="color:var(--accent);font-weight:700;">7%</span>
+            </div>
+            <div class="ch-progress-track">
+              <div class="ch-progress-fill" id="headerFill" style="width:7%;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tab Nav -->
+      <nav class="tab-nav" id="tabNav" style="display:none;">
+        <button class="tab-btn active" id="tabModule" onclick="switchTab('module')">
+          <span>📚</span> Module
+        </button>
+        <button class="tab-btn" id="tabAssignment" onclick="switchTab('assignment')">
+          <span>📝</span> Assignment
+          <span class="tab-badge" id="assignBadge">0</span>
+        </button>
+        <button class="tab-btn" id="tabResources" onclick="switchTab('resources')">
+          <span>🔗</span> Resources
+        </button>
+        <button class="tab-btn" id="tabLeaderboard" onclick="switchTab('leaderboard')">
+          <span>🏆</span> Leader Board
+        </button>
+        <button class="tab-btn" id="tabAnnouncements" onclick="switchTab('announcements')">
+          <span>📢</span> Announcements
+          <span class="tab-badge" id="announceBadge" style="display:none;"></span>
+        </button>
+      </nav>
+
+      <!-- ── MODULE TAB ── -->
+      <div class="content-area active" id="panelModule">
+        <div class="section-header">
+          <h2>Course <em>Curriculum</em></h2>
+          <p>All modules and lectures for this course.</p>
+        </div>
+        <div class="modules-list" id="modulesList">
+          <div class="loader"><div class="spin"></div> Loading modules...</div>
+        </div>
+      </div>
+
+      <!-- ── ASSIGNMENT TAB ── -->
+      <div class="content-area" id="panelAssignment">
+        <div class="section-header">
+          <h2>Assignments &amp; <em>Exercises</em></h2>
+          <p>Practice tasks and assessments set by your instructor.</p>
+        </div>
+        <div class="stat-cards" id="assignStatCards">
+          <div class="stat-card"><div class="num" id="statLectures">—</div><div class="lbl">Lectures</div></div>
+          <div class="stat-card"><div class="num" id="statExercises">—</div><div class="lbl">Exercises</div></div>
+          <div class="stat-card"><div class="num" id="statAssignments">—</div><div class="lbl">Assignments</div></div>
+        </div>
+        <div id="assignmentsList"></div>
+      </div>
+
+      <!-- ── RESOURCES TAB ── -->
+      <div class="content-area" id="panelResources">
+        <div class="section-header">
+          <h2>Course <em>Resources</em></h2>
+          <p>Useful links and materials for this course.</p>
+        </div>
+        <div class="resources-grid" id="resourcesGrid">
+          <!-- Filled dynamically -->
+        </div>
+      </div>
+
+      <!-- ── LEADERBOARD TAB ── -->
+      <div class="content-area" id="panelLeaderboard">
+        <div class="section-header">
+          <h2>Leader <em>Board</em></h2>
+          <p>Top performers in this course.</p>
+        </div>
+        <div class="lb-coming-soon">
+          <div class="empty-icon">🏆</div>
+          <h3>Leaderboard Coming Soon</h3>
+          <p>Complete assignments and exercises to earn your rank when this feature launches.</p>
+        </div>
+      </div>
+
+      <!-- ── ANNOUNCEMENTS TAB ── -->
+      <div class="content-area" id="panelAnnouncements">
+        <div class="section-header">
+          <h2>Course <em>Announcements</em></h2>
+          <p>Latest updates and notices from your instructor.</p>
+        </div>
+        <div id="announcementsList"></div>
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+</div>
+
+<script>
+  // ── STATE ──────────────────────────────────────────────────────────────
+  let currentUser  = null;
+  let activeCourse = null;
+  let courseModules = {};
+
+  // ── INIT ───────────────────────────────────────────────────────────────
+  async function initApp() {
+    // Auth check
+    try {
+      const res  = await fetch('/api/auth/verify', { credentials: 'include' });
+      const data = await res.json();
+      if (data.success && data.user) {
+        currentUser = data.user;
+        const initials = currentUser.username.substring(0,2).toUpperCase();
+        document.getElementById('navAvatar').textContent     = initials;
+        document.getElementById('dropName').textContent      = currentUser.username;
+        document.getElementById('dropEmail').textContent     = currentUser.email;
+        document.getElementById('topbarStudentId').textContent = `DF-${currentUser.id.toString().padStart(6,'0')}`;
+      } else {
+        window.location.href = 'login.html';
+        return;
+      }
+    } catch(e) {
+      window.location.href = 'login.html';
+      return;
+    }
+
+    // Load course
+    const params   = new URLSearchParams(window.location.search);
+    const courseId = params.get('id');
+    if (!courseId) { showError('No course ID provided.'); return; }
+
+    try {
+      const res  = await fetch('/api/_public/courses');
+      const data = await res.json();
+      activeCourse = (data.courses || []).find(c => String(c.id) === String(courseId));
+      if (!activeCourse) { showError('Course not found.'); return; }
+
+      populatePage();
+    } catch(e) {
+      showError('Failed to load course data.');
+    }
+  }
+
+  // ── POPULATE ────────────────────────────────────────────────────────────
+  function populatePage() {
+    // Parse modules JSON safely
+    try {
+      courseModules = typeof activeCourse.modules === 'string'
+        ? JSON.parse(activeCourse.modules)
+        : (activeCourse.modules || {});
+    } catch(e) {
+      courseModules = {};
+    }
+    if (!courseModules || typeof courseModules !== 'object') courseModules = {};
+
+    const curriculum   = Array.isArray(courseModules.curriculum) ? courseModules.curriculum : [];
+    const lectures     = parseInt(courseModules.lectures)   || 0;
+    const exercises    = parseInt(courseModules.exercises)  || 0;
+    const assignCount  = parseInt(courseModules.assignments)|| 0;
+    const content      = courseModules.content || '';
+    const status       = activeCourse.status   || 'ongoing';
+
+    // ─ Header
+    document.getElementById('headerTitle').textContent      = activeCourse.title || 'Untitled Course';
+    document.getElementById('topbarTitle').textContent      = activeCourse.title || 'Course';
+    document.getElementById('headerModules').textContent    = curriculum.length;
+    document.getElementById('headerLectures').textContent   = lectures;
+    document.getElementById('headerExercises').textContent  = exercises;
+
+    const statusChip = document.getElementById('courseStatusChip');
+    if (status && status !== 'ongoing') {
+      statusChip.textContent  = status.charAt(0).toUpperCase() + status.slice(1);
+      statusChip.className    = `status-chip ${status}`;
+      statusChip.style.display = '';
+    }
+
+    // ─ Sidebar course info
+    const sidebarInfo = document.getElementById('sidebarCourseInfo');
+    sidebarInfo.style.display = '';
+    document.getElementById('sidebarCourseTitle').textContent = activeCourse.title || 'Untitled';
+    if (activeCourse.thumbnail_url && activeCourse.thumbnail_url.length > 10) {
+      document.getElementById('sidebarThumb').innerHTML = `<img src="${activeCourse.thumbnail_url}" alt="thumbnail">`;
+    }
+
+    // ─ Hide loader, show content
+    document.getElementById('pageLoader').style.display  = 'none';
+    document.getElementById('courseHeader').style.display = '';
+    document.getElementById('tabNav').style.display       = '';
+
+    // ─ Stat badges
+    document.getElementById('statLectures').textContent   = lectures   || '—';
+    document.getElementById('statExercises').textContent  = exercises  || '—';
+    document.getElementById('statAssignments').textContent= assignCount|| '—';
+
+    const ab = document.getElementById('assignBadge');
+    ab.textContent = assignCount;
+    if (!assignCount) ab.style.display = 'none';
+
+    // ─ Render tabs
+    renderModules(curriculum);
+    renderAssignments(assignCount, content, curriculum);
+    renderResources();
+    renderAnnouncements(content, activeCourse);
+  }
+
+  // ── MODULE TAB ─────────────────────────────────────────────────────────
+  function renderModules(curriculum) {
+    const container = document.getElementById('modulesList');
+    if (!curriculum || curriculum.length === 0) {
+      container.innerHTML = `
+        <div class="module-empty">
+          <div class="empty-icon">📦</div>
+          <h3>Curriculum Coming Soon</h3>
+          <p>Your instructor hasn't added modules yet. Check back soon!</p>
+        </div>`;
+      return;
+    }
+    container.innerHTML = curriculum.map((mod, i) => {
+      const topics = Array.isArray(mod.topics) ? mod.topics
+                   : (typeof mod.topics === 'string' && mod.topics ? [mod.topics] : []);
+      const topicsHTML = topics.length
+        ? `<ul class="topic-list">${topics.map((t, j) => `
+            <li class="topic-item">
+              <div class="topic-icon">${getTopicIcon(t, j)}</div>
+              <span>${escapeHtml(t)}</span>
+            </li>`).join('')}</ul>`
+        : `<p style="color:var(--muted);font-size:.85rem;margin-top:12px;">Topics will be listed here shortly.</p>`;
+
+      const duration = mod.duration ? `· ${escapeHtml(mod.duration)}` : '';
+      const topicCount = topics.length ? `${topics.length} topic${topics.length !== 1 ? 's' : ''} ${duration}` : `No topics listed ${duration}`;
+
+      return `
+        <div class="module-card" id="mod-${i}">
+          <div class="module-header" onclick="toggleModule(${i})">
+            <div class="module-num">${i+1}</div>
+            <div class="module-info">
+              <div class="module-title">${escapeHtml(mod.title || `Module ${i+1}`)}</div>
+              <div class="module-subtitle">${topicCount}</div>
+            </div>
+            <div class="module-toggle">▼</div>
+          </div>
+          <div class="module-body">${topicsHTML}</div>
+        </div>`;
+    }).join('');
+
+    // Auto-open first module
+    setTimeout(() => toggleModule(0), 100);
+  }
+
+  function toggleModule(idx) {
+    const card = document.getElementById(`mod-${idx}`);
+    if (card) card.classList.toggle('open');
+  }
+
+  function getTopicIcon(text, idx) {
+    const t = (text || '').toLowerCase();
+    if (t.includes('intro')  || t.includes('overview'))   return '📖';
+    if (t.includes('smart')  || t.includes('contract'))   return '📜';
+    if (t.includes('deploy') || t.includes('deploying'))  return '🚀';
+    if (t.includes('test')   || t.includes('testing'))    return '🧪';
+    if (t.includes('web3')   || t.includes('dapp'))       return '🌐';
+    if (t.includes('solidity'))                            return '⚙️';
+    if (t.includes('wallet') || t.includes('metamask'))   return '💼';
+    if (t.includes('project'))                             return '🏗️';
+    if (t.includes('video')  || t.includes('lecture'))    return '🎬';
+    const icons = ['▶','📌','💡','🔑','🔧','📊','🗂️','🔍'];
+    return icons[idx % icons.length];
+  }
+
+  // ── ASSIGNMENT TAB ─────────────────────────────────────────────────────
+  function renderAssignments(count, content, curriculum) {
+    const container = document.getElementById('assignmentsList');
+    const tasks = [];
+
+    // Pull named assignments/exercises from curriculum topics
+    if (curriculum && curriculum.length) {
+      curriculum.forEach(mod => {
+        const topics = Array.isArray(mod.topics) ? mod.topics : [];
+        topics.forEach(t => {
+          const lower = (t || '').toLowerCase();
+          if (lower.includes('assignment') || lower.includes('project') || lower.includes('exercise') || lower.includes('task')) {
+            tasks.push({ title: t, module: mod.title, badge: 'open' });
+          }
+        });
+      });
+    }
+
+    // Fallback: use assignments count from admin
+    if (tasks.length === 0) {
+      if (count > 0) {
+        for (let i = 1; i <= Math.min(count, 5); i++) {
+          tasks.push({ title: `Assignment ${i}`, module: 'Course Assignment', badge: i === 1 ? 'open' : 'pending' });
+        }
+      }
+    }
+
+    if (tasks.length === 0) {
+      container.innerHTML = `
+        <div class="module-empty">
+          <div class="empty-icon">📝</div>
+          <h3>No Assignments Yet</h3>
+          <p>Your instructor hasn't posted assignments yet. They'll appear here once added.</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = tasks.map((t, i) => `
+      <div class="assignment-card" style="animation-delay:${i*.05}s">
+        <div class="assignment-card-header">
+          <div class="assignment-title">${escapeHtml(t.title)}</div>
+          <span class="assignment-badge badge-${t.badge || 'open'}">${
+            t.badge === 'done' ? '✓ Completed' : t.badge === 'pending' ? '⏳ Upcoming' : '● Open'
+          }</span>
+        </div>
+        <div class="assignment-desc">${t.module ? `From module: <strong style="color:var(--text)">${escapeHtml(t.module)}</strong>` : 'Course Assignment'}</div>
+      </div>`).join('');
+  }
+
+  // ── RESOURCES TAB ──────────────────────────────────────────────────────
+  function renderResources() {
+    const container = document.getElementById('resourcesGrid');
+    const resources = [];
+
+    if (activeCourse.whatsapp) {
+      resources.push({
+        icon: '💬', iconClass: 'green',
+        title: 'WhatsApp Community',
+        desc: 'Join the course WhatsApp group to collaborate with fellow students and get direct support.',
+        label: 'Join Group',
+        href: activeCourse.whatsapp
+      });
+    }
+
+    // Static helpful resources
+    resources.push({
+      icon: '📖', iconClass: 'cyan',
+      title: 'Course Notes',
+      desc: 'Study materials, notes, and reference documents will be shared here by your instructor.',
+      label: 'Coming Soon',
+      href: null
+    }, {
+      icon: '🎥', iconClass: 'purple',
+      title: 'Video Lectures',
+      desc: 'All recorded lectures and live session replays are accessible directly in the Module tab.',
+      label: 'Go to Modules',
+      href: null,
+      action: () => switchTab('module')
+    }, {
+      icon: '🔗', iconClass: 'pink',
+      title: 'External Links',
+      desc: 'Useful references, documentation, and tools recommended by the instructor.',
+      label: 'Coming Soon',
+      href: null
+    });
+
+    container.innerHTML = resources.map(r => `
+      <div class="resource-card">
+        <div class="resource-icon ${r.iconClass}">${r.icon}</div>
+        <h4>${r.title}</h4>
+        <p>${r.desc}</p>
+        ${r.href
+          ? `<a class="resource-link" href="${escapeHtml(r.href)}" target="_blank">${r.label} →</a>`
+          : `<span class="resource-link" style="opacity:.5;cursor:default;">${r.label}</span>`}
+      </div>`).join('');
+  }
+
+  // ── ANNOUNCEMENTS TAB ──────────────────────────────────────────────────
+  function renderAnnouncements(content, course) {
+    const container = document.getElementById('announcementsList');
+    const announcements = [];
+
+    // Use admin's course content field as the primary "welcome" announcement
+    if (content && content.trim().length > 10) {
+      announcements.push({
+        title: `Welcome to ${course.title || 'the Course'}`,
+        date: formatDate(course.created_at || new Date().toISOString()),
+        body: content.trim(),
+        tag: 'info'
+      });
+    }
+
+    // Add status-based announcement
+    const status = (course.status || '').toLowerCase();
+    if (status === 'ongoing') {
+      announcements.push({
+        title: '🚀 Course is Now Live!',
+        date: formatDate(course.created_at || new Date().toISOString()),
+        body: 'This course is currently ongoing. New content and lectures are being added regularly. Stay tuned and keep learning!',
+        tag: 'update'
+      });
+    } else if (status === 'upcoming') {
+      announcements.push({
+        title: '📅 Course Starting Soon',
+        date: formatDate(new Date().toISOString()),
+        body: 'This course will launch soon. In the meantime, review any available materials and prepare your setup.',
+        tag: 'important'
+      });
+    }
+
+    // Badge
+    if (announcements.length > 0) {
+      const badge = document.getElementById('announceBadge');
+      const sideBadge = document.getElementById('sideAnnounceBadge');
+      badge.textContent     = announcements.length;
+      badge.style.display   = '';
+      sideBadge.textContent = announcements.length;
+      sideBadge.style.display = '';
+    }
+
+    if (announcements.length === 0) {
+      container.innerHTML = `
+        <div class="no-announcement">
+          <div class="empty-icon">📢</div>
+          <h3>No Announcements Yet</h3>
+          <p>Your instructor hasn't posted any announcements. Check back later.</p>
+        </div>`;
+      return;
+    }
+
+    container.innerHTML = announcements.map((a, i) => `
+      <div class="announcement-card" style="animation-delay:${i*.08}s">
+        <div class="announcement-card-header">
+          <div class="announcement-title">${escapeHtml(a.title)}</div>
+          <div class="announcement-date">${a.date}</div>
+        </div>
+        <div class="announcement-body">${escapeHtml(a.body)}</div>
+        <span class="announcement-tag tag-${a.tag}">${a.tag === 'info' ? 'Info' : a.tag === 'update' ? 'Update' : 'Important'}</span>
+      </div>`).join('');
+  }
+
+  // ── TAB SWITCHING ──────────────────────────────────────────────────────
+  const TABS = ['module','assignment','resources','leaderboard','announcements'];
+
+  function switchTab(name) {
+    TABS.forEach(t => {
+      // Content panels
+      const panel = document.getElementById(`panel${capitalize(t)}`);
+      if (panel) panel.classList.toggle('active', t === name);
+
+      // Top tab buttons
+      const btn = document.getElementById(`tab${capitalize(t)}`);
+      if (btn) btn.classList.toggle('active', t === name);
+
+      // Sidebar nav buttons
+      const side = document.getElementById(`sideNav${capitalize(t)}`);
+      if (side) side.classList.toggle('active', t === name);
+    });
+    // Close dropdown
+    document.getElementById('userMenu').classList.remove('show');
+  }
+
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+
+  // ── HELPERS ────────────────────────────────────────────────────────────
+  function escapeHtml(text) {
+    const d = document.createElement('div');
+    d.textContent = text;
+    return d.innerHTML;
+  }
+
+  function formatDate(iso) {
+    try {
+      return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
+    } catch(e) { return ''; }
+  }
+
+  function showError(msg) {
+    document.getElementById('pageLoader').innerHTML = `
+      <div style="text-align:center;padding:60px 20px;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">⚠️</div>
+        <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;margin-bottom:6px;">${msg}</h3>
+        <a href="my-courses.html" style="color:var(--accent);font-size:.9rem;text-decoration:none;">← Back to My Courses</a>
+      </div>`;
+  }
+
+  // ── DROPDOWN & AUTH ────────────────────────────────────────────────────
+  function toggleDropdown(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('show');
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.avatar-wrapper')) {
+      document.getElementById('userMenu').classList.remove('show');
+    }
+  });
+  async function logoutUser() {
+    try { await fetch('/api/auth/logout', { method:'POST', credentials:'include' }); } catch(e){}
+    window.location.href = 'login.html';
+  }
+
+  // ── EXPOSE GLOBALS ─────────────────────────────────────────────────────
+  window.toggleDropdown = toggleDropdown;
+  window.logoutUser     = logoutUser;
+  window.switchTab      = switchTab;
+  window.toggleModule   = toggleModule;
+
+  // ── BOOT ───────────────────────────────────────────────────────────────
+  document.addEventListener('DOMContentLoaded', initApp);
+</script>
+</body>
+</html>
