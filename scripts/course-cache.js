@@ -1,150 +1,113 @@
 /**
  * Course Caching Module
- * Provides localStorage caching for courses to reduce database calls
+ * Always fetches fresh data from API; localStorage is used only as a
+ * short-term fallback when the API is temporarily unreachable.
+ *
+ * TTL is 60 s — short enough that status changes made in the admin panel
+ * are visible to users within one minute.  The admin panel also explicitly
+ * clears the cache on every course save / delete.
  */
 
-const CACHE_KEY = 'courses';
+const CACHE_KEY           = 'courses';
 const CACHE_TIMESTAMP_KEY = 'courses_timestamp';
-const CACHE_EXPIRY_MS = 3600000; // 1 hour
+const CACHE_EXPIRY_MS     = 60 * 1000; // 60 seconds
 
 /**
- * Get courses from cache or fetch from API
- * @returns {Promise<Array>} Array of course objects
+ * Get courses.  Always tries the API first; falls back to cache on error.
+ * @returns {Promise<Array>}
  */
 export async function getCourses() {
   try {
-    // Check cache first
-    const cached = getCachedCourses();
-    if (cached) {
-      // Return cached data immediately
-      console.log('Using cached courses');
-      return cached;
-    }
-    
-    // Fetch fresh data
     const response = await fetch('/api/_public/courses');
-    if (!response.ok) throw new Error('Failed to fetch courses');
-    
-    const { courses } = await response.json();
-    
-    // Update cache
-    cacheCourses(courses);
-    
-    return courses;
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+    const data = await response.json();
+    if (!data.success || !Array.isArray(data.courses)) {
+      throw new Error('Invalid API response');
+    }
+
+    cacheCourses(data.courses);
+    return data.courses;
   } catch (error) {
-    console.error('Error fetching courses:', error);
-    
-    // Fallback to cache even if expired
-    const cached = getCachedCourses(true); // force get even if expired
-    if (cached) {
-      console.log('Using expired cache as fallback');
+    console.warn('Courses API unavailable, trying cache:', error.message);
+
+    const cached = getCachedCourses(true); // accept any age
+    if (cached && cached.length > 0) {
+      console.log('Using cached courses as fallback');
       return cached;
     }
-    
+
     throw error;
   }
 }
 
 /**
- * Get cached courses if available and not expired
- * @param {boolean} force - Return cached data even if expired
- * @returns {Array|null} Cached courses or null
+ * Read from localStorage cache.
+ * @param {boolean} force  If true, ignore expiry and return even stale data.
+ * @returns {Array|null}
  */
 function getCachedCourses(force = false) {
   try {
-    const cachedData = localStorage.getItem(CACHE_KEY);
-    const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-    
-    if (!cachedData || !timestamp) return null;
-    
-    const age = Date.now() - parseInt(timestamp, 10);
-    
-    if (!force && age > CACHE_EXPIRY_MS) {
-      console.log('Cache expired, fetching fresh data');
-      return null;
-    }
-    
-    return JSON.parse(cachedData);
-  } catch (error) {
-    console.error('Error reading cache:', error);
+    const raw  = localStorage.getItem(CACHE_KEY);
+    const ts   = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+    if (!raw || !ts) return null;
+    const age  = Date.now() - parseInt(ts, 10);
+    if (!force && age > CACHE_EXPIRY_MS) return null;
+    return JSON.parse(raw);
+  } catch {
     return null;
   }
 }
 
-/**
- * Cache courses to localStorage
- * @param {Array} courses - Course data to cache
- */
+/** Write courses + current timestamp to localStorage. */
 function cacheCourses(courses) {
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify(courses));
     localStorage.setItem(CACHE_TIMESTAMP_KEY, Date.now().toString());
-    console.log('Courses cached successfully');
-  } catch (error) {
-    console.error('Error caching courses:', error);
+  } catch (e) {
+    console.warn('Could not cache courses:', e.message);
   }
 }
 
-/**
- * Clear the course cache
- */
+/** Remove cached data.  Called by the admin panel after saving or deleting a course. */
 export function clearCourseCache() {
   localStorage.removeItem(CACHE_KEY);
   localStorage.removeItem(CACHE_TIMESTAMP_KEY);
-  console.log('Course cache cleared');
 }
 
 /**
- * Force refresh courses from API and update cache
- * @returns {Promise<Array>} Fresh course data
+ * Force a fresh API fetch, bypassing any cached data.
+ * @returns {Promise<Array>}
  */
 export async function refreshCourses() {
-  try {
-    const response = await fetch('/api/_public/courses');
-    if (!response.ok) throw new Error('Failed to fetch courses');
-    
-    const { courses } = await response.json();
-    cacheCourses(courses);
-    
-    return courses;
-  } catch (error) {
-    console.error('Error refreshing courses:', error);
-    throw error;
-  }
+  clearCourseCache();
+  return getCourses();
 }
 
 /**
- * Get cache status
- * @returns {Object} Cache status information
+ * Return cache metadata (useful for admin debugging).
+ * @returns {Object}
  */
 export function getCacheStatus() {
-  const cachedData = localStorage.getItem(CACHE_KEY);
-  const timestamp = localStorage.getItem(CACHE_TIMESTAMP_KEY);
-  
-  if (!cachedData || !timestamp) {
-    return { hasCache: false, age: null, expired: true };
-  }
-  
-  const age = Date.now() - parseInt(timestamp, 10);
+  const raw = localStorage.getItem(CACHE_KEY);
+  const ts  = localStorage.getItem(CACHE_TIMESTAMP_KEY);
+
+  if (!raw || !ts) return { hasCache: false, age: null, expired: true };
+
+  const age     = Date.now() - parseInt(ts, 10);
   const expired = age > CACHE_EXPIRY_MS;
-  
+
   return {
     hasCache: true,
     age,
     expired,
-    ageFormatted: formatAge(age),
-    itemCount: JSON.parse(cachedData).length
+    ageFormatted: _formatAge(age),
+    itemCount: JSON.parse(raw).length,
   };
 }
 
-/**
- * Format age in human readable format
- * @param {number} ms - Age in milliseconds
- * @returns {string} Formatted age
- */
-function formatAge(ms) {
-  if (ms < 60000) return `${Math.floor(ms / 1000)} seconds`;
+function _formatAge(ms) {
+  if (ms < 60000)   return `${Math.floor(ms / 1000)} seconds`;
   if (ms < 3600000) return `${Math.floor(ms / 60000)} minutes`;
-  if (ms < 86400000) return `${Math.floor(ms / 3600000)} hours`;
-  return `${Math.floor(ms / 86400000)} days`;
+  return `${Math.floor(ms / 3600000)} hours`;
 }
