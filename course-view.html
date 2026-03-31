@@ -8,6 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Course — DecentraForce</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<script src="https://www.youtube.com/iframe_api"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -543,6 +544,614 @@
     font-size: .75rem;
     font-weight: 600;
   }
+
+  /* ─── TWO‑COLUMN VIDEO LAYOUT ─── */
+  .video-module-container {
+    display: flex;
+    gap: 32px;
+    margin-top: 24px;
+  }
+
+  .video-main {
+    flex: 0 0 65%;
+    max-width: 65%;
+  }
+
+  .video-sidebar {
+    flex: 0 0 35%;
+    max-width: 35%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px;
+    align-self: flex-start;
+  }
+
+  /* Dark video player area */
+  .video-player-area {
+    background: var(--bg); /* near-black/dark green background */
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin-bottom: 20px;
+  }
+
+  .video-title-bar {
+    padding: 24px;
+    text-align: center;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .video-title-bar h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .video-title-underline {
+    width: 120px;
+    height: 3px;
+    background: linear-gradient(90deg, #ffd700, #ffaa00);
+    margin: 0 auto;
+    border-radius: 2px;
+    position: relative;
+  }
+
+  .video-title-underline::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: #ffd700;
+    border-radius: 50%;
+    top: -2.5px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .video-player-wrapper {
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+    overflow: hidden;
+  }
+
+  .video-player-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+
+  .video-controls-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border-top: 1px solid var(--border2);
+  }
+
+  .control-left, .control-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .control-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+  }
+
+  .control-btn:hover {
+    opacity: 1;
+  }
+
+  .progress-bar {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    margin: 0 20px;
+    overflow: hidden;
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    width: 8%;
+    border-radius: 2px;
+  }
+
+  .time-display {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.7);
+    font-family: 'DM Sans', monospace;
+    min-width: 100px;
+    text-align: center;
+  }
+
+  .lesson-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text);
+    margin: 20px 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .video-navigation {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .nav-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    border: 2px solid transparent;
+  }
+
+  .nav-btn.prev {
+    background: transparent;
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .nav-btn.prev:hover {
+    background: rgba(0,229,255,0.1);
+  }
+
+  .nav-btn.next {
+    background: var(--accent);
+    color: #000;
+    border-color: var(--accent);
+  }
+
+  .nav-btn.next:hover {
+    background: #00cce5;
+    border-color: #00cce5;
+  }
+
+  .description-tab {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border2);
+  }
+
+  .description-label {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--text);
+    margin-bottom: 8px;
+    padding-bottom: 6px;
+    border-bottom: 2px solid var(--accent);
+    display: inline-block;
+  }
+
+  .description-content {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* Sidebar progress */
+  .sidebar-progress {
+    margin-bottom: 28px;
+  }
+
+  .sidebar-progress-label {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+
+  .sidebar-progress-bar {
+    height: 6px;
+    background: var(--surface2);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+
+  .sidebar-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #00e599, #00cc88);
+    border-radius: 3px;
+    width: 7%;
+  }
+
+  .module-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .module-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    background: var(--surface);
+    border-radius: 10px;
+    border: 1px solid var(--border2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .module-row:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,229,255,0.1);
+  }
+
+  .module-info {
+    flex: 1;
+  }
+
+  .module-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .module-subtext {
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+
+  .module-chevron {
+    color: var(--muted);
+    font-size: 0.9rem;
+    transition: transform 0.2s;
+  }
+
+  .module-row:hover .module-chevron {
+    color: var(--accent);
+    transform: translateX(3px);
+  }
+
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .video-module-container {
+      flex-direction: column;
+      gap: 24px;
+    }
+    .video-main, .video-sidebar {
+      flex: 1;
+      max-width: 100%;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .video-controls-bar {
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .progress-bar {
+      order: 3;
+      flex: 1 0 100%;
+      margin: 8px 0 0;
+    }
+    .time-display {
+      min-width: auto;
+    }
+  }
+  
+  /* ─── CUSTOM YOUTUBE OVERLAY & CONTROLS ─── */
+  .youtube-player-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+  }
+  
+  .youtube-iframe-wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+  }
+  
+  .youtube-iframe-wrapper iframe {
+    width: 100%;
+    height: 100%;
+    border: none;
+    pointer-events: none; /* Allow clicks to pass through to overlay */
+  }
+  
+  .youtube-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 2;
+    pointer-events: auto;
+    background: transparent;
+  }
+  
+  /* Custom controls bar */
+  .custom-controls-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.7), transparent);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    transition: opacity 0.3s ease;
+    opacity: 0;
+  }
+  
+  .youtube-overlay:hover .custom-controls-bar {
+    opacity: 1;
+  }
+  
+  .control-group {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .control-btn {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.85;
+    transition: opacity 0.2s, transform 0.2s;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+  }
+  
+  .control-btn:hover {
+    opacity: 1;
+    background: rgba(255,255,255,0.1);
+    transform: scale(1.05);
+  }
+  
+  .control-btn.play-pause {
+    background: var(--accent);
+    color: #000;
+    font-size: 1rem;
+  }
+  
+  .control-btn.play-pause:hover {
+    background: #00cce5;
+  }
+  
+  /* Timeline slider */
+  .timeline-slider-container {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .timeline-slider {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+  }
+  
+  .timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    box-shadow: 0 0 8px rgba(0,229,255,0.8);
+  }
+  
+  .timeline-slider::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 8px rgba(0,229,255,0.8);
+  }
+  
+  .time-display {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.9);
+    font-family: 'DM Sans', monospace;
+    min-width: 100px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  
+  /* Volume slider */
+  .volume-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 120px;
+  }
+  
+  .volume-slider {
+    flex: 1;
+    height: 4px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    cursor: pointer;
+  }
+  
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent2);
+    cursor: pointer;
+  }
+  
+  .volume-slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--accent2);
+    cursor: pointer;
+    border: none;
+  }
+  
+  /* Fullscreen button */
+  .control-btn.fullscreen {
+    margin-left: auto;
+  }
+  
+  /* Loading indicator */
+  .youtube-loading {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 3;
+    background: rgba(0,0,0,0.8);
+    padding: 20px 30px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: var(--text);
+    font-size: 0.9rem;
+  }
+  
+  .youtube-loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  /* Block right-click context menu */
+  .youtube-overlay {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+  
+  /* Hide native YouTube controls */
+  .youtube-iframe-wrapper iframe {
+    /* These parameters are set via API, but extra assurance */
+    color: white;
+    iv_load_policy: 3;
+    modestbranding: 1;
+    controls: 0;
+    disablekb: 1;
+    fs: 0;
+    rel: 0;
+    showinfo: 0;
+  }
+
+  /* ── RESPONSIVE ADJUSTMENTS FOR CUSTOM CONTROLS ─── */
+  @media (max-width: 768px) {
+    .custom-controls-bar {
+      padding: 12px 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    
+    .control-group {
+      flex: 1 1 100%;
+      margin-bottom: 8px;
+    }
+    
+    .control-group:last-child {
+      margin-bottom: 0;
+    }
+    
+    .timeline-slider-container {
+      order: 1;
+    }
+    
+    .volume-slider-container {
+      width: 80px;
+    }
+    
+    .control-btn.play-pause {
+      width: 36px;
+      height: 36px;
+      font-size: 0.9rem;
+    }
+    
+    .time-display {
+      min-width: 60px;
+      font-size: 0.75rem;
+    }
+    
+    .control-btn.fullscreen {
+      margin-left: 0;
+      order: 2;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .custom-controls-bar {
+      padding: 10px 12px;
+      gap: 8px;
+    }
+    
+    .timeline-slider-container {
+      gap: 6px;
+    }
+    
+    .volume-slider-container {
+      width: 60px;
+    }
+    
+    .control-btn {
+      width: 32px;
+      height: 32px;
+      font-size: 1rem;
+    }
+  }
 </style>
 </head>
 <body>
@@ -890,6 +1499,8 @@
         </div>`;
       return;
     }
+
+    // For each module, create the two-column video layout
     container.innerHTML = curriculum.map((mod, i) => {
       // Determine module title
       const moduleTitle = mod.moduleTitle || mod.title || `Module ${i+1}`;
@@ -897,44 +1508,89 @@
       const lectures = Array.isArray(mod.lectures) ? mod.lectures : [];
       const topics = Array.isArray(mod.topics) ? mod.topics
                    : (typeof mod.topics === 'string' && mod.topics ? [mod.topics] : []);
+
+      // Get first lecture for video player (or placeholder)
+      const firstLecture = lectures.length > 0 ? lectures[0] : null;
+      const videoTitle = firstLecture ? firstLecture.title : 'Digital Signature & Advanced Cryptographic Protocols';
+      const videoUrl = firstLecture ? firstLecture.url : '';
+      const videoDuration = firstLecture ? firstLecture.duration : '18:34';
+
+      // Build custom YouTube player with overlay
+      let videoPlayerHTML = '';
+      const videoId = videoUrl ? extractYouTubeVideoId(videoUrl) : null;
       
-      // Build lectures HTML (video embeds)
-      let lecturesHTML = '';
-      if (lectures.length > 0) {
-        lecturesHTML = lectures.map(lec => {
-          const title = lec.title || '';
-          const url = lec.url || '';
-          const duration = lec.duration || '';
-          const videoId = extractYouTubeVideoId(url);
-          if (videoId) {
-            return embedYouTube(url, title, duration);
-          } else if (url) {
-            // Non-YouTube video link (fallback)
-            return `
-              <div class="lecture-video">
-                <div class="video-container">
-                  <iframe src="${escapeHtml(url)}" title="${escapeHtml(title)}" allowfullscreen></iframe>
-                </div>
-                <div class="lecture-meta">
-                  <div>
-                    <div class="lecture-title">${escapeHtml(title)}</div>
-                    <div>External Video</div>
+      if (videoId) {
+        const playerId = `youtube-player-${i}`;
+        const overlayId = `youtube-overlay-${i}`;
+        
+        videoPlayerHTML = `
+          <div class="youtube-player-container" id="${playerId}-container">
+            <div class="youtube-iframe-wrapper" id="${playerId}-wrapper">
+              <!-- YouTube iframe will be injected by API -->
+            </div>
+            <div class="youtube-overlay" id="${overlayId}">
+              <div class="youtube-loading" id="${playerId}-loading">
+                <div class="youtube-loading-spinner"></div>
+                <span>Loading video...</span>
+              </div>
+              <div class="custom-controls-bar">
+                <div class="control-group">
+                  <button class="control-btn play-pause" data-player="${playerId}" onclick="togglePlayPause('${playerId}')">▶</button>
+                  <div class="timeline-slider-container">
+                    <span class="time-display current-time" data-player="${playerId}">0:00</span>
+                    <input type="range" class="timeline-slider" min="0" max="100" value="0" data-player="${playerId}" oninput="seekVideo('${playerId}', this.value)" onchange="seekVideo('${playerId}', this.value)">
+                    <span class="time-display duration" data-player="${playerId}">${videoDuration}</span>
                   </div>
-                  ${duration ? `<span class="lecture-duration">${escapeHtml(duration)}</span>` : ''}
                 </div>
-              </div>`;
-          } else {
-            // No URL, treat as topic
-            return `
-              <div class="topic-item">
-                <div class="topic-icon">${getTopicIcon(title, 0)}</div>
-                <span>${escapeHtml(title)}</span>
-              </div>`;
-          }
-        }).join('');
+                <div class="control-group">
+                  <button class="control-btn volume-btn" data-player="${playerId}" onclick="toggleMute('${playerId}')">🔊</button>
+                  <div class="volume-slider-container">
+                    <input type="range" class="volume-slider" min="0" max="100" value="80" data-player="${playerId}" oninput="setVolume('${playerId}', this.value)">
+                  </div>
+                </div>
+                <button class="control-btn fullscreen" data-player="${playerId}" onclick="toggleFullscreen('${playerId}-container')">⛶</button>
+              </div>
+            </div>
+          </div>`;
+        
+        // Schedule player initialization after DOM insertion
+        setTimeout(() => initializeYouTubePlayer(playerId, videoId, overlayId), 100);
+      } else if (videoUrl) {
+        // Non-YouTube video fallback
+        videoPlayerHTML = `
+          <div class="video-player-wrapper">
+            <iframe src="${escapeHtml(videoUrl)}" title="${escapeHtml(videoTitle)}" allowfullscreen></iframe>
+          </div>`;
+      } else {
+        // Placeholder video area
+        videoPlayerHTML = `
+          <div class="video-player-wrapper" style="background: #000; display: grid; place-items: center; color: #fff; font-size: 1.2rem;">
+            <div style="text-align: center;">
+              <div style="font-size: 3rem; margin-bottom: 12px;">🎬</div>
+              <div>Video placeholder</div>
+              <div style="font-size: 0.9rem; opacity: 0.7;">Video will appear here</div>
+            </div>
+          </div>`;
       }
-      
-      // Build topics HTML (old style)
+
+      // Build module list for sidebar (simulate all modules)
+      const moduleListHTML = curriculum.map((m, j) => {
+        const mTitle = m.moduleTitle || m.title || `Module ${j+1}`;
+        const mLectures = Array.isArray(m.lectures) ? m.lectures.length : 0;
+        const mTopics = Array.isArray(m.topics) ? m.topics.length : 0;
+        const mTotal = mLectures + mTopics;
+        const mDuration = m.duration || '02:22:03';
+        return `
+          <div class="module-row ${i === j ? 'active' : ''}" onclick="scrollToModule(${j})">
+            <div class="module-info">
+              <div class="module-name">${escapeHtml(mTitle)}</div>
+              <div class="module-subtext">${mDuration} hours • ${mTotal} lectures</div>
+            </div>
+            <div class="module-chevron">▼</div>
+          </div>`;
+      }).join('');
+
+      // Build topics HTML (old style) for below video
       let topicsHTML = '';
       if (topics.length > 0) {
         topicsHTML = `<ul class="topic-list">${topics.map((t, j) => `
@@ -943,19 +1599,7 @@
               <span>${escapeHtml(t)}</span>
             </li>`).join('')}</ul>`;
       }
-      
-      // Combine lectures and topics
-      let bodyHTML = '';
-      if (lecturesHTML) {
-        bodyHTML += `<div class="lectures-container">${lecturesHTML}</div>`;
-      }
-      if (topicsHTML) {
-        bodyHTML += topicsHTML;
-      }
-      if (!bodyHTML) {
-        bodyHTML = `<p style="color:var(--muted);font-size:.85rem;margin-top:12px;">Content will be added soon.</p>`;
-      }
-      
+
       // Counts for subtitle
       const lectureCount = lectures.length;
       const topicCount = topics.length;
@@ -981,7 +1625,46 @@
             </div>
             <div class="module-toggle">▼</div>
           </div>
-          <div class="module-body">${bodyHTML}</div>
+          <div class="module-body">
+            <div class="video-module-container">
+              <div class="video-main">
+                <div class="video-player-area">
+                  <div class="video-title-bar">
+                    <h2>Digital Signature & Advanced Cryptographic Protocols</h2>
+                    <div class="video-title-underline"></div>
+                  </div>
+                  ${videoPlayerHTML}
+                </div>
+                <div class="lesson-title">M 14.4 - Digital Signature & Advanced Cryptographic Protocols</div>
+                <div class="video-navigation">
+                  <button class="nav-btn prev">← Previous</button>
+                  <button class="nav-btn next">Next →</button>
+                </div>
+                <div class="description-tab">
+                  <div class="description-label">Description:</div>
+                  <div class="description-content">
+                    This lecture covers the fundamentals of digital signatures and advanced cryptographic protocols used in blockchain technology.
+                    ${firstLecture ? escapeHtml(firstLecture.description || '') : 'Detailed description will appear here.'}
+                  </div>
+                </div>
+                ${topicsHTML}
+              </div>
+              <div class="video-sidebar">
+                <div class="sidebar-progress">
+                  <div class="sidebar-progress-label">
+                    <span>Progress</span>
+                    <span>7%</span>
+                  </div>
+                  <div class="sidebar-progress-bar">
+                    <div class="sidebar-progress-fill"></div>
+                  </div>
+                </div>
+                <div class="module-list">
+                  ${moduleListHTML}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>`;
     }).join('');
 
@@ -992,6 +1675,17 @@
   function toggleModule(idx) {
     const card = document.getElementById(`mod-${idx}`);
     if (card) card.classList.toggle('open');
+  }
+
+  function scrollToModule(idx) {
+    const card = document.getElementById(`mod-${idx}`);
+    if (card) {
+      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      // Open the module if closed
+      if (!card.classList.contains('open')) {
+        card.classList.add('open');
+      }
+    }
   }
 
   function getTopicIcon(text, idx) {
@@ -1047,6 +1741,207 @@
         </div>
       </div>`;
   }
+
+  // ── YOUTUBE PLAYER API & CUSTOM CONTROLS ───────────────────────────────
+  const youtubePlayers = {};
+
+  // Initialize YouTube player
+  function initializeYouTubePlayer(playerId, videoId, overlayId) {
+    const container = document.getElementById(`${playerId}-container`);
+    const wrapper = document.getElementById(`${playerId}-wrapper`);
+    const loading = document.getElementById(`${playerId}-loading`);
+    
+    if (!container || !wrapper) return;
+    
+    // Check if YouTube API is loaded
+    if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
+      // Retry after 500ms
+      setTimeout(() => initializeYouTubePlayer(playerId, videoId, overlayId), 500);
+      return;
+    }
+    
+    // Create iframe
+    const player = new YT.Player(`${playerId}-iframe`, {
+      width: '100%',
+      height: '100%',
+      videoId: videoId,
+      playerVars: {
+        autoplay: 0,
+        controls: 0,          // Hide native controls
+        modestbranding: 1,    // Reduce YouTube branding
+        rel: 0,              // Don't show related videos
+        showinfo: 0,         // Hide video title and uploader
+        iv_load_policy: 3,   // Hide annotations
+        disablekb: 1,        // Disable keyboard controls
+        fs: 0,               // Disable fullscreen button
+        playsinline: 1       // Play inline on iOS
+      },
+      events: {
+        onReady: (event) => {
+          youtubePlayers[playerId] = event.target;
+          if (loading) loading.style.display = 'none';
+          
+          // Set initial volume
+          event.target.setVolume(80);
+          
+          // Update duration display
+          const duration = formatTime(event.target.getDuration());
+          container.querySelector('.duration').textContent = duration;
+          
+          // Start update interval
+          startPlayerUpdateInterval(playerId);
+        },
+        onStateChange: (event) => {
+          const playPauseBtn = container.querySelector('.play-pause');
+          if (playPauseBtn) {
+            playPauseBtn.textContent = event.data === YT.PlayerState.PLAYING ? '⏸' : '▶';
+          }
+        },
+        onError: (error) => {
+          console.error('YouTube player error:', error);
+          if (loading) {
+            loading.innerHTML = '<div style="color: #ff4d8d;">⚠️ Video failed to load</div>';
+          }
+        }
+      }
+    });
+    
+    // Inject iframe into wrapper
+    wrapper.appendChild(player.getIframe());
+    
+    // Store reference
+    youtubePlayers[playerId] = player;
+  }
+
+  // Start interval to update timeline
+  function startPlayerUpdateInterval(playerId) {
+    setInterval(() => {
+      const player = youtubePlayers[playerId];
+      if (!player || player.getPlayerState() !== YT.PlayerState.PLAYING) return;
+      
+      const currentTime = player.getCurrentTime();
+      const duration = player.getDuration();
+      const percent = (currentTime / duration) * 100;
+      
+      const container = document.getElementById(`${playerId}-container`);
+      if (!container) return;
+      
+      // Update slider
+      const slider = container.querySelector('.timeline-slider');
+      if (slider) slider.value = percent;
+      
+      // Update time display
+      const currentTimeEl = container.querySelector('.current-time');
+      if (currentTimeEl) currentTimeEl.textContent = formatTime(currentTime);
+    }, 500);
+  }
+
+  // Format seconds to MM:SS
+  function formatTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
+
+  // Control functions
+  function togglePlayPause(playerId) {
+    const player = youtubePlayers[playerId];
+    if (!player) return;
+    
+    if (player.getPlayerState() === YT.PlayerState.PLAYING) {
+      player.pauseVideo();
+    } else {
+      player.playVideo();
+    }
+  }
+
+  function seekVideo(playerId, percent) {
+    const player = youtubePlayers[playerId];
+    if (!player) return;
+    
+    const duration = player.getDuration();
+    const targetTime = (percent / 100) * duration;
+    player.seekTo(targetTime, true);
+    
+    // Update current time display
+    const container = document.getElementById(`${playerId}-container`);
+    if (container) {
+      const currentTimeEl = container.querySelector('.current-time');
+      if (currentTimeEl) currentTimeEl.textContent = formatTime(targetTime);
+    }
+  }
+
+  function setVolume(playerId, volume) {
+    const player = youtubePlayers[playerId];
+    if (!player) return;
+    
+    player.setVolume(volume);
+    
+    // Update volume button icon
+    const container = document.getElementById(`${playerId}-container`);
+    if (container) {
+      const volumeBtn = container.querySelector('.volume-btn');
+      if (volumeBtn) {
+        if (volume == 0) {
+          volumeBtn.textContent = '🔇';
+        } else if (volume < 30) {
+          volumeBtn.textContent = '🔈';
+        } else if (volume < 70) {
+          volumeBtn.textContent = '🔉';
+        } else {
+          volumeBtn.textContent = '🔊';
+        }
+      }
+    }
+  }
+
+  function toggleMute(playerId) {
+    const player = youtubePlayers[playerId];
+    if (!player) return;
+    
+    const isMuted = player.isMuted();
+    if (isMuted) {
+      player.unMute();
+      setVolume(playerId, player.getVolume());
+    } else {
+      player.mute();
+      const container = document.getElementById(`${playerId}-container`);
+      if (container) {
+        const volumeBtn = container.querySelector('.volume-btn');
+        if (volumeBtn) volumeBtn.textContent = '🔇';
+      }
+    }
+  }
+
+  function toggleFullscreen(containerId) {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+    
+    if (!document.fullscreenElement) {
+      if (container.requestFullscreen) {
+        container.requestFullscreen();
+      } else if (container.webkitRequestFullscreen) {
+        container.webkitRequestFullscreen();
+      } else if (container.msRequestFullscreen) {
+        container.msRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen();
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen();
+      }
+    }
+  }
+
+  // YouTube API global callback
+  window.onYouTubeIframeAPIReady = function() {
+    console.log('YouTube API ready');
+    // Players are initialized individually via initializeYouTubePlayer
+  };
 
   // ── ASSIGNMENT TAB ─────────────────────────────────────────────────────
   function renderAssignments(count, content, curriculum) {
@@ -1274,6 +2169,12 @@
   window.logoutUser     = logoutUser;
   window.switchTab      = switchTab;
   window.toggleModule   = toggleModule;
+  window.togglePlayPause = togglePlayPause;
+  window.seekVideo = seekVideo;
+  window.setVolume = setVolume;
+  window.toggleMute = toggleMute;
+  window.toggleFullscreen = toggleFullscreen;
+  window.scrollToModule = scrollToModule;
 
   // ── BOOT ───────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', initApp);
