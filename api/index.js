@@ -56,6 +56,69 @@ async function verifyCoupon(req, res) {
   return res.status(400).json({ success: false, error: 'Invalid or expired coupon' });
 }
 
+// ── PUBLIC: POST /api/purchases ─────────────────────────────────────
+async function createPurchase(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  
+  // Get user from session
+  const token = req.cookies?.session_token;
+  if (!token) return res.status(401).json({ success: false, error: 'Not authenticated' });
+  
+  const userResult = await query(
+    `SELECT id FROM users WHERE session_token=$1 AND session_expires>NOW()`,
+    [token]
+  );
+  if (!userResult.rows.length) return res.status(401).json({ success: false, error: 'Invalid or expired session' });
+  
+  const user = userResult.rows[0];
+  const { course_id, sender_number, transaction_id, payment_method } = req.body || {};
+  
+  if (!course_id) return res.status(400).json({ success: false, error: 'Course ID required' });
+  if (!sender_number) return res.status(400).json({ success: false, error: 'Sender number required' });
+  if (!transaction_id) return res.status(400).json({ success: false, error: 'Transaction ID required' });
+  
+  // Verify course exists
+  const courseResult = await query('SELECT id FROM courses WHERE id=$1', [course_id]);
+  if (!courseResult.rows.length) return res.status(404).json({ success: false, error: 'Course not found' });
+  
+  // Insert purchase with pending status
+  const result = await query(
+    `INSERT INTO purchases (user_id, course_id, sender_number, transaction_id, payment_method, status)
+     VALUES ($1, $2, $3, $4, $5, 'pending') RETURNING *`,
+    [user.id, course_id, sender_number, transaction_id, payment_method || 'unknown']
+  );
+  
+  return res.status(201).json({ success: true, purchase: result.rows[0] });
+}
+
+// ── USER: GET /api/user/purchases ───────────────────────────────────
+async function userPurchases(req, res) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
+  
+  // Get user from session
+  const token = req.cookies?.session_token;
+  if (!token) return res.status(401).json({ success: false, error: 'Not authenticated' });
+  
+  const userResult = await query(
+    `SELECT id FROM users WHERE session_token=$1 AND session_expires>NOW()`,
+    [token]
+  );
+  if (!userResult.rows.length) return res.status(401).json({ success: false, error: 'Invalid or expired session' });
+  
+  const user = userResult.rows[0];
+  
+  // Fetch purchases for this user, join with course details
+  const r = await query(`
+    SELECT p.*, c.title AS course_title, c.thumbnail_url, c.price, c.whatsapp
+    FROM purchases p
+    LEFT JOIN courses c ON p.course_id = c.id
+    WHERE p.user_id = $1
+    ORDER BY p.created_at DESC
+  `, [user.id]);
+  
+  return res.status(200).json({ success: true, purchases: r.rows });
+}
+
 // ── ADMIN: GET/PUT /api/admin/purchases ─────────────────────────────
 async function adminPurchases(req, res) {
   const admin = await requireAdmin(req, res); if (!admin) return;
@@ -63,10 +126,10 @@ async function adminPurchases(req, res) {
   if (req.method === 'GET') {
     // Fetch purchases and join with course and user tables to get titles and names
     const r = await query(`
-      SELECT p.*, c.title AS course_title, u.username AS sender_name 
-      FROM purchases p 
-      LEFT JOIN courses c ON p.course_id = c.id 
-      LEFT JOIN users u ON p.user_id = u.id 
+      SELECT p.*, c.title AS course_title, u.username AS sender_name
+      FROM purchases p
+      LEFT JOIN courses c ON p.course_id = c.id
+      LEFT JOIN users u ON p.user_id = u.id
       ORDER BY p.created_at DESC
     `);
     return res.status(200).json({ success: true, purchases: r.rows });
@@ -84,8 +147,8 @@ async function adminPurchases(req, res) {
       const p = await query('SELECT user_id, course_id FROM purchases WHERE id = $1', [id]);
       if (p.rows.length) {
         await query(`
-          INSERT INTO user_courses (user_id, course_id, granted_by, granted_at) 
-          VALUES ($1, $2, $3, NOW()) 
+          INSERT INTO user_courses (user_id, course_id, granted_by, granted_at)
+          VALUES ($1, $2, $3, NOW())
           ON CONFLICT (user_id, course_id) DO NOTHING
         `, [p.rows[0].user_id, p.rows[0].course_id, admin.id]);
       }
@@ -552,6 +615,12 @@ export default async function handler(req, res) {
     if (path.endsWith('/_public/verify-coupon') || path.endsWith('/public/verify-coupon')) return await verifyCoupon(req, res);
     if (path.endsWith('/_public/mentors')       || path.endsWith('/public/mentors'))       return await publicMentors(req, res);
     if (path.endsWith('/_public/testimonials')  || path.endsWith('/public/testimonials'))  return await publicTestimonials(req, res);
+
+    // Purchase creation (authenticated)
+    if (path.endsWith('/purchases')) return await createPurchase(req, res);
+
+    // User purchases (authenticated)
+    if (path.endsWith('/user/purchases')) return await userPurchases(req, res);
 
     // Auth
     if (path.endsWith('/auth/register'))       return await authRegister(req, res);

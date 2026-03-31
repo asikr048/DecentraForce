@@ -1509,37 +1509,44 @@ window.addEventListener('storage', (e) => {
           return;
         }
 
-        // Create the purchase object (No coupons, so price is just basePrice)
-        const purchase = {
-          courseId: activeCourse.id,
-          courseTitle: activeCourse.title,
-          price: basePrice, 
-          whatsappLink: activeCourse.whatsapp || '',
-          paymentMethod: paymentMethod,
-          senderNumber: senderNumber,
-          trxId: transactionId,
-          status: "pending",
-          timestamp: new Date().toISOString(),
-          id: Date.now().toString()
+        // Create the purchase object for API
+        const purchaseData = {
+          course_id: activeCourse.id,
+          sender_number: senderNumber,
+          transaction_id: transactionId,
+          payment_method: paymentMethod
         };
 
-        const purchases = JSON.parse(localStorage.getItem('purchases') || '[]');
-        purchases.push(purchase);
-        localStorage.setItem('purchases', JSON.stringify(purchases));
-
         newConfirmBtn.textContent = 'Processing...';
-        setTimeout(() => {
-          closeCheckoutModal();
-          newConfirmBtn.textContent = 'Submit Payment';
-          
-          if (purchase.whatsappLink) {
-            window.open(purchase.whatsappLink, '_blank'); 
-            window.location.href = 'my-courses.html'; 
-          } else {
+        newConfirmBtn.disabled = true;
+
+        // Send to API
+        fetch('/api/purchases', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(purchaseData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            closeCheckoutModal();
+            if (activeCourse.whatsapp) {
+              window.open(activeCourse.whatsapp, '_blank');
+            }
             alert(`Payment submitted successfully for ${activeCourse.title}!\nOur team will verify your transaction shortly.`);
             window.location.href = 'my-courses.html';
+          } else {
+            alert('Failed to submit purchase: ' + (data.error || 'Unknown error'));
+            newConfirmBtn.textContent = 'Submit Payment';
+            newConfirmBtn.disabled = false;
           }
-        }, 1000);
+        })
+        .catch(error => {
+          console.error('Purchase submission error:', error);
+          alert('Network error. Please check your connection and try again.');
+          newConfirmBtn.textContent = 'Submit Payment';
+          newConfirmBtn.disabled = false;
+        });
       });
     }
     // Initialize courses dynamically from the API, fallback to localStorage if needed
