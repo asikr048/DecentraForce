@@ -1307,8 +1307,15 @@ async function renderCourses() {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
           const courseId = this.dataset.courseId;
-          // Redirect to course details page instead of opening modal
-          window.location.href = `course-details.html?id=${encodeURIComponent(courseId)}`;
+          // Find the course object
+          const course = courses.find(c => (c.id || '').toString() === courseId.toString());
+          if (course) {
+            // Open checkout modal with course details
+            openCheckoutModal(course);
+          } else {
+            // Fallback to course details page
+            window.location.href = `course-details.html?id=${encodeURIComponent(courseId)}`;
+          }
         });
       });
     }
