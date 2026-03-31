@@ -1418,7 +1418,8 @@ function getCourseButton(course, type, isPending) {
     // Safe navigation with encoded parameters
     const encodedId = encodeURIComponent(courseId);
     const encodedTitle = encodeURIComponent(courseTitle || '');
-    window.location.href = `video-course.html?courseId=${encodedId}&title=${encodedTitle}`;
+    // Redirect to course-details.html instead of video-course.html
+    window.location.href = `course-details.html?id=${encodedId}`;
   }
 
   function getEmojiForCourse(title) {
