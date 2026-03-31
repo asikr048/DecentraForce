@@ -1428,11 +1428,18 @@ function getCourseButton(course, type, isPending) {
 
   function getModuleCount(course) {
     try {
+      let modulesObj;
       if (course.modules && typeof course.modules === 'string') {
-        const parsed = JSON.parse(course.modules);
-        if (Array.isArray(parsed)) return parsed.length;
-      } else if (Array.isArray(course.modules)) {
-        return course.modules.length;
+        modulesObj = JSON.parse(course.modules);
+      } else {
+        modulesObj = course.modules;
+      }
+      if (Array.isArray(modulesObj)) {
+        return modulesObj.length;
+      } else if (modulesObj && typeof modulesObj === 'object') {
+        // Count keys excluding metadata (same logic as index.html)
+        const exclude = ['category', 'level', 'assignments'];
+        return Object.keys(modulesObj).filter(k => !exclude.includes(k.toLowerCase())).length;
       }
     } catch (e) {}
     return 0;

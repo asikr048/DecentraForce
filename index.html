@@ -1326,6 +1326,63 @@ window.addEventListener('storage', (e) => {
       }
     }
 
+    // Fetch user purchases from API (similar to my-courses.html)
+    async function fetchUserPurchases() {
+      let dbPurchases = [];
+      try {
+        const res = await fetch('/api/user/purchases', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success) {
+            dbPurchases = data.purchases.map(p => ({
+              courseId: p.course_id?.toString(),
+              status: p.status,
+              senderNumber: p.sender_number,
+              transactionId: p.transaction_id,
+              paymentMethod: p.payment_method,
+              timestamp: p.created_at,
+              id: p.id?.toString()
+            }));
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch purchases from API:', error);
+      }
+
+      // Load from localStorage for free enrollments (legacy)
+      let localPurchases = [];
+      try {
+        const purchasesJson = localStorage.getItem('purchases');
+        if (purchasesJson) {
+          const parsed = JSON.parse(purchasesJson);
+          if (Array.isArray(parsed)) {
+            localPurchases = parsed;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading purchases from localStorage:', error);
+      }
+
+      // Merge: prefer DB purchases, but keep local purchases that are not in DB (by courseId and transactionId)
+      const merged = [...dbPurchases];
+      const existingIds = new Set(dbPurchases.map(p => `${p.courseId}-${p.transactionId}`));
+      for (const local of localPurchases) {
+        const key = `${local.courseId}-${local.trxId}`;
+        if (!existingIds.has(key)) {
+          merged.push({
+            courseId: local.courseId?.toString(),
+            status: local.status,
+            senderNumber: local.senderNumber,
+            transactionId: local.trxId,
+            paymentMethod: local.paymentMethod,
+            timestamp: local.timestamp,
+            id: local.id?.toString()
+          });
+        }
+      }
+      return merged;
+    }
+
     // Fetch real courses from the Database via API
     async function fetchPublicCourses() {
       try {
@@ -1342,7 +1399,7 @@ window.addEventListener('storage', (e) => {
     }
 
     // Render course cards into a given container
-    function renderCourseGrid(containerSelector, courses) {
+    function renderCourseGrid(containerSelector, courses, enrolledCourseIds = [], pendingCourseIds = []) {
       const container = document.querySelector(containerSelector);
       if (!container) return;
 
@@ -1372,6 +1429,19 @@ window.addEventListener('storage', (e) => {
         
         const priceDisplay = isFree ? '<span style="color:var(--accent);font-weight:700">Free</span>' : `<div class="price"><span>${originalPrice}</span>${price}</div>`;
         const status = course.status || 'upcoming';
+
+        // Determine enrollment status
+        const courseIdStr = course.id?.toString();
+        const isEnrolled = enrolledCourseIds.includes(courseIdStr);
+        const isPending = pendingCourseIds.includes(courseIdStr);
+        
+        // Enrollment badge text and class
+        let enrollmentBadge = '';
+        if (isEnrolled) {
+          enrollmentBadge = '<span class="tag tag-green" style="background:rgba(0,229,153,0.15);color:#00e599;border:1px solid rgba(0,229,153,0.3);">✅ Enrolled</span>';
+        } else if (isPending) {
+          enrollmentBadge = '<span class="tag tag-purple" style="background:rgba(255,191,36,0.15);color:#fbbf24;border:1px solid rgba(255,191,36,0.3);">⏳ Pending</span>';
+        }
 
         // Extract category if available in modules JSON
         let categoryTag = 'Blockchain';
@@ -1406,6 +1476,7 @@ window.addEventListener('storage', (e) => {
           <div class="card-body">
             <div class="card-meta">
               <span class="tag tag-blue">${categoryTag}</span>
+              ${enrollmentBadge}
               <span class="tag tag-purple">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
               <span class="tag tag-green">📦 ${moduleCount || 0} Lectures</span>
             </div>
@@ -1419,9 +1490,18 @@ window.addEventListener('storage', (e) => {
         `;
         container.appendChild(card);
 
-      // Make the card itself open the course details page
+      // Make the card itself open the appropriate page based on enrollment status
         card.addEventListener('click', function() {
-          window.location.href = `course-details.html?id=${course.id}`;
+          if (isEnrolled) {
+            // If enrolled, go directly to course content
+            window.location.href = `course-view.html?id=${course.id}`;
+          } else if (isPending) {
+            // If pending, still show details but maybe with a message
+            window.location.href = `course-details.html?id=${course.id}`;
+          } else {
+            // Not enrolled, go to details page
+            window.location.href = `course-details.html?id=${course.id}`;
+          }
         });
       });
     }// Modal functions
@@ -1568,15 +1648,28 @@ window.addEventListener('storage', (e) => {
       return seqA - seqB;
     });
     
-    // Render all courses to the main grid
-    renderCourseGrid('.courses-grid', courses);
+    // Fetch user purchases to determine enrollment status
+    let enrolledCourseIds = [];
+    let pendingCourseIds = [];
+    try {
+      const purchases = await fetchUserPurchases();
+      const approvedPurchases = purchases.filter(p => p && p.status === 'approved');
+      const pendingPurchases = purchases.filter(p => p && p.status === 'pending');
+      enrolledCourseIds = approvedPurchases.map(p => p.courseId?.toString()).filter(Boolean);
+      pendingCourseIds = pendingPurchases.map(p => p.courseId?.toString()).filter(Boolean);
+    } catch (error) {
+      console.error('Error fetching purchases for enrollment status:', error);
+    }
+    
+    // Render all courses to the main grid with enrollment status
+    renderCourseGrid('.courses-grid', courses, enrolledCourseIds, pendingCourseIds);
     
     // Filter and Render Free Courses (Price == 0)
     const freeCourses = courses.filter(course => {
       const p = parseFloat(course.price);
       return isNaN(p) || p === 0 || course.price === '0' || course.price === null;
     });
-    renderCourseGrid('#free-courses-grid', freeCourses);
+    renderCourseGrid('#free-courses-grid', freeCourses, enrolledCourseIds, pendingCourseIds);
   });
   
   
