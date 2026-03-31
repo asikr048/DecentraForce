@@ -496,6 +496,25 @@
     cursor: pointer;
   }
 
+  /* --- NEW: BIG PLAY BUTTON TO FIX "BLACK SCREEN/STUCK" --- */
+  .big-play-overlay {
+    position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 70px);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 6; pointer-events: none; /* Let shield handle the actual click */
+  }
+  .big-play-btn {
+    width: 76px; height: 76px; border-radius: 50%;
+    background: rgba(0, 229, 255, 0.85); color: #000;
+    display: grid; place-items: center; font-size: 2.2rem;
+    padding-left: 6px; /* optic center alignment for play triangle */
+    box-shadow: 0 0 30px rgba(0, 229, 255, 0.4);
+    opacity: 1; transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+  /* When video is playing, hide the big button */
+  .is-playing .big-play-btn {
+    opacity: 0; transform: scale(1.3);
+  }
+
   .youtube-overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -506,10 +525,14 @@
     justify-content: flex-end;
   }
 
+  /* --- UPGRADED DESIGN: GLASSMORPHISM CONTROL BAR --- */
   .custom-controls-bar {
     pointer-events: auto; /* Controls MUST be clickable */
-    background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.7), transparent);
-    padding: 16px 20px;
+    background: rgba(5, 10, 24, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding: 14px 20px;
     display: flex;
     align-items: center;
     gap: 16px;
@@ -517,7 +540,8 @@
     opacity: 0;
   }
 
-  .video-player-area:hover .custom-controls-bar {
+  .video-player-area:hover .custom-controls-bar,
+  .custom-controls-bar:focus-within {
     opacity: 1;
   }
 
@@ -531,26 +555,64 @@
   }
   .control-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); transform: scale(1.05); }
   .control-btn.play-pause { background: var(--accent); color: #000; font-size: 1rem; }
-  .control-btn.play-pause:hover { background: #00cce5; }
+  .control-btn.play-pause:hover { background: #00cce5; box-shadow: 0 0 10px rgba(0,229,255,0.4); }
+
+  /* Subtitle (CC) and Settings Styling */
+  .cc-btn { font-size: 0.9rem; font-weight: 700; font-family: sans-serif; }
+  .cc-btn.active { color: var(--accent); position: relative; }
+  .cc-btn.active::after { 
+    content:''; position:absolute; bottom:4px; left:50%; transform:translateX(-50%); 
+    width:12px; height:2px; background:var(--accent); border-radius:2px; 
+  }
+
+  .settings-menu-container { position: relative; display: flex; align-items: center; }
+  .settings-popup {
+    position: absolute; bottom: calc(100% + 15px); right: -10px; background: rgba(5, 10, 24, 0.95);
+    border: 1px solid var(--border); border-radius: 10px; padding: 8px 0;
+    min-width: 170px; display: none; flex-direction: column; z-index: 100;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+  }
+  .settings-popup.show { display: flex; }
+  
+  .settings-item {
+    padding: 10px 18px; font-size: 0.85rem; color: var(--text); cursor: pointer;
+    display: flex; justify-content: space-between; align-items: center; transition: background 0.2s;
+  }
+  .settings-item:hover { background: rgba(255,255,255,0.1); color: var(--accent); }
+  .settings-item-value { color: var(--muted); font-size: 0.75rem; pointer-events: none; }
+
+  .settings-submenu {
+    position: absolute; bottom: 0; right: 100%; background: rgba(5, 10, 24, 0.95);
+    border: 1px solid var(--border); border-radius: 10px; padding: 8px 0;
+    min-width: 140px; display: none; flex-direction: column; margin-right: 4px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+  }
+  .settings-item.has-submenu:hover .settings-submenu { display: flex; }
 
   /* Timeline slider */
   .timeline-slider-container { flex: 1; display: flex; align-items: center; gap: 10px; }
   .timeline-slider, .volume-slider {
-    flex: 1; height: 4px; background: rgba(255,255,255,0.2);
+    flex: 1; height: 4px; background: rgba(255,255,255,0.15);
     border-radius: 2px; outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;
+    transition: height 0.2s;
   }
+  .timeline-slider:hover { height: 6px; }
+  
   .timeline-slider::-webkit-slider-thumb, .volume-slider::-webkit-slider-thumb {
     -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
-    border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 8px rgba(0,229,255,0.8);
+    border-radius: 50%; background: var(--accent); cursor: pointer; 
+    box-shadow: 0 0 8px rgba(0,229,255,0.8); transition: transform 0.2s;
   }
+  .timeline-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
   .volume-slider::-webkit-slider-thumb { background: var(--accent2); box-shadow: none; }
+  .volume-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
 
   .time-display {
     font-size: 0.85rem; color: rgba(255,255,255,0.9);
     font-family: 'DM Sans', monospace; min-width: 45px;
     text-align: center; font-variant-numeric: tabular-nums;
   }
-  .volume-slider-container { display: flex; align-items: center; gap: 8px; width: 100px; }
+  .volume-slider-container { display: flex; align-items: center; gap: 8px; width: 80px; }
   .control-btn.fullscreen { margin-left: auto; }
 
   /* Meta under video */
@@ -564,7 +626,7 @@
     font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
     border: 1px solid var(--border); background: var(--surface2); color: var(--text);
   }
-  .nav-btn:hover:not(:disabled) { background: var(--surface3); border-color: var(--accent); color: var(--accent); }
+  .nav-btn:hover:not(:disabled) { background: var(--surface3); border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
   .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
   .description-tab {
@@ -798,7 +860,13 @@
                 <div class="youtube-iframe-wrapper" id="yt-wrapper">
                   <div id="main-yt-iframe"></div>
                 </div>
+                
                 <div class="youtube-click-shield" onclick="toggleMainPlayPause()"></div>
+                
+                <div class="big-play-overlay">
+                  <div class="big-play-btn" id="bigPlayBtn">▶</div>
+                </div>
+
                 <div class="youtube-overlay">
                   <div class="custom-controls-bar" id="customControls">
                     <button class="control-btn play-pause" id="btnPlayPause" onclick="toggleMainPlayPause()">▶</button>
@@ -810,9 +878,43 @@
                     </div>
 
                     <div class="control-group">
-                      <button class="control-btn" id="btnMute" onclick="toggleMainMute()">🔊</button>
+                      <button class="control-btn" id="btnMute" onclick="toggleMainMute()">🔉</button>
                       <div class="volume-slider-container">
-                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80" oninput="setMainVolume(this.value)">
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="40" oninput="setMainVolume(this.value)">
+                      </div>
+                    </div>
+
+                    <button class="control-btn cc-btn" id="btnCC" onclick="toggleMainCaptions()">CC</button>
+                    
+                    <div class="settings-menu-container">
+                      <button class="control-btn" id="btnSettings" onclick="toggleSettingsMenu()">⚙️</button>
+                      <div class="settings-popup" id="settingsPopup">
+                        
+                        <div class="settings-item has-submenu">
+                          <span>Playback Speed</span>
+                          <span class="settings-item-value" id="currentSpeed">Normal</span>
+                          <div class="settings-submenu">
+                            <div class="settings-item" onclick="setMainPlaybackRate(0.5)">0.5x</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(0.75)">0.75x</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(1)">Normal</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(1.25)">1.25x</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(1.5)">1.5x</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(2)">2x</div>
+                          </div>
+                        </div>
+
+                        <div class="settings-item has-submenu">
+                          <span>Quality</span>
+                          <span class="settings-item-value" id="currentQuality">Auto</span>
+                          <div class="settings-submenu">
+                            <div class="settings-item" onclick="setMainQuality('highres')">1080p</div>
+                            <div class="settings-item" onclick="setMainQuality('hd720')">720p</div>
+                            <div class="settings-item" onclick="setMainQuality('large')">480p</div>
+                            <div class="settings-item" onclick="setMainQuality('medium')">360p</div>
+                            <div class="settings-item" onclick="setMainQuality('default')">Auto</div>
+                          </div>
+                        </div>
+
                       </div>
                     </div>
                     
@@ -914,6 +1016,7 @@
   let isPlayerReady = false;
   let updateInterval = null;
   let isDraggingTimeline = false;
+  let captionsEnabled = false; // Tracks custom CC state
 
   // ── INIT ───────────────────────────────────────────────────────────────
   async function initApp() {
@@ -1151,6 +1254,9 @@
     document.getElementById('sideModPct').textContent = `${pct}%`;
     document.getElementById('sideModFill').style.width = `${pct}%`;
 
+    // Make sure we show the play button state before loading
+    document.getElementById('yt-container').classList.remove('is-playing');
+
     // Load Video
     initOrUpdatePlayer(lec.url);
   }
@@ -1174,6 +1280,8 @@
     if (!isPlayerReady || typeof YT === 'undefined' || !YT.Player) return;
 
     if (mainPlayer) {
+      // Load the video. Browsers often block autoplay on dynamic loads without interaction,
+      // which is why the 'is-playing' class and Big Play Button are essential.
       mainPlayer.loadVideoById(videoId);
       resetCustomUI();
     } else {
@@ -1197,22 +1305,28 @@
   }
 
   function onPlayerReady(event) {
-    // Set default volume
-    mainPlayer.setVolume(80);
+    // Set default volume significantly lower per request (40)
+    mainPlayer.setVolume(40);
     startUIInterval();
   }
 
   function onPlayerStateChange(event) {
-    const btn = document.getElementById('btnPlayPause');
+    const btnPlayPause = document.getElementById('btnPlayPause');
+    const ytContainer = document.getElementById('yt-container');
+
     if (event.data === YT.PlayerState.PLAYING) {
-      btn.textContent = '⏸';
+      btnPlayPause.textContent = '⏸';
+      ytContainer.classList.add('is-playing'); // Hides big play button
       startUIInterval();
+      // Ensure duration is grabbed accurately
+      document.getElementById('timeDuration').textContent = formatTime(mainPlayer.getDuration());
     } else {
-      btn.textContent = '▶';
+      btnPlayPause.textContent = '▶';
+      ytContainer.classList.remove('is-playing'); // Shows big play button
     }
     
-    // Update duration once video starts metadata load
-    if (event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.PAUSED) {
+    // Catch duration on metadata load even if paused
+    if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.CUED) {
        document.getElementById('timeDuration').textContent = formatTime(mainPlayer.getDuration());
     }
   }
@@ -1239,6 +1353,13 @@
     document.getElementById('timelineSlider').value = 0;
     document.getElementById('timeCurrent').textContent = '0:00';
     document.getElementById('timeDuration').textContent = '0:00';
+    
+    // Reset Captions State visually if changing videos
+    if(captionsEnabled) {
+      document.getElementById('btnCC').classList.add('active');
+    } else {
+      document.getElementById('btnCC').classList.remove('active');
+    }
   }
 
   function toggleMainPlayPause() {
@@ -1297,6 +1418,59 @@
     }
   }
 
+  // ── NEW: SETTINGS & CAPTIONS LOGIC ──────────────────────────────────────
+  
+  function toggleMainCaptions() {
+    if (!mainPlayer) return;
+    const btn = document.getElementById('btnCC');
+    if (captionsEnabled) {
+      mainPlayer.unloadModule('captions');
+      captionsEnabled = false;
+      btn.classList.remove('active');
+    } else {
+      mainPlayer.loadModule('captions');
+      mainPlayer.setOption('captions', 'track', {languageCode: 'en'}); // Best attempt to force English
+      captionsEnabled = true;
+      btn.classList.add('active');
+    }
+  }
+
+  function toggleSettingsMenu() {
+    const popup = document.getElementById('settingsPopup');
+    popup.classList.toggle('show');
+  }
+
+  function setMainPlaybackRate(rate) {
+    if (!mainPlayer) return;
+    mainPlayer.setPlaybackRate(rate);
+    document.getElementById('currentSpeed').textContent = rate === 1 ? 'Normal' : rate + 'x';
+    toggleSettingsMenu(); // auto-close popup
+  }
+
+  function setMainQuality(quality) {
+    if (!mainPlayer) return;
+    // Firing the command. Note: YouTube frequently ignores this on modern HTML5 embedded players.
+    mainPlayer.setPlaybackQuality(quality); 
+    
+    // Update the UI label
+    let label = 'Auto';
+    if(quality === 'highres') label = '1080p';
+    if(quality === 'hd720') label = '720p';
+    if(quality === 'large') label = '480p';
+    if(quality === 'medium') label = '360p';
+    document.getElementById('currentQuality').textContent = label;
+    toggleSettingsMenu(); // auto-close popup
+  }
+
+  // Listen for clicks outside the settings menu to close it
+  document.addEventListener('click', function(e) {
+    if(!e.target.closest('.settings-menu-container')) {
+      const popup = document.getElementById('settingsPopup');
+      if(popup && popup.classList.contains('show')) popup.classList.remove('show');
+    }
+  });
+
+  // ── MISC FORMATTING ──────────────────────────────────────────────────
   function formatTime(seconds) {
     if (isNaN(seconds) || seconds < 0) return '0:00';
     const mins = Math.floor(seconds / 60);
@@ -1413,6 +1587,7 @@
   document.addEventListener('click', e => { if (!e.target.closest('.avatar-wrapper')) document.getElementById('userMenu').classList.remove('show'); });
   async function logoutUser() { try { await fetch('/api/auth/logout', { method:'POST', credentials:'include' }); } catch(e){} window.location.href = 'login.html'; }
 
+  // Expose to window for inline onclicks
   window.toggleDropdown = toggleDropdown;
   window.logoutUser     = logoutUser;
   window.switchTab      = switchTab;
@@ -1425,6 +1600,10 @@
   window.onTimelineDrag = onTimelineDrag;
   window.onTimelineDrop = onTimelineDrop;
   window.toggleMainFullscreen = toggleMainFullscreen;
+  window.toggleMainCaptions = toggleMainCaptions;
+  window.toggleSettingsMenu = toggleSettingsMenu;
+  window.setMainPlaybackRate = setMainPlaybackRate;
+  window.setMainQuality = setMainQuality;
 
   document.addEventListener('DOMContentLoaded', initApp);
 </script>
