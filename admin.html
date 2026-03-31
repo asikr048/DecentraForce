@@ -1494,6 +1494,11 @@ const body = {
   const data = await res.json();
   if (data.success) {
     showToast(id ? 'Course updated!' : 'Course created!', 'success');
+    
+    // FIX: Clear the frontend cache so new courses show up immediately
+    localStorage.removeItem('courses');
+    localStorage.removeItem('courses_timestamp');
+    
     await loadCourses();
     renderOverview();
     showTab('courses');
@@ -1512,6 +1517,11 @@ async function deleteCourse(id) {
   const data = await res.json();
   if (data.success) {
     showToast('Course deleted successfully', 'success');
+    
+    // FIX: Clear the frontend cache so deleted courses disappear immediately
+    localStorage.removeItem('courses');
+    localStorage.removeItem('courses_timestamp');
+    
     await loadCourses();
     renderOverview();
   } else {
