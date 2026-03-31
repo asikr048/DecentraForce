@@ -80,7 +80,19 @@ async function createPurchase(req, res) {
   // Verify course exists
   const courseResult = await query('SELECT id FROM courses WHERE id=$1', [course_id]);
   if (!courseResult.rows.length) return res.status(404).json({ success: false, error: 'Course not found' });
-  
+
+  // Ensure purchases table exists
+  await query(`CREATE TABLE IF NOT EXISTS purchases (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    sender_number VARCHAR(50) NOT NULL,
+    transaction_id VARCHAR(100) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   // Insert purchase with pending status
   const result = await query(
     `INSERT INTO purchases (user_id, course_id, sender_number, transaction_id, payment_method, status)
@@ -107,6 +119,18 @@ async function userPurchases(req, res) {
   
   const user = userResult.rows[0];
   
+  // Ensure purchases table exists
+  await query(`CREATE TABLE IF NOT EXISTS purchases (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    sender_number VARCHAR(50) NOT NULL,
+    transaction_id VARCHAR(100) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  )`);
+
   // Fetch purchases for this user, join with course details
   const r = await query(`
     SELECT p.*, c.title AS course_title, c.thumbnail_url, c.price, c.whatsapp
@@ -360,6 +384,18 @@ async function adminInit(req, res) {
 // ── ADMIN: GET/POST/PUT/DELETE /api/admin/courses ─────────────────────────────
 async function adminCourses(req, res) {
   const admin = await requireAdmin(req, res); if (!admin) return;
+
+  // Ensure purchases table exists
+  await query(`CREATE TABLE IF NOT EXISTS purchases (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    sender_number VARCHAR(50) NOT NULL,
+    transaction_id VARCHAR(100) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  )`);
 
   if (req.method === 'GET') {
     const r = await query(`
