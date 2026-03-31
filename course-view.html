@@ -881,7 +881,7 @@
     width: 100%;
     height: 100%;
     border: none;
-    pointer-events: none; /* Allow clicks to pass through to overlay */
+    pointer-events: auto; /* Allow clicks to reach YouTube player for play/pause */
   }
   
   .youtube-overlay {
@@ -891,8 +891,12 @@
     width: 100%;
     height: 100%;
     z-index: 2;
-    pointer-events: auto;
+    pointer-events: none; /* Allow clicks to pass through to iframe */
     background: transparent;
+  }
+  
+  .custom-controls-bar {
+    pointer-events: auto; /* Controls should be clickable */
   }
   
   /* Custom controls bar */
@@ -1088,6 +1092,62 @@
     fs: 0;
     rel: 0;
     showinfo: 0;
+  }
+
+  /* Settings dropdown */
+  .settings-group {
+    position: relative;
+  }
+  
+  .settings-dropdown {
+    position: absolute;
+    bottom: 100%;
+    right: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 0;
+    min-width: 150px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    z-index: 100;
+    margin-bottom: 10px;
+  }
+  
+  .settings-item {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    color: var(--text);
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+  
+  .settings-item:hover {
+    background: var(--surface2);
+    color: var(--accent);
+  }
+  
+  .settings-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 6px 0;
+  }
+  
+  /* Quality submenu */
+  .quality-menu {
+    position: absolute;
+    left: 100%;
+    top: 0;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 8px 0;
+    min-width: 120px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    display: none;
+  }
+  
+  .settings-item:hover .quality-menu {
+    display: block;
   }
 
   /* ── RESPONSIVE ADJUSTMENTS FOR CUSTOM CONTROLS ─── */
@@ -1548,6 +1608,20 @@
                     <input type="range" class="volume-slider" min="0" max="100" value="80" data-player="${playerId}" oninput="setVolume('${playerId}', this.value)">
                   </div>
                 </div>
+                <div class="control-group settings-group">
+                  <button class="control-btn settings-btn" data-player="${playerId}" onclick="toggleSettings('${playerId}')">⚙️</button>
+                  <div class="settings-dropdown" id="settings-${playerId}" style="display: none;">
+                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 0.5)">0.5x</div>
+                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 0.75)">0.75x</div>
+                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 1)" style="color: var(--accent); font-weight: bold;">1x (Normal)</div>
+                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 1.25)">1.25x</div>
+                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 1.5)">1.5x</div>
+                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 2)">2x</div>
+                    <div class="settings-divider"></div>
+                    <div class="settings-item" onclick="toggleCaptions('${playerId}')">Captions: Off</div>
+                    <div class="settings-item" onclick="showQualityMenu('${playerId}', event)">Quality: Auto</div>
+                  </div>
+                </div>
                 <button class="control-btn fullscreen" data-player="${playerId}" onclick="toggleFullscreen('${playerId}-container')">⛶</button>
               </div>
             </div>
@@ -1934,6 +2008,162 @@
       } else if (document.msExitFullscreen) {
         document.msExitFullscreen();
       }
+    }
+  }
+
+  // Settings dropdown toggle
+  function toggleSettings(playerId) {
+    const dropdown = document.getElementById(`settings-${playerId}`);
+    if (!dropdown) return;
+    
+    // Close all other settings dropdowns
+    document.querySelectorAll('.settings-dropdown').forEach(d => {
+      if (d !== dropdown) d.style.display = 'none';
+    });
+    
+    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+  }
+
+  // Close settings dropdown when clicking elsewhere
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.settings-group')) {
+      document.querySelectorAll('.settings-dropdown').forEach(d => {
+        d.style.display = 'none';
+      });
+    }
+  });
+
+  // Change playback rate
+  function changePlaybackRate(playerId, rate) {
+    const player = youtubePlayers[playerId];
+    if (!player) return;
+    
+    player.setPlaybackRate(rate);
+    
+    // Update UI to show selected rate
+    const dropdown = document.getElementById(`settings-${playerId}`);
+    if (dropdown) {
+      const items = dropdown.querySelectorAll('.settings-item');
+      items.forEach(item => {
+        if (item.textContent.includes('x')) {
+          item.style.color = '';
+          item.style.fontWeight = '';
+          if (item.textContent.includes(`${rate}x`)) {
+            item.style.color = 'var(--accent)';
+            item.style.fontWeight = 'bold';
+          }
+        }
+      });
+    }
+  }
+
+  // Toggle captions
+  function toggleCaptions(playerId) {
+    const player = youtubePlayers[playerId];
+    if (!player) return;
+    
+    const trackModule = player.getModule('captions');
+    if (trackModule) {
+      // This is a simplified approach - actual caption toggling requires more complex API usage
+      const isOn = trackModule.isVisible();
+      if (isOn) {
+        trackModule.hide();
+        updateCaptionButton(playerId, false);
+      } else {
+        trackModule.show();
+        updateCaptionButton(playerId, true);
+      }
+    } else {
+      // Fallback: toggle captions via player API
+      const captions = player.getOption('captions', 'track');
+      if (captions) {
+        player.setOption('captions', 'track', {});
+        updateCaptionButton(playerId, false);
+      } else {
+        player.setOption('captions', 'track', { languageCode: 'en' });
+        updateCaptionButton(playerId, true);
+      }
+    }
+  }
+
+  function updateCaptionButton(playerId, isOn) {
+    const dropdown = document.getElementById(`settings-${playerId}`);
+    if (dropdown) {
+      const captionItem = Array.from(dropdown.querySelectorAll('.settings-item')).find(item =>
+        item.textContent.includes('Captions:')
+      );
+      if (captionItem) {
+        captionItem.textContent = `Captions: ${isOn ? 'On' : 'Off'}`;
+      }
+    }
+  }
+
+  // Show quality menu
+  function showQualityMenu(playerId, event) {
+    event.stopPropagation();
+    
+    const dropdown = document.getElementById(`settings-${playerId}`);
+    if (!dropdown) return;
+    
+    // Create or show quality submenu
+    let qualityMenu = dropdown.querySelector('.quality-menu');
+    if (!qualityMenu) {
+      qualityMenu = document.createElement('div');
+      qualityMenu.className = 'quality-menu';
+      qualityMenu.innerHTML = `
+        <div class="settings-item" onclick="setQuality('${playerId}', 'auto')">Auto</div>
+        <div class="settings-item" onclick="setQuality('${playerId}', 'hd2160')">4K</div>
+        <div class="settings-item" onclick="setQuality('${playerId}', 'hd1440')">1440p</div>
+        <div class="settings-item" onclick="setQuality('${playerId}', 'hd1080')">1080p</div>
+        <div class="settings-item" onclick="setQuality('${playerId}', 'hd720')">720p</div>
+        <div class="settings-item" onclick="setQuality('${playerId}', 'large')">480p</div>
+        <div class="settings-item" onclick="setQuality('${playerId}', 'medium')">360p</div>
+        <div class="settings-item" onclick="setQuality('${playerId}', 'small')">240p</div>
+      `;
+      dropdown.appendChild(qualityMenu);
+    }
+    
+    qualityMenu.style.display = qualityMenu.style.display === 'block' ? 'none' : 'block';
+    
+    // Position it
+    const qualityItem = event.target.closest('.settings-item');
+    if (qualityItem) {
+      qualityMenu.style.left = '100%';
+      qualityMenu.style.top = '0';
+    }
+  }
+
+  function setQuality(playerId, quality) {
+    const player = youtubePlayers[playerId];
+    if (!player) return;
+    
+    // Note: YouTube API doesn't directly expose quality setting in embed.
+    // This would require custom implementation or using player.setPlaybackQuality
+    try {
+      player.setPlaybackQuality(quality);
+      
+      // Update UI
+      const dropdown = document.getElementById(`settings-${playerId}`);
+      if (dropdown) {
+        const qualityItem = Array.from(dropdown.querySelectorAll('.settings-item')).find(item =>
+          item.textContent.includes('Quality:')
+        );
+        if (qualityItem) {
+          const qualityMap = {
+            'auto': 'Auto',
+            'hd2160': '4K',
+            'hd1440': '1440p',
+            'hd1080': '1080p',
+            'hd720': '720p',
+            'large': '480p',
+            'medium': '360p',
+            'small': '240p'
+          };
+          qualityItem.textContent = `Quality: ${qualityMap[quality] || quality}`;
+        }
+      }
+    } catch (e) {
+      console.warn('Quality setting not supported:', e);
     }
   }
 
