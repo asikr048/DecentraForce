@@ -56,6 +56,48 @@ async function verifyCoupon(req, res) {
   return res.status(400).json({ success: false, error: 'Invalid or expired coupon' });
 }
 
+// ── ADMIN: GET/PUT /api/admin/purchases ─────────────────────────────
+async function adminPurchases(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+
+  if (req.method === 'GET') {
+    // Fetch purchases and join with course and user tables to get titles and names
+    const r = await query(`
+      SELECT p.*, c.title AS course_title, u.username AS sender_name 
+      FROM purchases p 
+      LEFT JOIN courses c ON p.course_id = c.id 
+      LEFT JOIN users u ON p.user_id = u.id 
+      ORDER BY p.created_at DESC
+    `);
+    return res.status(200).json({ success: true, purchases: r.rows });
+  }
+  
+  if (req.method === 'PUT') {
+    const { id, status } = req.body || {};
+    if (!id || !status) return res.status(400).json({ success: false, error: 'ID and status required' });
+    
+    // Update the purchase status
+    await query('UPDATE purchases SET status = $1 WHERE id = $2', [status, id]);
+    
+    // If approved, automatically grant the user access to the course
+    if (status === 'approved') {
+      const p = await query('SELECT user_id, course_id FROM purchases WHERE id = $1', [id]);
+      if (p.rows.length) {
+        await query(`
+          INSERT INTO user_courses (user_id, course_id, granted_by, granted_at) 
+          VALUES ($1, $2, $3, NOW()) 
+          ON CONFLICT (user_id, course_id) DO NOTHING
+        `, [p.rows[0].user_id, p.rows[0].course_id, admin.id]);
+      }
+    }
+    
+    return res.status(200).json({ success: true, message: `Purchase ${status}` });
+  }
+  
+  return res.status(405).json({ error: 'Method not allowed' });
+}
+
+
 // ── AUTH: POST /api/auth/register ─────────────────────────────────────────────
 async function authRegister(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
@@ -521,6 +563,7 @@ export default async function handler(req, res) {
     if (path.endsWith('/auth/verify-email'))   return await authVerifyEmail(req, res);
 
     // Admin
+    if (path.endsWith('/admin/purchases'))     return await adminPurchases(req, res);
     if (path.endsWith('/admin/init'))          return await adminInit(req, res);
     if (path.endsWith('/admin/courses'))       return await adminCourses(req, res);
     if (path.endsWith('/admin/users'))         return await adminUsers(req, res);

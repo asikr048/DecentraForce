@@ -1713,55 +1713,52 @@ function refreshCoupons() {
 
 /* ────────────────────────────────────────────────────────
    PURCHASE MANAGEMENT
+──────────────────────────────────────────────────────── *//* ────────────────────────────────────────────────────────
+   PURCHASE MANAGEMENT (DATABASE CONNECTED)
 ──────────────────────────────────────────────────────── */
-// Load purchases from localStorage
-function getPurchases() {
+let allPurchases = [];
+
+// Fetch purchases from your backend API
+async function loadPurchases() {
   try {
-    const stored = localStorage.getItem('purchases');
-    return stored ? JSON.parse(stored) : [];
+    const res = await fetch('/api/admin/purchases', { credentials: 'include' });
+    const data = await res.json();
+    if (data.success) {
+      allPurchases = data.purchases;
+      renderPurchasesList();
+    } else {
+      showToast(data.error || 'Failed to load purchases', 'error');
+    }
   } catch (error) {
-    console.error('Error loading purchases:', error);
-    return [];
+    showToast('Network error loading purchases', 'error');
   }
 }
 
-// Save purchases to localStorage
-function savePurchases(purchases) {
-  try {
-    localStorage.setItem('purchases', JSON.stringify(purchases));
-    return true;
-  } catch (error) {
-    console.error('Error saving purchases:', error);
-    return false;
-  }
-}
-
-// Render purchases table
+// Render the table using database columns (snake_case)
 function renderPurchasesList() {
-  const purchases = getPurchases();
   const container = document.getElementById('purchasesTableBody');
   const emptyRow = document.getElementById('purchasesEmpty');
   
-  if (!purchases || purchases.length === 0) {
+  if (!allPurchases || allPurchases.length === 0) {
     if (emptyRow) emptyRow.classList.remove('hidden');
     if (container) container.innerHTML = '';
     return;
   }
   
   if (emptyRow) emptyRow.classList.add('hidden');
-  container.innerHTML = purchases.map(purchase => `
+  container.innerHTML = allPurchases.map(purchase => `
     <tr class="hover:bg-surface2 transition-colors">
       <td class="px-6 py-4">
-        <div class="font-medium text-white">${esc(purchase.courseName || purchase.courseTitle || 'Unknown Course')}</div>
-        <div class="text-xs text-muted mt-1">ID: ${purchase.courseId || 'N/A'}</div>
+        <div class="font-medium text-white">${esc(purchase.course_title || 'Unknown Course')}</div>
+        <div class="text-xs text-muted mt-1">Course ID: ${purchase.course_id}</div>
       </td>
       <td class="px-6 py-4">
-        <div class="font-medium text-white">${esc(purchase.senderNumber || 'N/A')}</div>
-        <div class="text-xs text-muted mt-1">${purchase.senderName ? esc(purchase.senderName) : ''}</div>
+        <div class="font-medium text-white">${esc(purchase.sender_number || 'N/A')}</div>
+        <div class="text-xs text-muted mt-1">${esc(purchase.sender_name || 'Unknown User')}</div>
       </td>
       <td class="px-6 py-4">
-        <div class="font-mono text-sm text-accent">${esc(purchase.transactionId || purchase.trxId || 'N/A')}</div>
-        <div class="text-xs text-muted mt-1">${purchase.paymentMethod ? esc(purchase.paymentMethod) : ''}</div>
+        <div class="font-mono text-sm text-accent">${esc(purchase.transaction_id || 'N/A')}</div>
+        <div class="text-xs text-muted mt-1">${esc(purchase.payment_method || 'Unknown')}</div>
       </td>
       <td class="px-6 py-4">
         <span class="badge ${purchase.status === 'approved' ? 'badge-green' : purchase.status === 'rejected' ? 'badge-gray' : 'badge-blue'}">
@@ -1769,23 +1766,17 @@ function renderPurchasesList() {
         </span>
       </td>
       <td class="px-6 py-4">
-        <div class="text-sm text-white">${fmtDate(purchase.date || purchase.timestamp) || '—'}</div>
-        <div class="text-xs text-muted">${purchase.timestamp ? new Date(purchase.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : (purchase.time || '')}</div>
+        <div class="text-sm text-white">${fmtDate(purchase.created_at)}</div>
       </td>
-
-
-
       <td class="px-6 py-4">
         <div class="flex items-center gap-2">
           ${purchase.status !== 'approved' ? `
-            <button onclick="approvePurchase('${purchase.id}')" class="bg-green-900/20 text-green-400 hover:bg-green-900/30 border border-green-800 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+            <button onclick="updatePurchaseStatus('${purchase.id}', 'approved')" class="bg-green-900/20 text-green-400 hover:bg-green-900/30 border border-green-800 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors flex items-center gap-1">
               Approve
             </button>
           ` : ''}
           ${purchase.status !== 'rejected' ? `
-            <button onclick="rejectPurchase('${purchase.id}')" class="bg-red-900/20 text-red-400 hover:bg-red-900/30 border border-red-800 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <button onclick="updatePurchaseStatus('${purchase.id}', 'rejected')" class="bg-red-900/20 text-red-400 hover:bg-red-900/30 border border-red-800 px-3 py-1.5 rounded-lg text-sm font-bold transition-colors flex items-center gap-1">
               Reject
             </button>
           ` : ''}
@@ -1795,62 +1786,33 @@ function renderPurchasesList() {
   `).join('');
 }
 
-// Approve a purchase
-function approvePurchase(id) {
-  if (!confirm('Approve this purchase? The user will be granted access to the course.')) return;
+// Update status in the database
+async function updatePurchaseStatus(id, newStatus) {
+  if (!confirm(`Are you sure you want to mark this purchase as ${newStatus}?`)) return;
   
-  const purchases = getPurchases();
-  const index = purchases.findIndex(p => p.id === id);
-  if (index === -1) {
-    showToast('Purchase not found', 'error');
-    return;
-  }
-  
-  purchases[index].status = 'approved';
-  purchases[index].processedAt = new Date().toISOString();
-  
-  if (savePurchases(purchases)) {
-    showToast('Purchase approved successfully', 'success');
-    renderPurchasesList();
+  try {
+    const res = await fetch('/api/admin/purchases', {
+      method: 'PUT',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: id, status: newStatus })
+    });
     
-    // Optional: Trigger course access grant logic here
-    // grantCourseAccess(purchases[index].userId, purchases[index].courseId);
-  } else {
-    showToast('Failed to approve purchase', 'error');
+    const data = await res.json();
+    if (data.success) {
+      showToast(`Purchase ${newStatus} successfully`, 'success');
+      loadPurchases(); // Refresh list from DB
+    } else {
+      showToast(data.error || 'Failed to update purchase', 'error');
+    }
+  } catch (error) {
+    showToast('Network error updating purchase', 'error');
   }
 }
 
-// Reject a purchase
-function rejectPurchase(id) {
-  if (!confirm('Reject this purchase? The purchase will be marked as rejected.')) return;
-  
-  const purchases = getPurchases();
-  const index = purchases.findIndex(p => p.id === id);
-  if (index === -1) {
-    showToast('Purchase not found', 'error');
-    return;
-  }
-  
-  purchases[index].status = 'rejected';
-  purchases[index].processedAt = new Date().toISOString();
-  
-  if (savePurchases(purchases)) {
-    showToast('Purchase rejected successfully', 'success');
-    renderPurchasesList();
-  } else {
-    showToast('Failed to reject purchase', 'error');
-  }
-}
-
-// Refresh purchases list
 function refreshPurchases() {
-  renderPurchasesList();
-  showToast('Purchases list refreshed', 'info');
-}
-
-// Load purchases when tab is shown
-function loadPurchases() {
-  renderPurchasesList();
+  loadPurchases();
+  showToast('Refreshing purchases...', 'info');
 }
 
 /* ────────────────────────────────────────────────────────
