@@ -1307,16 +1307,22 @@ async function renderCourses() {
         btn.addEventListener('click', function(e) {
           e.stopPropagation();
           const courseId = this.dataset.courseId;
-          // Find the course object
-          const course = courses.find(c => (c.id || '').toString() === courseId.toString());
-          if (course) {
-            // Open checkout modal with course details
-            openCheckoutModal(course);
-          } else {
-            // Fallback to course details page
-            window.location.href = `course-details.html?id=${encodeURIComponent(courseId)}`;
-          }
+          // Navigate to course details page instead of opening modal directly
+          window.location.href = `course-details.html?id=${encodeURIComponent(courseId)}`;
         });
+      });
+      
+      // Add click handler to premium course cards
+      container.querySelectorAll('.course-card').forEach(card => {
+        const courseId = card.querySelector('.buy-now-btn')?.dataset.courseId;
+        if (courseId) {
+          card.style.cursor = 'pointer';
+          card.addEventListener('click', function(e) {
+            // Don't navigate if clicking on the purchase button or any link
+            if (e.target.closest('.buy-now-btn') || e.target.closest('a')) return;
+            window.location.href = `course-details.html?id=${encodeURIComponent(courseId)}`;
+          });
+        }
       });
     }
     
