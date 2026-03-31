@@ -460,7 +460,7 @@
         if (activeCourse.whatsapp) {
           window.open(activeCourse.whatsapp, '_blank');
         }
-        alert(`Payment submitted successfully for ${activeCourse.title}!\nOur team will verify your transaction shortly.`);
+        alert(`Payment submitted for "${activeCourse.title}"!\nYour purchase is now Pending — the course card will show ⏳ Pending Approval until an admin verifies your transaction.`);
         window.location.href = 'my-courses.html';
       } else {
         alert('Error: ' + data.error);

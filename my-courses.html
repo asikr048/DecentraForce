@@ -1175,12 +1175,15 @@ async function renderCourses() {
     // Load and filter purchases
     const allPurchases = await loadPurchases();
     const approvedPurchases = allPurchases.filter(p => p && p.status === 'approved');
-    const pendingPurchases = allPurchases.filter(p => p && p.status === 'pending');
+    const pendingPurchases  = allPurchases.filter(p => p && p.status === 'pending');
     
     const enrolledCourseIds = approvedPurchases.map(p => p.courseId?.toString());
-    const pendingCourseIds = pendingPurchases.map(p => p.courseId?.toString());
-    
-    // Find enrolled courses (both paid and free that are approved)
+    const pendingCourseIds  = pendingPurchases.map(p => p.courseId?.toString());
+
+    // Store for openCourseContent access gate
+    window._approvedCourseIds = new Set(enrolledCourseIds);
+
+    // Find enrolled courses (approved purchases)
     const enrolledCourses = courses.filter(course =>
       enrolledCourseIds.includes(course.id?.toString())
     );
@@ -1195,21 +1198,21 @@ async function renderCourses() {
       return;
     }
 
-    // Filter Premium courses (Price > 0, not enrolled)
+    // Premium = price > 0, NOT yet enrolled (pending courses stay here so button flips to pending state)
     const premiumCourses = courses.filter(c => {
       const price = parseFloat(c.price) || 0;
       return price > 0 && !enrolledCourseIds.includes(c.id?.toString());
     });
     
-    // Filter Free courses (Price == 0, not enrolled)
+    // Free = price 0, not enrolled
     const freeCourses = courses.filter(c => {
       const price = parseFloat(c.price) || 0;
       return price === 0 && !enrolledCourseIds.includes(c.id?.toString());
     });
 
     renderCourseGrid('enrolled-courses', enrolledCourses, 'Enrolled', pendingCourseIds);
-    renderCourseGrid('premium-courses', premiumCourses, 'Premium', pendingCourseIds);
-    renderCourseGrid('free-courses', freeCourses, 'Free', pendingCourseIds);
+    renderCourseGrid('premium-courses',  premiumCourses,  'Premium',  pendingCourseIds);
+    renderCourseGrid('free-courses',     freeCourses,     'Free',     pendingCourseIds);
   }
 
   function enrollFreeCourse(courseId, courseTitle) {
@@ -1399,40 +1402,20 @@ function getCourseButton(course, type, isPending) {
   
   // Safe course content opening with validation
   function openCourseContent(courseId, courseTitle = '') {
-    if (!courseId) {
-      showToast('Course ID is missing', 'error');
+    if (!courseId) { showToast('Course ID is missing', 'error'); return; }
+
+    const course = allCourses.find(c => (c.id || '').toString() === courseId.toString());
+    if (!course) { showToast('Course not found or no longer available', 'error'); return; }
+
+    const isFreeCourse      = parseFloat(course.price || 0) === 0;
+    const hasApprovedAccess = window._approvedCourseIds && window._approvedCourseIds.has(courseId.toString());
+
+    if (!isFreeCourse && !hasApprovedAccess) {
+      showToast('You need a confirmed enrollment to access this course', 'error');
       return;
     }
-    
-    // Validate course exists in available courses
-    const courseExists = allCourses.some(c => (c.id || '').toString() === courseId.toString());
-    
-    if (!courseExists) {
-      showToast('Course not found or no longer available', 'error');
-      return;
-    }
-    
-    // For purchased courses, verify purchase status
-    if (courseId) {
-      const purchases = loadPurchasesFromLocalStorage();
-      const approvedPurchases = filterApprovedPurchases(purchases);
-      const hasApprovedPurchase = approvedPurchases.some(p => p.courseId === courseId.toString());
-      
-      // Allow access if course is free or user has approved purchase
-      const course = allCourses.find(c => (c.id || '').toString() === courseId.toString());
-      const isFreeCourse = course && parseFloat(course.price || 0) === 0;
-      
-      if (!isFreeCourse && !hasApprovedPurchase) {
-        showToast('You need to purchase this course to access content', 'error');
-        return;
-      }
-    }
-    
-    // Safe navigation with encoded parameters
-    const encodedId = encodeURIComponent(courseId);
-    const encodedTitle = encodeURIComponent(courseTitle || '');
-    // Redirect to course-details.html instead of video-course.html
-    window.location.href = `course-details.html?id=${encodedId}`;
+
+    window.location.href = `course-details.html?id=${encodeURIComponent(courseId)}`;
   }
 
   function getEmojiForCourse(title) {
