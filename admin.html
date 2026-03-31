@@ -971,8 +971,7 @@ let adminEmail = '';
 document.addEventListener('DOMContentLoaded', async () => {
   const ok = await checkAdminAuth();
   if (!ok) return;
-  await Promise.all([loadUsers(), loadCourses()]);
-  renderOverview();
+await Promise.all([loadUsers(), loadCourses(), loadPurchases()]);  renderOverview();
   // Initialize mock data for feedback and mentors
   if (typeof initDefaultFeedbacks === 'function') initDefaultFeedbacks();
   if (typeof initDefaultMentors === 'function') initDefaultMentors();
@@ -1016,8 +1015,7 @@ function showTab(name) {
   if (name === 'feedback') { if (typeof initDefaultFeedbacks === 'function') initDefaultFeedbacks(); renderFeedbacksList(); refreshUserFeedbacks(); }
   if (name === 'mentors') { renderMentorsList(); }
   if (name === 'section-order') { renderSectionOrderList(); renderCourseOrderList(); renderMentorOrderList(); renderFeedbackOrderList(); }
-  if (name === 'purchases') { renderPurchasesList(); }
-  if (name === 'coupons') { renderCouponsList(); }
+if (name === 'purchases') { loadPurchases(); }  if (name === 'coupons') { renderCouponsList(); }
   if (name === 'assignments') { renderAssignmentsList(); }
 }
 
