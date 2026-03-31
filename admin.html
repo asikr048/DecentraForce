@@ -111,8 +111,8 @@
 <body>
 
 <div class="flex min-h-screen">
-  <aside class="w-64 bg-surface border-r border-border fixed h-full flex flex-col z-20">
-    <div class="p-6 border-b border-border">
+ <aside class="w-64 bg-surface border-r border-border fixed h-full flex flex-col z-20">
+    <div class="p-6 border-b border-border flex-shrink-0">
       <a href="index.html" class="flex items-center gap-3 decoration-none">
         <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-accent2 to-accent flex items-center justify-center text-white font-bold text-sm shadow-[0_0_15px_rgba(123,92,255,0.5)]">DF</div>
         <div>
@@ -121,7 +121,7 @@
       </a>
     </div>
 
-    <nav class="flex-1 py-6 space-y-2">
+    <nav class="flex-1 py-6 space-y-2 overflow-y-auto overflow-x-hidden pb-24">
       <button onclick="showTab('overview')" class="tab-btn active w-full text-left flex items-center gap-4 px-6 py-3 text-muted font-medium" data-tab="overview">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
         DASHBOARD
@@ -878,6 +878,9 @@ function showTab(name) {
   if (name === 'feedback') { if (typeof initDefaultFeedbacks === 'function') initDefaultFeedbacks(); renderFeedbacksList(); refreshUserFeedbacks(); }
   if (name === 'mentors') { renderMentorsList(); }
   if (name === 'section-order') { renderSectionOrderList(); renderCourseOrderList(); renderMentorOrderList(); renderFeedbackOrderList(); }
+  if (name === 'purchases') { renderPurchasesList(); }
+  if (name === 'coupons') { renderCouponsList(); }
+  if (name === 'assignments') { renderAssignmentsList(); }
 }
 
 /* ────────────────────────────────────────────────────────
@@ -1736,11 +1739,10 @@ function renderPurchasesList() {
   }
   
   if (emptyRow) emptyRow.classList.add('hidden');
-  
   container.innerHTML = purchases.map(purchase => `
     <tr class="hover:bg-surface2 transition-colors">
       <td class="px-6 py-4">
-        <div class="font-medium text-white">${esc(purchase.courseName || 'Unknown Course')}</div>
+        <div class="font-medium text-white">${esc(purchase.courseName || purchase.courseTitle || 'Unknown Course')}</div>
         <div class="text-xs text-muted mt-1">ID: ${purchase.courseId || 'N/A'}</div>
       </td>
       <td class="px-6 py-4">
@@ -1748,7 +1750,7 @@ function renderPurchasesList() {
         <div class="text-xs text-muted mt-1">${purchase.senderName ? esc(purchase.senderName) : ''}</div>
       </td>
       <td class="px-6 py-4">
-        <div class="font-mono text-sm text-accent">${esc(purchase.transactionId || 'N/A')}</div>
+        <div class="font-mono text-sm text-accent">${esc(purchase.transactionId || purchase.trxId || 'N/A')}</div>
         <div class="text-xs text-muted mt-1">${purchase.paymentMethod ? esc(purchase.paymentMethod) : ''}</div>
       </td>
       <td class="px-6 py-4">
@@ -1757,9 +1759,12 @@ function renderPurchasesList() {
         </span>
       </td>
       <td class="px-6 py-4">
-        <div class="text-sm text-white">${fmtDate(purchase.date) || '—'}</div>
-        <div class="text-xs text-muted">${purchase.time || ''}</div>
+        <div class="text-sm text-white">${fmtDate(purchase.date || purchase.timestamp) || '—'}</div>
+        <div class="text-xs text-muted">${purchase.timestamp ? new Date(purchase.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : (purchase.time || '')}</div>
       </td>
+
+
+
       <td class="px-6 py-4">
         <div class="flex items-center gap-2">
           ${purchase.status !== 'approved' ? `
