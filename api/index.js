@@ -664,11 +664,10 @@ export default async function handler(req, res) {
     if (path.endsWith('/_public/mentors')       || path.endsWith('/public/mentors'))       return await publicMentors(req, res);
     if (path.endsWith('/_public/testimonials')  || path.endsWith('/public/testimonials'))  return await publicTestimonials(req, res);
 
-    // Purchase creation (authenticated)
-    if (path.endsWith('/purchases')) return await createPurchase(req, res);
-
-    // User purchases (authenticated)
-    if (path.endsWith('/user/purchases')) return await userPurchases(req, res);
+    // IMPORTANT: specific routes checked before generic /purchases to avoid endsWith overlap
+    if (path.endsWith('/admin/purchases'))     return await adminPurchases(req, res);
+    if (path.endsWith('/user/purchases'))      return await userPurchases(req, res);
+    if (path.endsWith('/purchases'))           return await createPurchase(req, res);
 
     // Auth
     if (path.endsWith('/auth/register'))       return await authRegister(req, res);
@@ -679,8 +678,7 @@ export default async function handler(req, res) {
     if (path.endsWith('/auth/reset-password')) return await authResetPassword(req, res);
     if (path.endsWith('/auth/verify-email'))   return await authVerifyEmail(req, res);
 
-    // Admin
-    if (path.endsWith('/admin/purchases'))     return await adminPurchases(req, res);
+    // Admin (remaining)
     if (path.endsWith('/admin/init'))          return await adminInit(req, res);
     if (path.endsWith('/admin/courses'))       return await adminCourses(req, res);
     if (path.endsWith('/admin/users'))         return await adminUsers(req, res);
