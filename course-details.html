@@ -2,68 +2,248 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Course Details — DecentraForce</title>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles/global.css"> <style>
-    /* Add basic styling to match your theme */
-    body { background: #050a18; color: #e8eeff; font-family: 'DM Sans', sans-serif; }
-    .details-container { max-width: 800px; margin: 120px auto 60px; padding: 40px; background: #0d1630; border: 1px solid rgba(0, 229, 255, 0.12); border-radius: 20px; box-shadow: 0 16px 48px rgba(0,0,0,0.5); }
-    .details-title { font-family: 'Syne', sans-serif; font-size: 2.5rem; color: #00e5ff; margin-bottom: 20px; }
-    .details-desc { font-size: 1.1rem; color: #7d8fb3; line-height: 1.8; margin-bottom: 40px; }
-    .details-price { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 700; margin-bottom: 20px; }
-    .btn-purchase { background: linear-gradient(135deg, #7b5cff, #00e5ff); color: #fff; padding: 15px 30px; font-size: 1.1rem; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+  <link rel="icon" type="image/svg+xml" href="/assets/favicon.svg">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+  <style>
+    /* === GLOBAL VARS & RESETS === */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #050a18; --bg2: #080f22; --surface: #0d1630; --surface2: #111d3a;
+      --accent: #00e5ff; --accent2: #7b5cff; --accent3: #ff4d8d;
+      --text: #e8eeff; --muted: #7d8fb3; --border: rgba(0, 229, 255, 0.12);
+    }
+    body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; overflow-x: hidden; }
     
-    /* Paste the modal CSS from index.html here exactly as it is */
+    /* NAV (Simplified for details page) */
+    nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 0 5%; height: 70px; background: rgba(5,10,24,.8); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); }
+    .logo { display: flex; align-items: center; gap: 10px; font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.3rem; color: var(--text); text-decoration: none; }
+    .logo-icon { width: 36px; height: 36px; background: linear-gradient(135deg, var(--accent2), var(--accent)); border-radius: 8px; display: grid; place-items: center; font-size: .8rem; font-weight: 900; color: #fff; }
+    .logo span { color: var(--accent); }
+    .btn-back { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); text-decoration: none; font-weight: 500; transition: color 0.2s; }
+    .btn-back:hover { color: var(--accent); }
+
+    /* === HERO SECTION === */
+    .course-hero { background: linear-gradient(135deg, #0a1128, #050a18); padding: 130px 5% 60px; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+    .course-hero::before { content: ''; position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(123,92,255,0.15), transparent 70%); border-radius: 50%; pointer-events: none; }
+    .hero-container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 1; }
+    .course-badges { display: flex; gap: 10px; flex-wrap: wrap; }
+    .c-badge { padding: 6px 14px; border-radius: 100px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .c-badge.category { background: rgba(0,229,255,0.1); color: var(--accent); border: 1px solid rgba(0,229,255,0.2); }
+    .c-badge.status { background: rgba(123,92,255,0.15); color: var(--accent2); border: 1px solid rgba(123,92,255,0.2); }
+    .course-title { font-family: 'Syne', sans-serif; font-size: clamp(2rem, 4vw, 3.2rem); font-weight: 800; line-height: 1.1; margin-bottom: 10px; }
+    .course-meta { display: flex; align-items: center; gap: 24px; color: var(--muted); font-size: 0.95rem; flex-wrap: wrap; }
+    .course-meta span { display: flex; align-items: center; gap: 6px; }
+    .rating-stars { color: #fbbf24; }
+
+    /* === WIDE LAYOUT GRID === */
+    .course-layout { display: grid; grid-template-columns: 1fr 380px; gap: 40px; max-width: 1200px; margin: 0 auto; padding: 50px 5% 100px; align-items: start; }
+    @media (max-width: 900px) { .course-layout { grid-template-columns: 1fr; } }
+
+    /* === LEFT COLUMN: TABS & CONTENT === */
+    .content-column { min-width: 0; }
+    .tabs { display: flex; gap: 32px; border-bottom: 1px solid var(--border); margin-bottom: 32px; overflow-x: auto; }
+    .tab { padding: 0 0 16px 0; color: var(--muted); font-weight: 600; font-size: 1.05rem; cursor: pointer; border-bottom: 3px solid transparent; transition: all 0.2s; white-space: nowrap; }
+    .tab:hover { color: var(--text); }
+    .tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    
+    .tab-content { display: none; animation: fadeIn 0.4s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+    .desc-text { font-size: 1.05rem; color: #a4b5d6; line-height: 1.8; white-space: pre-wrap; }
+    
+    /* Modules/Curriculum Styling */
+    .module-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
+    .module-header { padding: 20px; background: rgba(17, 29, 58, 0.4); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; border-bottom: 1px solid var(--border); }
+    .module-body { padding: 20px; color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
+    .module-body ul { padding-left: 20px; margin-top: 10px; }
+    .module-body li { margin-bottom: 8px; }
+
+    /* === RIGHT COLUMN: STICKY PURCHASE CARD === */
+    .sticky-card { position: sticky; top: 100px; background: var(--surface); border: 1px solid rgba(0,229,255,0.2); border-radius: 20px; overflow: hidden; box-shadow: 0 24px 50px rgba(0,0,0,0.5); }
+    .card-thumbnail { width: 100%; height: 200px; background: linear-gradient(135deg, #111d3a, #0d1630); display: flex; align-items: center; justify-content: center; font-size: 4rem; position: relative; }
+    .card-thumbnail img { width: 100%; height: 100%; object-fit: cover; }
+    .card-body { padding: 32px 24px; }
+    .price-display { font-family: 'Syne', sans-serif; font-size: 2.5rem; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+    .price-display span { font-family: 'DM Sans'; font-size: 1rem; color: var(--muted); text-decoration: line-through; margin-right: 12px; font-weight: 400; }
+    
+    .btn-purchase { display: flex; align-items: center; justify-content: center; width: 100%; padding: 16px; border-radius: 12px; background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #fff; font-family: 'DM Sans', sans-serif; font-weight: 700; font-size: 1.1rem; border: none; cursor: pointer; transition: all 0.3s; box-shadow: 0 8px 24px rgba(123,92,255,0.3); margin-top: 20px; }
+    .btn-purchase:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(123,92,255,0.5); }
+    
+    .payment-methods { margin-top: 24px; text-align: center; border-top: 1px solid var(--border); padding-top: 20px; }
+    .payment-methods p { font-size: 0.85rem; color: var(--muted); margin-bottom: 12px; font-weight: 500; }
+    .pm-badges { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; }
+    .pm-badge { padding: 6px 14px; border-radius: 8px; font-size: 0.8rem; font-weight: 700; letter-spacing: 0.5px; }
+    .pm-bkash { background: rgba(226,19,110,0.15); color: #e2136e; border: 1px solid rgba(226,19,110,0.3); }
+    .pm-nagad { background: rgba(240,101,34,0.15); color: #f06522; border: 1px solid rgba(240,101,34,0.3); }
+    .pm-rocket { background: rgba(140,52,148,0.15); color: #8c3494; border: 1px solid rgba(140,52,148,0.3); }
+    .pm-upay { background: rgba(0,166,81,0.15); color: #00a651; border: 1px solid rgba(0,166,81,0.3); }
+
+    .includes-list { margin-top: 24px; list-style: none; }
+    .includes-list li { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--muted); margin-bottom: 12px; }
+    .includes-list li svg { color: var(--accent); flex-shrink: 0; }
+
+    /* === MODAL STYLES (Exactly as required) === */
     .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; }
     .modal-overlay.open { display: flex; }
-    .modal { background: #0d1630; border: 1px solid rgba(0, 229, 255, 0.12); border-radius: 20px; width: 100%; max-width: 440px; max-height: 90vh; display: flex; flex-direction: column; }
-    .modal-header { padding: 20px 24px; border-bottom: 1px solid rgba(0, 229, 255, 0.12); display: flex; align-items: center; justify-content: space-between; }
-    .modal-close { width: 32px; height: 32px; border-radius: 8px; background: #111d3a; border: 1px solid rgba(0, 229, 255, 0.12); display: grid; place-items: center; cursor: pointer; color: #7d8fb3; transition: all 0.2s; }
+    .modal { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 440px; box-shadow: 0 32px 80px rgba(0, 0, 0, 0.6); max-height: 90vh; display: flex; flex-direction: column; animation: modalFadeIn 0.3s ease-out; }
+    @keyframes modalFadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-header { padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .modal-header h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.2rem; margin:0; }
+    .modal-close { width: 32px; height: 32px; border-radius: 8px; background: var(--surface2); border: 1px solid var(--border); display: grid; place-items: center; cursor: pointer; color: var(--muted); font-size: 1.2rem; transition: all 0.2s; }
+    .modal-close:hover { color: var(--accent); border-color: var(--accent); }
     .modal-body { padding: 24px; overflow-y: auto; flex: 1; }
+    .modal-body::-webkit-scrollbar { width: 6px; }
+    .modal-body::-webkit-scrollbar-thumb { background: rgba(0, 229, 255, 0.2); border-radius: 10px; }
+    .feedback-input { width: 100%; padding: 14px 16px; background: var(--surface2); border: 1px solid var(--border); border-radius: 10px; color: var(--text); font-family: inherit; margin-bottom: 16px; outline: none; transition: border 0.3s; }
+    .feedback-input:focus { border-color: var(--accent); }
     .modal-actions { display: flex; gap: 12px; margin-top: 10px; }
-    .btn { padding: 12px; font-weight: 600; cursor: pointer; border-radius: 8px; border: none; }
-    .btn-ghost { background: transparent; color: #7d8fb3; }
-    .btn-success { background: linear-gradient(135deg, #00e599, #00e5ff); color: #111; flex: 1; }
-    .feedback-input { width: 100%; padding: 12px; margin-bottom: 16px; background: #111d3a; border: 1px solid rgba(0, 229, 255, 0.12); color: white; border-radius: 8px; }
+    .modal-actions .btn { flex: 1; padding: 14px; font-size: 0.95rem; font-weight: 600; border: none; border-radius: 10px; cursor: pointer; }
+    .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
+    .btn-success { background: linear-gradient(135deg, #00e599, #00e5ff); color: #111; }
+    .btn-success:hover { box-shadow: 0 8px 32px rgba(0, 229, 153, 0.4); }
   </style>
 </head>
 <body>
 
-  <div class="details-container" id="courseDetailsBlock">
-    <h1 class="details-title">Loading Course...</h1>
-    <div class="details-desc">Please wait while we fetch the course details.</div>
-  </div>
+  <nav>
+    <a href="index.html" class="logo">
+      <div class="logo-icon">DF</div>
+      Decentra<span>Force</span>
+    </a>
+    <a href="index.html#courses" class="btn-back">
+      <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      Back to Courses
+    </a>
+  </nav>
+
+  <header class="course-hero">
+    <div class="hero-container">
+      <div class="course-badges" id="heroBadges">
+        </div>
+      <h1 class="course-title" id="heroTitle">Loading Course...</h1>
+      <div class="course-meta">
+        <span><strong class="rating-stars">★★★★★</strong> <span id="heroRating">4.8 (500+ reviews)</span></span>
+        <span><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg> <span id="heroEnrolled">1,200+ Enrolled</span></span>
+        <span><svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg> Bangla / English</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="course-layout">
+    
+    <div class="content-column">
+      <div class="tabs">
+        <div class="tab active" data-target="tab-overview">Overview</div>
+        <div class="tab" data-target="tab-curriculum">Curriculum & Modules</div>
+        <div class="tab" data-target="tab-assignments">Assignments & Exercises</div>
+      </div>
+
+      <div class="tab-content active" id="tab-overview">
+        <div class="desc-text" id="courseDescription">
+          Fetching course details...
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-curriculum">
+        <div id="curriculumContainer">
+          <p style="color:var(--muted)">Curriculum data is being loaded.</p>
+        </div>
+      </div>
+
+      <div class="tab-content" id="tab-assignments">
+        <div id="assignmentsContainer">
+          <div class="module-item">
+            <div class="module-header">Practical Exercises</div>
+            <div class="module-body">
+              This course includes hands-on assignments to test your knowledge. Details will be unlocked upon enrollment.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <aside>
+      <div class="sticky-card">
+        <div class="card-thumbnail" id="cardThumbnail">
+          <span style="z-index:2;position:relative">🎓</span>
+        </div>
+        <div class="card-body">
+          <div class="price-display" id="cardPrice">৳0</div>
+          
+          <button class="btn-purchase" id="pagePurchaseBtn">Purchase Course</button>
+          
+          <div class="payment-methods">
+            <p>Secure payment methods accepted:</p>
+            <div class="pm-badges">
+              <span class="pm-badge pm-bkash">bKash</span>
+              <span class="pm-badge pm-nagad">Nagad</span>
+              <span class="pm-badge pm-rocket">Rocket</span>
+              <span class="pm-badge pm-upay">Upay</span>
+            </div>
+          </div>
+
+          <ul class="includes-list">
+            <li><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Full Lifetime Access</li>
+            <li><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Access on Mobile and PC</li>
+            <li><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Certificate of Completion</li>
+            <li><svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg> Direct Support via WhatsApp</li>
+          </ul>
+        </div>
+      </div>
+    </aside>
+
+  </main>
 
   <div class="modal-overlay" id="checkoutModal">
     <div class="modal">
       <div class="modal-header">
-        <h3 style="margin:0; font-family:'Syne',sans-serif;">Complete Purchase</h3>
+        <h3>Complete Purchase</h3>
         <button class="modal-close" id="modalClose">&times;</button>
       </div>
       <div class="modal-body">
-        <h4 id="modalCourseTitle" style="font-family:'Syne',sans-serif; margin-bottom:4px;"></h4>
-        <p id="modalCourseDesc" style="color:#7d8fb3; font-size:0.85rem; margin-bottom:16px;"></p>
+        <h4 id="modalCourseTitle" style="font-family:'Syne',sans-serif; font-weight:700; font-size:1.1rem; color:var(--text); margin-bottom:4px;"></h4>
+        <p id="modalCourseDesc" style="color:var(--muted); font-size:0.85rem; line-height:1.5; margin-bottom:16px;"></p>
         
-        <div style="background: rgba(0,229,255,0.05); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; margin-bottom: 16px;">
-          <span>Total Price:</span>
-          <span id="modalCoursePrice" style="color:#00e5ff; font-weight:bold; font-size:1.4rem;"></span>
+        <div style="background: rgba(0,229,255,0.05); border: 1px solid rgba(0,229,255,0.1); padding: 12px 16px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+          <span style="color: var(--muted); font-size: 0.9rem; font-weight: 500;">Total Price:</span>
+          <span id="modalCoursePrice" style="font-family:'Syne',sans-serif; font-weight:800; font-size:1.4rem; color:var(--accent); margin:0;"></span>
         </div>
 
-        <div id="paymentInstructionsPanel" style="background: rgba(123,92,255,0.08); padding: 16px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
-          <p><strong>Send Money to : 01302201431</strong></p>
-          <button id="sentMoneyBtn" class="btn btn-purchase" style="width: 100%;">I have sent the money</button>
+        <div id="paymentInstructionsPanel" style="background: rgba(123,92,255,0.08); border: 1px solid rgba(123,92,255,0.2); padding: 16px; border-radius: 12px; margin-bottom: 24px; text-align: center;">
+          <p style="color: var(--text); font-size: 1.1rem; margin-bottom: 12px;">
+            <strong style="color: #00e5ff; font-size: 1.3rem; letter-spacing: 0.5px;">Send Money to : 01302201431</strong>
+          </p>
+          <div style="display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px;">
+            <span class="pm-badge pm-bkash">bKash</span>
+            <span class="pm-badge pm-nagad">Nagad</span>
+            <span class="pm-badge pm-rocket">Rocket</span>
+            <span class="pm-badge pm-upay">Upay</span>
+          </div>
+          <button id="sentMoneyBtn" class="btn-purchase" style="margin-top:0;">I have sent the money</button>
         </div>
 
-        <div id="paymentDetailsForm" style="display: none;">
-          <select id="paymentMethod" class="feedback-input">
-            <option value="">Select method...</option>
-            <option value="bkash">bKash</option>
-            <option value="nagad">Nagad</option>
-            <option value="rocket">Rocket</option>
-            <option value="upay">Upay</option>
-          </select>
-          <input type="text" id="senderNumber" class="feedback-input" placeholder="Sender Number (01XXXXXXXXX)">
-          <input type="text" id="transactionId" class="feedback-input" placeholder="Transaction ID (TrxID)">
+        <div id="paymentDetailsForm" style="display: none; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px;">
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted); display:block;">Payment Method *</label>
+            <select id="paymentMethod" class="feedback-input" style="margin: 0;">
+              <option value="">Select method...</option>
+              <option value="bkash">bKash</option>
+              <option value="nagad">Nagad</option>
+              <option value="rocket">Rocket</option>
+              <option value="upay">Upay</option>
+            </select>
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted); display:block;">Sender Number *</label>
+            <input type="text" id="senderNumber" class="feedback-input" placeholder="01XXXXXXXXX" style="margin: 0;">
+          </div>
+          <div style="margin-bottom: 16px;">
+            <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted); display:block;">Transaction ID *</label>
+            <input type="text" id="transactionId" class="feedback-input" placeholder="TrxID" style="margin: 0;">
+          </div>
         </div>
 
         <div class="modal-actions" id="modalActionButtons" style="display: none;">
@@ -77,43 +257,117 @@
 <script>
   let activeCourse = null;
 
+  // Tab Switching Logic
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.target).classList.add('active');
+    });
+  });
+
+  // Fetch and Populate Data
   document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Get Course ID from URL (e.g., course-details.html?id=5)
     const urlParams = new URLSearchParams(window.location.search);
     const courseId = urlParams.get('id');
 
     if (!courseId) {
-      document.getElementById('courseDetailsBlock').innerHTML = '<h2>Course not found. Please go back.</h2>';
+      document.getElementById('heroTitle').textContent = 'Course not found.';
       return;
     }
 
-    // 2. Fetch all courses and find the specific one
     try {
       const res = await fetch('/api/_public/courses');
       const data = await res.json();
-      
       activeCourse = data.courses.find(c => c.id == courseId);
 
       if (!activeCourse) {
-        document.getElementById('courseDetailsBlock').innerHTML = '<h2>Course not found or is inactive.</h2>';
+        document.getElementById('heroTitle').textContent = 'Course not found or inactive.';
         return;
       }
 
-      // 3. Render Details on the Page
+      // 1. Populate Hero & Badges
+      document.getElementById('heroTitle').textContent = activeCourse.title || 'Untitled Course';
+      
+      const status = activeCourse.status || 'upcoming';
+      let badgesHTML = `<span class="c-badge status">${status}</span>`;
+      
+      let categoryTag = 'Blockchain';
+      try {
+        const parsedMods = typeof activeCourse.modules === 'string' ? JSON.parse(activeCourse.modules) : activeCourse.modules;
+        if (parsedMods && parsedMods.category) categoryTag = parsedMods.category;
+      } catch(e){}
+      badgesHTML += `<span class="c-badge category">${categoryTag}</span>`;
+      document.getElementById('heroBadges').innerHTML = badgesHTML;
+
+      // 2. Populate Overview Description
+      document.getElementById('courseDescription').innerHTML = activeCourse.description 
+        ? activeCourse.description.replace(/\n/g, '<br><br>') 
+        : 'No description available for this course.';
+
+      // 3. Populate Price & Thumbnail (Sticky Card)
       const priceVal = parseFloat(activeCourse.price) || 0;
       const priceText = priceVal === 0 ? 'Free' : `৳${priceVal}`;
+      const originalPriceText = priceVal === 0 ? '' : `<span>৳${Math.round(priceVal * 1.5)}</span>`;
+      
+      document.getElementById('cardPrice').innerHTML = `${originalPriceText}${priceText}`;
+      const purchaseBtn = document.getElementById('pagePurchaseBtn');
+      purchaseBtn.textContent = priceVal === 0 ? 'Enroll for Free' : 'Purchase Course';
 
-      document.getElementById('courseDetailsBlock').innerHTML = `
-        <h1 class="details-title">${activeCourse.title}</h1>
-        <div class="details-price">${priceText}</div>
-        <div class="details-desc">${activeCourse.description}</div>
-        <button class="btn-purchase" id="pagePurchaseBtn">${priceVal === 0 ? 'Enroll for Free' : 'Purchase Course'}</button>
-      `;
+      if (activeCourse.thumbnail_url && activeCourse.thumbnail_url.length > 10) {
+        document.getElementById('cardThumbnail').innerHTML = `<img src="${activeCourse.thumbnail_url}" alt="Course Thumbnail">`;
+      }
 
-      // 4. Attach Event Listener to "Purchase" button to trigger Modal
-      document.getElementById('pagePurchaseBtn').addEventListener('click', () => {
+      // 4. Parse Admin Panel Modules (Curriculum & Assignments)
+      let parsedModules = {};
+      try {
+        parsedModules = typeof activeCourse.modules === 'string' ? JSON.parse(activeCourse.modules) : (activeCourse.modules || {});
+      } catch(e) {}
+
+      const currContainer = document.getElementById('curriculumContainer');
+      const assignContainer = document.getElementById('assignmentsContainer');
+
+      // Helper function to render JSON data into readable UI blocks
+      function renderModuleBlocks(dataObj, defaultTitle) {
+        if (!dataObj || Object.keys(dataObj).length === 0) {
+          return `<div class="module-item"><div class="module-header">${defaultTitle}</div><div class="module-body">Content will be uploaded shortly by the instructor.</div></div>`;
+        }
+        
+        let html = '';
+        // If the admin saved an array or structured object, iterate it
+        for (const [key, value] of Object.entries(dataObj)) {
+          // Skip internal metadata tags
+          if (['category', 'level', 'assignments'].includes(key.toLowerCase())) continue;
+          
+          let contentStr = '';
+          if (typeof value === 'object') {
+             contentStr = '<ul>' + Object.values(value).map(v => `<li>${v}</li>`).join('') + '</ul>';
+          } else {
+             contentStr = String(value).replace(/\n/g, '<br>');
+          }
+          
+          html += `
+            <div class="module-item">
+              <div class="module-header">${key.replace(/_/g, ' ').toUpperCase()}</div>
+              <div class="module-body">${contentStr}</div>
+            </div>`;
+        }
+        return html || `<div class="module-item"><div class="module-header">${defaultTitle}</div><div class="module-body">Content will be updated soon.</div></div>`;
+      }
+
+      // Render Curriculum
+      currContainer.innerHTML = renderModuleBlocks(parsedModules, 'Course Syllabus');
+      
+      // Render Assignments (if a specific "assignments" key exists, otherwise generic)
+      if (parsedModules.assignments || parsedModules.Assignments) {
+        const assignData = parsedModules.assignments || parsedModules.Assignments;
+        assignContainer.innerHTML = renderModuleBlocks({ "Assignments & Tasks": assignData }, 'Assignments');
+      }
+
+      // 5. Attach Purchase Action
+      purchaseBtn.addEventListener('click', () => {
         if (priceVal === 0) {
-           // Direct to free course logic
            window.location.href = 'my-courses.html?tab=free';
         } else {
            openCheckoutModal(activeCourse, priceVal);
@@ -122,29 +376,40 @@
 
     } catch (err) {
       console.error(err);
-      document.getElementById('courseDetailsBlock').innerHTML = '<h2>Failed to load course details.</h2>';
+      document.getElementById('heroTitle').textContent = 'Failed to load details.';
     }
   });
 
-  // Modal logic (Exact functionality from index.html)
+  // === MODAL LOGIC (Exact match to requirements) ===
   function openCheckoutModal(course, price) {
-    document.getElementById('modalCourseTitle').textContent = course.title;
-    document.getElementById('modalCourseDesc').textContent = course.description;
+    document.getElementById('modalCourseTitle').textContent = course.title || 'Course Enrollment';
+    const shortDesc = course.description ? (course.description.substring(0, 100) + '...') : 'Complete your payment to access the course.';
+    document.getElementById('modalCourseDesc').textContent = shortDesc;
     document.getElementById('modalCoursePrice').textContent = `৳${price}`;
     
     document.getElementById('paymentInstructionsPanel').style.display = 'block';
     document.getElementById('paymentDetailsForm').style.display = 'none';
     document.getElementById('modalActionButtons').style.display = 'none';
 
+    // Reset inputs
+    document.getElementById('paymentMethod').value = '';
+    document.getElementById('senderNumber').value = '';
+    document.getElementById('transactionId').value = '';
+
     document.getElementById('checkoutModal').classList.add('open');
+    document.body.style.overflow = 'hidden';
   }
 
   function closeCheckoutModal() {
     document.getElementById('checkoutModal').classList.remove('open');
+    document.body.style.overflow = '';
   }
 
   document.getElementById('modalClose').addEventListener('click', closeCheckoutModal);
   document.getElementById('modalCancel2').addEventListener('click', closeCheckoutModal);
+  document.getElementById('checkoutModal').addEventListener('click', (e) => {
+    if (e.target.id === 'checkoutModal') closeCheckoutModal();
+  });
 
   document.getElementById('sentMoneyBtn').addEventListener('click', () => {
     document.getElementById('paymentInstructionsPanel').style.display = 'none'; 
@@ -160,7 +425,8 @@
     const transactionId = document.getElementById('transactionId').value.trim();
     
     if (!paymentMethod || !senderNumber || !transactionId) {
-      alert('Please fill out all fields.'); return;
+      alert('Please fill out all fields: Payment Method, Sender Number, and Transaction ID.'); 
+      return;
     }
 
     btn.textContent = 'Processing...';
@@ -180,13 +446,22 @@
     .then(data => {
       if (data.success) {
         closeCheckoutModal();
-        alert('Payment submitted successfully!');
+        if (activeCourse.whatsapp) {
+          window.open(activeCourse.whatsapp, '_blank');
+        }
+        alert(`Payment submitted successfully for ${activeCourse.title}!\nOur team will verify your transaction shortly.`);
         window.location.href = 'my-courses.html';
       } else {
         alert('Error: ' + data.error);
         btn.textContent = 'Submit Payment';
         btn.disabled = false;
       }
+    })
+    .catch(error => {
+      console.error('Purchase submission error:', error);
+      alert('Network error. Please check your connection and try again.');
+      btn.textContent = 'Submit Payment';
+      btn.disabled = false;
     });
   });
 </script>
