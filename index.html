@@ -1409,13 +1409,9 @@ window.addEventListener('storage', (e) => {
         `;
         container.appendChild(card);
 
-        // Make the card itself open the checkout/enroll
+      // Make the card itself open the course details page
         card.addEventListener('click', function() {
-          if (isFree) {
-            window.location.href = 'my-courses.html?tab=free';
-          } else {
-            openCheckoutModal(course);
-          }
+          window.location.href = `course-details.html?id=${course.id}`;
         });
       });
     }// Modal functions

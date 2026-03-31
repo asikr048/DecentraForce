@@ -333,6 +333,18 @@ async function adminInit(req, res) {
     granted_by INTEGER REFERENCES users(id),
     granted_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id,course_id))`);
+// ADD THIS BLOCK RIGHT HERE:
+  await pool.query(`CREATE TABLE IF NOT EXISTS purchases (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    course_id INTEGER REFERENCES courses(id) ON DELETE CASCADE,
+    sender_number VARCHAR(50) NOT NULL,
+    transaction_id VARCHAR(100) NOT NULL,
+    payment_method VARCHAR(50) NOT NULL,
+    status VARCHAR(50) DEFAULT 'pending',
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+  )`);
+
 
   const ADMIN_EMAIL = 'asikrac@gmail.com', ADMIN_PASS = 'asikasik', ADMIN_NAME = 'Admin';
   const hash = await bcrypt.hash(ADMIN_PASS, 12);
