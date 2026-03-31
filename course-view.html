@@ -277,68 +277,11 @@
   .tab-btn.active .tab-badge { background: var(--accent); color: #000; }
 
   /* ─── CONTENT AREA ─── */
-  .content-area { display: none; padding: 32px 36px 60px; max-width: 900px; }
+  .content-area { display: none; padding: 32px 36px 60px; max-width: 1200px; margin: 0 auto; }
   .content-area.active { display: block; animation: fadeUp .4s cubic-bezier(.16,1,.3,1) both; }
 
-  /* ─── MODULE TAB ─── */
-  .modules-list { display: flex; flex-direction: column; gap: 14px; }
 
-  .module-card {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 14px; overflow: hidden;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  .module-card:hover { border-color: rgba(0,229,255,.2); box-shadow: 0 4px 20px rgba(0,0,0,.3); }
-
-  .module-header {
-    display: flex; align-items: center; gap: 16px;
-    padding: 18px 22px; cursor: pointer;
-    user-select: none;
-  }
-  .module-num {
-    width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    display: grid; place-items: center;
-    font-family: 'Syne', sans-serif; font-weight: 800; font-size: .85rem; color: #fff;
-    box-shadow: 0 0 12px rgba(123,92,255,.3);
-  }
-  .module-info { flex: 1; }
-  .module-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .98rem; color: var(--text); margin-bottom: 2px; }
-  .module-subtitle { font-size: .78rem; color: var(--muted); }
-  .module-toggle {
-    width: 28px; height: 28px; border-radius: 8px;
-    background: var(--surface2); border: 1px solid var(--border2);
-    display: grid; place-items: center; color: var(--muted);
-    font-size: .8rem; transition: all .2s; flex-shrink: 0;
-  }
-  .module-card.open .module-toggle { background: rgba(0,229,255,.1); color: var(--accent); border-color: rgba(0,229,255,.2); transform: rotate(180deg); }
-
-  .module-body {
-    display: none; border-top: 1px solid var(--border2);
-    padding: 0 22px 20px;
-  }
-  .module-card.open .module-body { display: block; }
-
-  .topic-list { list-style: none; margin-top: 14px; }
-  .topic-item {
-    display: flex; align-items: center; gap: 12px;
-    padding: 10px 14px; border-radius: 9px;
-    font-size: .88rem; color: var(--muted);
-    transition: background .2s; cursor: default;
-    border: 1px solid transparent;
-  }
-  .topic-item:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
-  .topic-icon { width: 28px; height: 28px; border-radius: 7px; background: var(--surface2); display: grid; place-items: center; font-size: .85rem; flex-shrink: 0; }
-
-  .module-empty {
-    text-align: center; padding: 50px 20px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-  }
-  .module-empty .empty-icon { font-size: 3rem; margin-bottom: 12px; }
-  .module-empty h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
-  .module-empty p { color: var(--muted); font-size: .9rem; }
-
-  /* ─── ASSIGNMENT TAB ─── */
+  /* ─── ASSIGNMENT & RESOURCES TAB ─── */
   .assignment-header { margin-bottom: 24px; }
   .stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
   .stat-card {
@@ -362,7 +305,6 @@
   .badge-done { background: rgba(0,229,153,.1); color: #00e599; border: 1px solid rgba(0,229,153,.15); }
   .assignment-desc { color: var(--muted); font-size: .88rem; line-height: 1.6; }
 
-  /* ─── RESOURCES TAB ─── */
   .resources-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px; }
   .resource-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
@@ -495,417 +437,78 @@
     .course-header h1 { font-size: 1.25rem; }
   }
 
-  /* ─── VIDEO LECTURES ─── */
-  .lecture-video {
-    margin-top: 16px;
-    border-radius: 12px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    background: var(--surface2);
+
+  /* ─── NEW UNIFIED MODULE LAYOUT ─── */
+  .unified-course-layout {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
   }
-  .lectures-container {
+
+  .video-main {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .video-sidebar {
+    width: 380px;
+    flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 16px;
   }
-  .video-container {
-    position: relative;
-    padding-bottom: 56.25%; /* 16:9 aspect ratio */
-    height: 0;
-    overflow: hidden;
-  }
-  .video-container iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-  .lecture-meta {
-    padding: 12px 16px;
-    border-top: 1px solid var(--border2);
-    font-size: .85rem;
-    color: var(--muted);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .lecture-title {
-    font-weight: 600;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-  .lecture-duration {
-    background: rgba(0,229,255,.1);
-    color: var(--accent);
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: .75rem;
-    font-weight: 600;
-  }
 
-  /* ─── TWO‑COLUMN VIDEO LAYOUT ─── */
-  .video-module-container {
-    display: flex;
-    gap: 32px;
-    margin-top: 24px;
-  }
-
-  .video-main {
-    flex: 0 0 65%;
-    max-width: 65%;
-  }
-
-  .video-sidebar {
-    flex: 0 0 35%;
-    max-width: 35%;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 24px;
-    align-self: flex-start;
-  }
-
-  /* Dark video player area */
   .video-player-area {
-    background: var(--bg); /* near-black/dark green background */
+    background: #000;
     border-radius: 12px;
     overflow: hidden;
     border: 1px solid var(--border);
     margin-bottom: 20px;
-  }
-
-  .video-title-bar {
-    padding: 24px;
-    text-align: center;
-    border-bottom: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .video-title-bar h2 {
-    font-family: 'Syne', sans-serif;
-    font-weight: 800;
-    font-size: 1.4rem;
-    color: var(--text);
-    margin-bottom: 8px;
-    letter-spacing: -0.01em;
-  }
-
-  .video-title-underline {
-    width: 120px;
-    height: 3px;
-    background: linear-gradient(90deg, #ffd700, #ffaa00);
-    margin: 0 auto;
-    border-radius: 2px;
     position: relative;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
   }
 
-  .video-title-underline::after {
-    content: '';
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background: #ffd700;
-    border-radius: 50%;
-    top: -2.5px;
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .video-player-wrapper {
-    position: relative;
-    padding-bottom: 56.25%;
-    height: 0;
-    overflow: hidden;
-  }
-
-  .video-player-wrapper iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-  }
-
-  .video-controls-bar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 20px;
-    background: rgba(0, 0, 0, 0.7);
-    border-top: 1px solid var(--border2);
-  }
-
-  .control-left, .control-right {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-  }
-
-  .control-btn {
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-size: 1.2rem;
-    cursor: pointer;
-    opacity: 0.8;
-    transition: opacity 0.2s;
-  }
-
-  .control-btn:hover {
-    opacity: 1;
-  }
-
-  .progress-bar {
-    flex: 1;
-    height: 4px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 2px;
-    margin: 0 20px;
-    overflow: hidden;
-  }
-
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    width: 8%;
-    border-radius: 2px;
-  }
-
-  .time-display {
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.7);
-    font-family: 'DM Sans', monospace;
-    min-width: 100px;
-    text-align: center;
-  }
-
-  .lesson-title {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 1.1rem;
-    color: var(--text);
-    margin: 20px 0 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border2);
-  }
-
-  .video-navigation {
-    display: flex;
-    gap: 12px;
-    margin-top: 20px;
-  }
-
-  .nav-btn {
-    flex: 1;
-    padding: 12px 20px;
-    border-radius: 8px;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-    border: 2px solid transparent;
-  }
-
-  .nav-btn.prev {
-    background: transparent;
-    color: var(--accent);
-    border-color: var(--accent);
-  }
-
-  .nav-btn.prev:hover {
-    background: rgba(0,229,255,0.1);
-  }
-
-  .nav-btn.next {
-    background: var(--accent);
-    color: #000;
-    border-color: var(--accent);
-  }
-
-  .nav-btn.next:hover {
-    background: #00cce5;
-    border-color: #00cce5;
-  }
-
-  .description-tab {
-    margin-top: 24px;
-    padding-top: 16px;
-    border-top: 1px solid var(--border2);
-  }
-
-  .description-label {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.95rem;
-    color: var(--text);
-    margin-bottom: 8px;
-    padding-bottom: 6px;
-    border-bottom: 2px solid var(--accent);
-    display: inline-block;
-  }
-
-  .description-content {
-    font-size: 0.9rem;
-    color: var(--muted);
-    line-height: 1.6;
-  }
-
-  /* Sidebar progress */
-  .sidebar-progress {
-    margin-bottom: 28px;
-  }
-
-  .sidebar-progress-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.85rem;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .sidebar-progress-bar {
-    height: 6px;
-    background: var(--surface2);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-
-  .sidebar-progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, #00e599, #00cc88);
-    border-radius: 3px;
-    width: 7%;
-  }
-
-  .module-list {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .module-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 14px 16px;
-    background: var(--surface);
-    border-radius: 10px;
-    border: 1px solid var(--border2);
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-
-  .module-row:hover {
-    border-color: var(--accent);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0,229,255,0.1);
-  }
-
-  .module-info {
-    flex: 1;
-  }
-
-  .module-name {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    color: var(--text);
-    margin-bottom: 4px;
-  }
-
-  .module-subtext {
-    font-size: 0.75rem;
-    color: var(--muted);
-  }
-
-  .module-chevron {
-    color: var(--muted);
-    font-size: 0.9rem;
-    transition: transform 0.2s;
-  }
-
-  .module-row:hover .module-chevron {
-    color: var(--accent);
-    transform: translateX(3px);
-  }
-
-  /* Responsive */
-  @media (max-width: 1024px) {
-    .video-module-container {
-      flex-direction: column;
-      gap: 24px;
-    }
-    .video-main, .video-sidebar {
-      flex: 1;
-      max-width: 100%;
-    }
-  }
-
-  @media (max-width: 768px) {
-    .video-controls-bar {
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .progress-bar {
-      order: 3;
-      flex: 1 0 100%;
-      margin: 8px 0 0;
-    }
-    .time-display {
-      min-width: auto;
-    }
-  }
-  
   /* ─── CUSTOM YOUTUBE OVERLAY & CONTROLS ─── */
   .youtube-player-container {
     position: relative;
     width: 100%;
-    height: 100%;
-    overflow: hidden;
+    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    height: 0;
+    background: #000;
   }
-  
+
   .youtube-iframe-wrapper {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    top: 0; left: 0; width: 100%; height: 100%;
     z-index: 1;
+    pointer-events: none; /* Crucial: Iframe receives NO clicks */
   }
-  
+
   .youtube-iframe-wrapper iframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-    pointer-events: auto; /* Allow clicks to reach YouTube player for play/pause */
+    width: 100%; height: 100%; border: none;
   }
-  
+
+  /* The Shield: Blocks all right clicks and catches play/pause toggles */
+  .youtube-click-shield {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: calc(100% - 60px); /* Leaves room for controls */
+    z-index: 5;
+    cursor: pointer;
+  }
+
   .youtube-overlay {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 2;
-    pointer-events: none; /* Allow clicks to pass through to iframe */
-    background: transparent;
+    top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 10;
+    pointer-events: none; /* Let clicks pass through to shield, except on controls */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
   }
-  
+
   .custom-controls-bar {
-    pointer-events: auto; /* Controls should be clickable */
-  }
-  
-  /* Custom controls bar */
-  .custom-controls-bar {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.7), transparent);
+    pointer-events: auto; /* Controls MUST be clickable */
+    background: linear-gradient(to top, rgba(0,0,0,0.95), rgba(0,0,0,0.7), transparent);
     padding: 16px 20px;
     display: flex;
     align-items: center;
@@ -913,304 +516,120 @@
     transition: opacity 0.3s ease;
     opacity: 0;
   }
-  
-  .youtube-overlay:hover .custom-controls-bar {
+
+  .video-player-area:hover .custom-controls-bar {
     opacity: 1;
   }
-  
-  .control-group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  
+
+  .control-group { display: flex; align-items: center; gap: 12px; }
+
   .control-btn {
-    background: transparent;
-    border: none;
-    color: var(--text);
-    font-size: 1.2rem;
-    cursor: pointer;
-    opacity: 0.85;
-    transition: opacity 0.2s, transform 0.2s;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
+    background: transparent; border: none; color: var(--text);
+    font-size: 1.2rem; cursor: pointer; opacity: 0.85;
+    transition: all 0.2s; width: 40px; height: 40px;
+    border-radius: 50%; display: grid; place-items: center;
   }
-  
-  .control-btn:hover {
-    opacity: 1;
-    background: rgba(255,255,255,0.1);
-    transform: scale(1.05);
-  }
-  
-  .control-btn.play-pause {
-    background: var(--accent);
-    color: #000;
-    font-size: 1rem;
-  }
-  
-  .control-btn.play-pause:hover {
-    background: #00cce5;
-  }
-  
+  .control-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); transform: scale(1.05); }
+  .control-btn.play-pause { background: var(--accent); color: #000; font-size: 1rem; }
+  .control-btn.play-pause:hover { background: #00cce5; }
+
   /* Timeline slider */
-  .timeline-slider-container {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  .timeline-slider-container { flex: 1; display: flex; align-items: center; gap: 10px; }
+  .timeline-slider, .volume-slider {
+    flex: 1; height: 4px; background: rgba(255,255,255,0.2);
+    border-radius: 2px; outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;
   }
-  
-  .timeline-slider {
-    flex: 1;
-    height: 4px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 2px;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-    cursor: pointer;
+  .timeline-slider::-webkit-slider-thumb, .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--accent); cursor: pointer; box-shadow: 0 0 8px rgba(0,229,255,0.8);
   }
-  
-  .timeline-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-    box-shadow: 0 0 8px rgba(0,229,255,0.8);
-  }
-  
-  .timeline-slider::-moz-range-thumb {
-    width: 14px;
-    height: 14px;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 0 8px rgba(0,229,255,0.8);
-  }
-  
+  .volume-slider::-webkit-slider-thumb { background: var(--accent2); box-shadow: none; }
+
   .time-display {
-    font-size: 0.85rem;
-    color: rgba(255,255,255,0.9);
-    font-family: 'DM Sans', monospace;
-    min-width: 100px;
-    text-align: center;
-    font-variant-numeric: tabular-nums;
+    font-size: 0.85rem; color: rgba(255,255,255,0.9);
+    font-family: 'DM Sans', monospace; min-width: 45px;
+    text-align: center; font-variant-numeric: tabular-nums;
   }
-  
-  /* Volume slider */
-  .volume-slider-container {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    width: 120px;
-  }
-  
-  .volume-slider {
-    flex: 1;
-    height: 4px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 2px;
-    outline: none;
-    -webkit-appearance: none;
-    appearance: none;
-    cursor: pointer;
-  }
-  
-  .volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--accent2);
-    cursor: pointer;
-  }
-  
-  .volume-slider::-moz-range-thumb {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background: var(--accent2);
-    cursor: pointer;
-    border: none;
-  }
-  
-  /* Fullscreen button */
-  .control-btn.fullscreen {
-    margin-left: auto;
-  }
-  
-  /* Loading indicator */
-  .youtube-loading {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 3;
-    background: rgba(0,0,0,0.8);
-    padding: 20px 30px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    color: var(--text);
-    font-size: 0.9rem;
-  }
-  
-  .youtube-loading-spinner {
-    width: 24px;
-    height: 24px;
-    border: 2px solid var(--border);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 1s linear infinite;
-  }
-  
-  /* Block right-click context menu */
-  .youtube-overlay {
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
-  
-  /* Hide native YouTube controls */
-  .youtube-iframe-wrapper iframe {
-    /* These parameters are set via API, but extra assurance */
-    color: white;
-    iv_load_policy: 3;
-    modestbranding: 1;
-    controls: 0;
-    disablekb: 1;
-    fs: 0;
-    rel: 0;
-    showinfo: 0;
-  }
+  .volume-slider-container { display: flex; align-items: center; gap: 8px; width: 100px; }
+  .control-btn.fullscreen { margin-left: auto; }
 
-  /* Settings dropdown */
-  .settings-group {
-    position: relative;
+  /* Meta under video */
+  .lesson-title-main {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.3rem;
+    color: var(--text); margin: 0 0 12px;
   }
-  
-  .settings-dropdown {
-    position: absolute;
-    bottom: 100%;
-    right: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 8px 0;
-    min-width: 150px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    z-index: 100;
-    margin-bottom: 10px;
+  .video-navigation { display: flex; gap: 12px; margin-bottom: 24px; }
+  .nav-btn {
+    padding: 10px 18px; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+    font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
+    border: 1px solid var(--border); background: var(--surface2); color: var(--text);
   }
-  
-  .settings-item {
-    padding: 8px 16px;
-    font-size: 0.85rem;
-    color: var(--text);
-    cursor: pointer;
-    transition: background 0.2s;
-  }
-  
-  .settings-item:hover {
-    background: var(--surface2);
-    color: var(--accent);
-  }
-  
-  .settings-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 6px 0;
-  }
-  
-  /* Quality submenu */
-  .quality-menu {
-    position: absolute;
-    left: 100%;
-    top: 0;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 8px 0;
-    min-width: 120px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    display: none;
-  }
-  
-  .settings-item:hover .quality-menu {
-    display: block;
-  }
+  .nav-btn:hover:not(:disabled) { background: var(--surface3); border-color: var(--accent); color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
 
-  /* ── RESPONSIVE ADJUSTMENTS FOR CUSTOM CONTROLS ─── */
+  .description-tab {
+    padding: 20px; border-radius: 12px; background: var(--surface);
+    border: 1px solid var(--border2);
+  }
+  .description-label {
+    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem;
+    color: var(--text); margin-bottom: 8px;
+  }
+  .description-content { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+
+  /* Sidebar Modules List */
+  .sidebar-progress {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 16px;
+  }
+  .sidebar-progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; }
+  .sidebar-progress-bar { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
+  .sidebar-progress-fill { height: 100%; background: linear-gradient(90deg, #00e599, #00cc88); border-radius: 3px; width: 0%; transition: width 0.3s; }
+
+  .module-accordion-list {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    max-height: 800px; overflow-y: auto;
+  }
+  .module-accordion-list::-webkit-scrollbar { width: 6px; }
+  .module-accordion-list::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+  .acc-module-item { border-bottom: 1px solid var(--border2); }
+  .acc-module-item:last-child { border-bottom: none; }
+  .acc-module-header {
+    padding: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center;
+    background: var(--surface); transition: background 0.2s;
+  }
+  .acc-module-header:hover { background: var(--surface2); }
+  .acc-module-title { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 4px; }
+  .acc-module-meta { font-size: 0.75rem; color: var(--muted); }
+  .acc-chevron { transition: transform 0.3s; color: var(--muted); }
+  .acc-module-item.open .acc-chevron { transform: rotate(180deg); color: var(--accent); }
+  
+  .acc-module-body { display: none; background: var(--bg); border-top: 1px solid var(--border2); }
+  .acc-module-item.open .acc-module-body { display: block; }
+
+  .acc-lecture-item {
+    padding: 12px 16px 12px 24px; display: flex; align-items: flex-start; gap: 12px;
+    cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.02); transition: all 0.2s;
+  }
+  .acc-lecture-item:hover { background: rgba(0,229,255,0.05); }
+  .acc-lecture-item.active { background: rgba(0,229,255,0.1); border-left: 3px solid var(--accent); padding-left: 21px; }
+  
+  .acc-lecture-icon { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+  .acc-lecture-item.active .acc-lecture-icon { color: var(--accent); }
+  .acc-lecture-info { flex: 1; }
+  .acc-lecture-title { font-size: 0.85rem; color: var(--text); margin-bottom: 4px; line-height: 1.4; }
+  .acc-lecture-item.active .acc-lecture-title { font-weight: 600; color: var(--accent); }
+  .acc-lecture-dur { font-size: 0.7rem; color: var(--muted); }
+
+  @media (max-width: 1024px) {
+    .unified-course-layout { flex-direction: column; }
+    .video-sidebar { width: 100%; }
+  }
   @media (max-width: 768px) {
-    .custom-controls-bar {
-      padding: 12px 16px;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-    
-    .control-group {
-      flex: 1 1 100%;
-      margin-bottom: 8px;
-    }
-    
-    .control-group:last-child {
-      margin-bottom: 0;
-    }
-    
-    .timeline-slider-container {
-      order: 1;
-    }
-    
-    .volume-slider-container {
-      width: 80px;
-    }
-    
-    .control-btn.play-pause {
-      width: 36px;
-      height: 36px;
-      font-size: 0.9rem;
-    }
-    
-    .time-display {
-      min-width: 60px;
-      font-size: 0.75rem;
-    }
-    
-    .control-btn.fullscreen {
-      margin-left: 0;
-      order: 2;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .custom-controls-bar {
-      padding: 10px 12px;
-      gap: 8px;
-    }
-    
-    .timeline-slider-container {
-      gap: 6px;
-    }
-    
-    .volume-slider-container {
-      width: 60px;
-    }
-    
-    .control-btn {
-      width: 32px;
-      height: 32px;
-      font-size: 1rem;
-    }
+    .custom-controls-bar { padding: 12px 10px; flex-wrap: wrap; justify-content: space-between; }
+    .timeline-slider-container { order: -1; flex: 1 1 100%; margin-bottom: 8px; }
   }
 </style>
 </head>
@@ -1221,7 +640,6 @@
 
 <div class="app-shell">
 
-  <!-- ─── SIDEBAR ─── -->
   <aside class="sidebar">
     <a href="index.html" class="sidebar-logo">
       <div class="logo-icon">DF</div>
@@ -1283,10 +701,8 @@
     </div>
   </aside>
 
-  <!-- ─── MAIN ─── -->
   <main class="main">
 
-    <!-- Top Bar -->
     <header class="topbar">
       <div class="topbar-left">
         <div class="topbar-breadcrumb">
@@ -1322,16 +738,13 @@
       </div>
     </header>
 
-    <!-- Page Body -->
     <div class="page-body">
 
-      <!-- Loading state -->
       <div class="loader" id="pageLoader">
         <div class="spin"></div>
         Loading course...
       </div>
 
-      <!-- Course Header Banner (hidden until loaded) -->
       <div class="course-header" id="courseHeader" style="display:none;">
         <div class="course-header-inner">
           <div class="course-status-row">
@@ -1345,26 +758,24 @@
             <span>🎥 <span id="headerLectures">0</span> Lectures</span>
             <span>⚡ <span id="headerExercises">0</span> Exercises</span>
           </div>
-          <div class="course-header-progress">
-            <div class="ch-progress-label">
+          <div class="course-header-progress" style="display:none;"> <div class="ch-progress-label">
               <span>Your Progress</span>
-              <span id="headerPct" style="color:var(--accent);font-weight:700;">7%</span>
+              <span id="headerPct" style="color:var(--accent);font-weight:700;">0%</span>
             </div>
             <div class="ch-progress-track">
-              <div class="ch-progress-fill" id="headerFill" style="width:7%;"></div>
+              <div class="ch-progress-fill" id="headerFill" style="width:0%;"></div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Tab Nav -->
       <nav class="tab-nav" id="tabNav" style="display:none;">
         <button class="tab-btn active" id="tabModule" onclick="switchTab('module')">
           <span>📚</span> Module
         </button>
         <button class="tab-btn" id="tabAssignment" onclick="switchTab('assignment')">
           <span>📝</span> Assignment
-          <span class="tab-badge" id="assignBadge">0</span>
+          <span class="tab-badge" id="assignBadge" style="display:none;">0</span>
         </button>
         <button class="tab-btn" id="tabResources" onclick="switchTab('resources')">
           <span>🔗</span> Resources
@@ -1378,18 +789,71 @@
         </button>
       </nav>
 
-      <!-- ── MODULE TAB ── -->
       <div class="content-area active" id="panelModule">
-        <div class="section-header">
-          <h2>Course <em>Curriculum</em></h2>
-          <p>All modules and lectures for this course.</p>
-        </div>
-        <div class="modules-list" id="modulesList">
-          <div class="loader"><div class="spin"></div> Loading modules...</div>
+        <div class="unified-course-layout">
+          
+          <div class="video-main">
+            <div class="video-player-area" id="mainPlayerArea">
+              <div class="youtube-player-container" id="yt-container">
+                <div class="youtube-iframe-wrapper" id="yt-wrapper">
+                  <div id="main-yt-iframe"></div>
+                </div>
+                <div class="youtube-click-shield" onclick="toggleMainPlayPause()"></div>
+                <div class="youtube-overlay">
+                  <div class="custom-controls-bar" id="customControls">
+                    <button class="control-btn play-pause" id="btnPlayPause" onclick="toggleMainPlayPause()">▶</button>
+                    
+                    <div class="timeline-slider-container">
+                      <span class="time-display" id="timeCurrent">0:00</span>
+                      <input type="range" class="timeline-slider" id="timelineSlider" min="0" max="100" value="0" oninput="onTimelineDrag()" onchange="onTimelineDrop(this.value)">
+                      <span class="time-display" id="timeDuration">0:00</span>
+                    </div>
+
+                    <div class="control-group">
+                      <button class="control-btn" id="btnMute" onclick="toggleMainMute()">🔊</button>
+                      <div class="volume-slider-container">
+                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="80" oninput="setMainVolume(this.value)">
+                      </div>
+                    </div>
+                    
+                    <button class="control-btn fullscreen" onclick="toggleMainFullscreen()">⛶</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <h2 class="lesson-title-main" id="displayLessonTitle">Select a lecture to begin</h2>
+            <div class="video-navigation">
+              <button class="nav-btn" id="btnPrevLec" onclick="navigateLecture(-1)" disabled>← Previous</button>
+              <button class="nav-btn" id="btnNextLec" onclick="navigateLecture(1)" disabled>Next →</button>
+            </div>
+
+            <div class="description-tab">
+              <div class="description-label">Description:</div>
+              <div class="description-content" id="displayLessonDesc">
+                Course description and notes will appear here.
+              </div>
+            </div>
+          </div>
+
+          <div class="video-sidebar">
+            <div class="sidebar-progress">
+              <div class="sidebar-progress-label">
+                <span>Course Progress</span>
+                <span id="sideModPct">0%</span>
+              </div>
+              <div class="sidebar-progress-bar">
+                <div class="sidebar-progress-fill" id="sideModFill"></div>
+              </div>
+            </div>
+
+            <div class="module-accordion-list" id="accordionList">
+              </div>
+          </div>
+
         </div>
       </div>
 
-      <!-- ── ASSIGNMENT TAB ── -->
       <div class="content-area" id="panelAssignment">
         <div class="section-header">
           <h2>Assignments &amp; <em>Exercises</em></h2>
@@ -1403,18 +867,15 @@
         <div id="assignmentsList"></div>
       </div>
 
-      <!-- ── RESOURCES TAB ── -->
       <div class="content-area" id="panelResources">
         <div class="section-header">
           <h2>Course <em>Resources</em></h2>
           <p>Useful links and materials for this course.</p>
         </div>
         <div class="resources-grid" id="resourcesGrid">
-          <!-- Filled dynamically -->
-        </div>
+          </div>
       </div>
 
-      <!-- ── LEADERBOARD TAB ── -->
       <div class="content-area" id="panelLeaderboard">
         <div class="section-header">
           <h2>Leader <em>Board</em></h2>
@@ -1427,7 +888,6 @@
         </div>
       </div>
 
-      <!-- ── ANNOUNCEMENTS TAB ── -->
       <div class="content-area" id="panelAnnouncements">
         <div class="section-header">
           <h2>Course <em>Announcements</em></h2>
@@ -1436,8 +896,7 @@
         <div id="announcementsList"></div>
       </div>
 
-    </div><!-- /page-body -->
-  </main>
+    </div></main>
 </div>
 
 <script>
@@ -1445,10 +904,19 @@
   let currentUser  = null;
   let activeCourse = null;
   let courseModules = {};
+  
+  // Flat list of all lectures for Next/Prev navigation
+  let flatLectures = []; 
+  let currentLectureIndex = -1;
+
+  // YouTube Player State
+  let mainPlayer = null;
+  let isPlayerReady = false;
+  let updateInterval = null;
+  let isDraggingTimeline = false;
 
   // ── INIT ───────────────────────────────────────────────────────────────
   async function initApp() {
-    // Auth check
     try {
       const res  = await fetch('/api/auth/verify', { credentials: 'include' });
       const data = await res.json();
@@ -1468,7 +936,6 @@
       return;
     }
 
-    // Load course
     const params   = new URLSearchParams(window.location.search);
     const courseId = params.get('id');
     if (!courseId) { showError('No course ID provided.'); return; }
@@ -1487,14 +954,11 @@
 
   // ── POPULATE ────────────────────────────────────────────────────────────
   function populatePage() {
-    // Parse modules JSON safely
     try {
       courseModules = typeof activeCourse.modules === 'string'
         ? JSON.parse(activeCourse.modules)
         : (activeCourse.modules || {});
-    } catch(e) {
-      courseModules = {};
-    }
+    } catch(e) { courseModules = {}; }
     if (!courseModules || typeof courseModules !== 'object') courseModules = {};
 
     const curriculum   = Array.isArray(courseModules.curriculum) ? courseModules.curriculum : [];
@@ -1504,7 +968,6 @@
     const content      = courseModules.content || '';
     const status       = activeCourse.status   || 'ongoing';
 
-    // ─ Header
     document.getElementById('headerTitle').textContent      = activeCourse.title || 'Untitled Course';
     document.getElementById('topbarTitle').textContent      = activeCourse.title || 'Course';
     document.getElementById('headerModules').textContent    = curriculum.length;
@@ -1518,7 +981,6 @@
       statusChip.style.display = '';
     }
 
-    // ─ Sidebar course info
     const sidebarInfo = document.getElementById('sidebarCourseInfo');
     sidebarInfo.style.display = '';
     document.getElementById('sidebarCourseTitle').textContent = activeCourse.title || 'Untitled';
@@ -1526,261 +988,114 @@
       document.getElementById('sidebarThumb').innerHTML = `<img src="${activeCourse.thumbnail_url}" alt="thumbnail">`;
     }
 
-    // ─ Hide loader, show content
     document.getElementById('pageLoader').style.display  = 'none';
     document.getElementById('courseHeader').style.display = '';
     document.getElementById('tabNav').style.display       = '';
 
-    // ─ Stat badges
     document.getElementById('statLectures').textContent   = lectures   || '—';
     document.getElementById('statExercises').textContent  = exercises  || '—';
     document.getElementById('statAssignments').textContent= assignCount|| '—';
 
     const ab = document.getElementById('assignBadge');
     ab.textContent = assignCount;
-    if (!assignCount) ab.style.display = 'none';
+    if (assignCount > 0) ab.style.display = 'inline-flex';
 
-    // ─ Render tabs
-    renderModules(curriculum);
+    renderUnifiedModules(curriculum);
     renderAssignments(assignCount, content, curriculum);
     renderResources();
     renderAnnouncements(content, activeCourse);
   }
 
-  // ── MODULE TAB ─────────────────────────────────────────────────────────
-  function renderModules(curriculum) {
-    const container = document.getElementById('modulesList');
+  // ── UNIFIED MODULE TAB LOGIC ───────────────────────────────────────────
+  function renderUnifiedModules(curriculum) {
+    const listContainer = document.getElementById('accordionList');
+    flatLectures = []; // Reset
+
     if (!curriculum || curriculum.length === 0) {
-      container.innerHTML = `
-        <div class="module-empty">
-          <div class="empty-icon">📦</div>
-          <h3>Curriculum Coming Soon</h3>
-          <p>Your instructor hasn't added modules yet. Check back soon!</p>
-        </div>`;
+      listContainer.innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted);">No modules available yet.</div>`;
       return;
     }
 
-    // For each module, create the two-column video layout
-    container.innerHTML = curriculum.map((mod, i) => {
-      // Determine module title
-      const moduleTitle = mod.moduleTitle || mod.title || `Module ${i+1}`;
-      // Determine lectures (new structure) and topics (old structure)
-      const lectures = Array.isArray(mod.lectures) ? mod.lectures : [];
-      const topics = Array.isArray(mod.topics) ? mod.topics
-                   : (typeof mod.topics === 'string' && mod.topics ? [mod.topics] : []);
+    let html = '';
+    let globalIndex = 0;
 
-      // Get first lecture for video player (or placeholder)
-      const firstLecture = lectures.length > 0 ? lectures[0] : null;
-      const videoTitle = firstLecture ? firstLecture.title : 'Digital Signature & Advanced Cryptographic Protocols';
-      const videoUrl = firstLecture ? firstLecture.url : '';
-      const videoDuration = firstLecture ? firstLecture.duration : '18:34';
-
-      // Build custom YouTube player with overlay
-      let videoPlayerHTML = '';
-      const videoId = videoUrl ? extractYouTubeVideoId(videoUrl) : null;
+    curriculum.forEach((mod, mIdx) => {
+      const title = mod.moduleTitle || mod.title || `Module ${mIdx+1}`;
+      const modLectures = Array.isArray(mod.lectures) ? mod.lectures : [];
+      const topics = Array.isArray(mod.topics) ? mod.topics : (typeof mod.topics === 'string' && mod.topics ? [mod.topics] : []);
       
-      if (videoId) {
-        const playerId = `youtube-player-${i}`;
-        const overlayId = `youtube-overlay-${i}`;
-        
-        videoPlayerHTML = `
-          <div class="youtube-player-container" id="${playerId}-container">
-            <div class="youtube-iframe-wrapper" id="${playerId}-wrapper">
-              <!-- YouTube iframe will be injected by API -->
-            </div>
-            <div class="youtube-overlay" id="${overlayId}">
-              <div class="youtube-loading" id="${playerId}-loading">
-                <div class="youtube-loading-spinner"></div>
-                <span>Loading video...</span>
-              </div>
-              <div class="custom-controls-bar">
-                <div class="control-group">
-                  <button class="control-btn play-pause" data-player="${playerId}" onclick="togglePlayPause('${playerId}')">▶</button>
-                  <div class="timeline-slider-container">
-                    <span class="time-display current-time" data-player="${playerId}">0:00</span>
-                    <input type="range" class="timeline-slider" min="0" max="100" value="0" data-player="${playerId}" oninput="seekVideo('${playerId}', this.value)" onchange="seekVideo('${playerId}', this.value)">
-                    <span class="time-display duration" data-player="${playerId}">${videoDuration}</span>
-                  </div>
-                </div>
-                <div class="control-group">
-                  <button class="control-btn volume-btn" data-player="${playerId}" onclick="toggleMute('${playerId}')">🔊</button>
-                  <div class="volume-slider-container">
-                    <input type="range" class="volume-slider" min="0" max="100" value="80" data-player="${playerId}" oninput="setVolume('${playerId}', this.value)">
-                  </div>
-                </div>
-                <div class="control-group settings-group">
-                  <button class="control-btn settings-btn" data-player="${playerId}" onclick="toggleSettings('${playerId}')">⚙️</button>
-                  <div class="settings-dropdown" id="settings-${playerId}" style="display: none;">
-                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 0.5)">0.5x</div>
-                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 0.75)">0.75x</div>
-                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 1)" style="color: var(--accent); font-weight: bold;">1x (Normal)</div>
-                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 1.25)">1.25x</div>
-                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 1.5)">1.5x</div>
-                    <div class="settings-item" onclick="changePlaybackRate('${playerId}', 2)">2x</div>
-                    <div class="settings-divider"></div>
-                    <div class="settings-item" onclick="toggleCaptions('${playerId}')">Captions: Off</div>
-                    <div class="settings-item" onclick="showQualityMenu('${playerId}', event)">Quality: Auto</div>
-                  </div>
-                </div>
-                <button class="control-btn fullscreen" data-player="${playerId}" onclick="toggleFullscreen('${playerId}-container')">⛶</button>
-              </div>
-            </div>
-          </div>`;
-        
-        // Schedule player initialization after DOM insertion
-        setTimeout(() => initializeYouTubePlayer(playerId, videoId, overlayId), 100);
-      } else if (videoUrl) {
-        // Non-YouTube video fallback
-        videoPlayerHTML = `
-          <div class="video-player-wrapper">
-            <iframe src="${escapeHtml(videoUrl)}" title="${escapeHtml(videoTitle)}" allowfullscreen></iframe>
-          </div>`;
-      } else {
-        // Placeholder video area
-        videoPlayerHTML = `
-          <div class="video-player-wrapper" style="background: #000; display: grid; place-items: center; color: #fff; font-size: 1.2rem;">
-            <div style="text-align: center;">
-              <div style="font-size: 3rem; margin-bottom: 12px;">🎬</div>
-              <div>Video placeholder</div>
-              <div style="font-size: 0.9rem; opacity: 0.7;">Video will appear here</div>
-            </div>
-          </div>`;
-      }
+      const countL = modLectures.length;
+      const duration = mod.duration || '00:00:00';
 
-      // Build module list for sidebar (simulate all modules)
-      const moduleListHTML = curriculum.map((m, j) => {
-        const mTitle = m.moduleTitle || m.title || `Module ${j+1}`;
-        const mLectures = Array.isArray(m.lectures) ? m.lectures.length : 0;
-        const mTopics = Array.isArray(m.topics) ? m.topics.length : 0;
-        const mTotal = mLectures + mTopics;
-        const mDuration = m.duration || '02:22:03';
-        return `
-          <div class="module-row ${i === j ? 'active' : ''}" onclick="scrollToModule(${j})">
-            <div class="module-info">
-              <div class="module-name">${escapeHtml(mTitle)}</div>
-              <div class="module-subtext">${mDuration} hours • ${mTotal} lectures</div>
-            </div>
-            <div class="module-chevron">▼</div>
-          </div>`;
-      }).join('');
+      let lecturesHtml = '';
+      modLectures.forEach((lec, lIdx) => {
+        const flatIdx = globalIndex++;
+        flatLectures.push({
+          flatIdx: flatIdx,
+          moduleIdx: mIdx,
+          title: lec.title || `Lecture ${lIdx+1}`,
+          url: lec.url || '',
+          desc: lec.description || 'No description provided.',
+          duration: lec.duration || '0:00'
+        });
 
-      // Build topics HTML (old style) for below video
-      let topicsHTML = '';
-      if (topics.length > 0) {
-        topicsHTML = `<ul class="topic-list">${topics.map((t, j) => `
-            <li class="topic-item">
-              <div class="topic-icon">${getTopicIcon(t, j)}</div>
-              <span>${escapeHtml(t)}</span>
-            </li>`).join('')}</ul>`;
-      }
-
-      // Counts for subtitle
-      const lectureCount = lectures.length;
-      const topicCount = topics.length;
-      const totalItems = lectureCount + topicCount;
-      const duration = mod.duration ? `· ${escapeHtml(mod.duration)}` : '';
-      let subtitle = '';
-      if (totalItems === 0) {
-        subtitle = `No content ${duration}`;
-      } else {
-        const parts = [];
-        if (lectureCount > 0) parts.push(`${lectureCount} lecture${lectureCount !== 1 ? 's' : ''}`);
-        if (topicCount > 0) parts.push(`${topicCount} topic${topicCount !== 1 ? 's' : ''}`);
-        subtitle = parts.join(', ') + ` ${duration}`;
-      }
-
-      return `
-        <div class="module-card" id="mod-${i}">
-          <div class="module-header" onclick="toggleModule(${i})">
-            <div class="module-num">${i+1}</div>
-            <div class="module-info">
-              <div class="module-title">${escapeHtml(moduleTitle)}</div>
-              <div class="module-subtitle">${subtitle}</div>
-            </div>
-            <div class="module-toggle">▼</div>
-          </div>
-          <div class="module-body">
-            <div class="video-module-container">
-              <div class="video-main">
-                <div class="video-player-area">
-                  <div class="video-title-bar">
-                    <h2>Digital Signature & Advanced Cryptographic Protocols</h2>
-                    <div class="video-title-underline"></div>
-                  </div>
-                  ${videoPlayerHTML}
-                </div>
-                <div class="lesson-title">M 14.4 - Digital Signature & Advanced Cryptographic Protocols</div>
-                <div class="video-navigation">
-                  <button class="nav-btn prev">← Previous</button>
-                  <button class="nav-btn next">Next →</button>
-                </div>
-                <div class="description-tab">
-                  <div class="description-label">Description:</div>
-                  <div class="description-content">
-                    This lecture covers the fundamentals of digital signatures and advanced cryptographic protocols used in blockchain technology.
-                    ${firstLecture ? escapeHtml(firstLecture.description || '') : 'Detailed description will appear here.'}
-                  </div>
-                </div>
-                ${topicsHTML}
-              </div>
-              <div class="video-sidebar">
-                <div class="sidebar-progress">
-                  <div class="sidebar-progress-label">
-                    <span>Progress</span>
-                    <span>7%</span>
-                  </div>
-                  <div class="sidebar-progress-bar">
-                    <div class="sidebar-progress-fill"></div>
-                  </div>
-                </div>
-                <div class="module-list">
-                  ${moduleListHTML}
-                </div>
-              </div>
+        lecturesHtml += `
+          <div class="acc-lecture-item" id="lec-item-${flatIdx}" onclick="loadLecture(${flatIdx})">
+            <div class="acc-lecture-icon">▶</div>
+            <div class="acc-lecture-info">
+              <div class="acc-lecture-title">${escapeHtml(lec.title || `Lecture ${lIdx+1}`)}</div>
+              <div class="acc-lecture-dur">${escapeHtml(lec.duration || '0:00')}</div>
             </div>
           </div>
-        </div>`;
-    }).join('');
+        `;
+      });
 
-    // Auto-open first module
-    setTimeout(() => toggleModule(0), 100);
-  }
+      // Topics appended at end of module if they exist
+      topics.forEach((t, tIdx) => {
+        lecturesHtml += `
+          <div class="acc-lecture-item" style="opacity:0.7; cursor:default;">
+            <div class="acc-lecture-icon">📌</div>
+            <div class="acc-lecture-info">
+              <div class="acc-lecture-title">${escapeHtml(t)}</div>
+            </div>
+          </div>
+        `;
+      });
 
-  function toggleModule(idx) {
-    const card = document.getElementById(`mod-${idx}`);
-    if (card) card.classList.toggle('open');
-  }
+      if (!lecturesHtml) lecturesHtml = `<div style="padding:12px 16px;color:var(--muted);font-size:0.8rem;">No lectures.</div>`;
 
-  function scrollToModule(idx) {
-    const card = document.getElementById(`mod-${idx}`);
-    if (card) {
-      card.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      // Open the module if closed
-      if (!card.classList.contains('open')) {
-        card.classList.add('open');
-      }
+      html += `
+        <div class="acc-module-item ${mIdx === 0 ? 'open' : ''}" id="acc-mod-${mIdx}">
+          <div class="acc-module-header" onclick="toggleAccordion(${mIdx})">
+            <div>
+              <div class="acc-module-title">Module ${mIdx+1}: ${escapeHtml(title)}</div>
+              <div class="acc-module-meta">${escapeHtml(duration)} • ${countL} lectures</div>
+            </div>
+            <div class="acc-chevron">▼</div>
+          </div>
+          <div class="acc-module-body">
+            ${lecturesHtml}
+          </div>
+        </div>
+      `;
+    });
+
+    listContainer.innerHTML = html;
+
+    // Load first lecture automatically if it exists
+    if (flatLectures.length > 0) {
+      loadLecture(0);
     }
   }
 
-  function getTopicIcon(text, idx) {
-    const t = (text || '').toLowerCase();
-    if (t.includes('intro')  || t.includes('overview'))   return '📖';
-    if (t.includes('smart')  || t.includes('contract'))   return '📜';
-    if (t.includes('deploy') || t.includes('deploying'))  return '🚀';
-    if (t.includes('test')   || t.includes('testing'))    return '🧪';
-    if (t.includes('web3')   || t.includes('dapp'))       return '🌐';
-    if (t.includes('solidity'))                            return '⚙️';
-    if (t.includes('wallet') || t.includes('metamask'))   return '💼';
-    if (t.includes('project'))                             return '🏗️';
-    if (t.includes('video')  || t.includes('lecture'))    return '🎬';
-    const icons = ['▶','📌','💡','🔑','🔧','📊','🗂️','🔍'];
-    return icons[idx % icons.length];
+  function toggleAccordion(mIdx) {
+    const el = document.getElementById(`acc-mod-${mIdx}`);
+    if (el) el.classList.toggle('open');
   }
 
-  // ── VIDEO HELPERS ─────────────────────────────────────────────────────
+  // ── VIDEO LOADING & YOUTUBE API ────────────────────────────────────────
   function extractYouTubeVideoId(url) {
     if (!url) return null;
-    // Match YouTube URL patterns
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
       /(?:youtube\.com\/v\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
@@ -1793,392 +1108,223 @@
     return null;
   }
 
-  function embedYouTube(url, title = '', duration = '') {
+  // Load YouTube API script globally
+  const tag = document.createElement('script');
+  tag.src = "https://www.youtube.com/iframe_api";
+  const firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+  window.onYouTubeIframeAPIReady = function() {
+    isPlayerReady = true;
+    // If a lecture was selected before API was ready, load it now
+    if (currentLectureIndex >= 0 && flatLectures[currentLectureIndex]) {
+       initOrUpdatePlayer(flatLectures[currentLectureIndex].url);
+    }
+  };
+
+  function loadLecture(flatIdx) {
+    if (flatIdx < 0 || flatIdx >= flatLectures.length) return;
+    
+    // Update active UI state
+    document.querySelectorAll('.acc-lecture-item').forEach(el => el.classList.remove('active'));
+    const activeEl = document.getElementById(`lec-item-${flatIdx}`);
+    if (activeEl) {
+      activeEl.classList.add('active');
+      // Ensure module is open
+      const modEl = activeEl.closest('.acc-module-item');
+      if (modEl && !modEl.classList.contains('open')) modEl.classList.add('open');
+    }
+
+    currentLectureIndex = flatIdx;
+    const lec = flatLectures[flatIdx];
+
+    // Update Text Data
+    document.getElementById('displayLessonTitle').textContent = lec.title;
+    document.getElementById('displayLessonDesc').textContent = lec.desc;
+
+    // Update Nav Buttons
+    document.getElementById('btnPrevLec').disabled = (flatIdx === 0);
+    document.getElementById('btnNextLec').disabled = (flatIdx === flatLectures.length - 1);
+
+    // Update Progress Bar roughly based on lecture index
+    const pct = Math.round(((flatIdx + 1) / flatLectures.length) * 100);
+    document.getElementById('sideModPct').textContent = `${pct}%`;
+    document.getElementById('sideModFill').style.width = `${pct}%`;
+
+    // Load Video
+    initOrUpdatePlayer(lec.url);
+  }
+
+  function navigateLecture(direction) {
+    const newIdx = currentLectureIndex + direction;
+    loadLecture(newIdx);
+  }
+
+  function initOrUpdatePlayer(url) {
     const videoId = extractYouTubeVideoId(url);
     if (!videoId) {
-      return `<div class="lecture-video">
-                <p style="padding:16px;color:var(--muted);">Invalid or unsupported video URL</p>
-              </div>`;
-    }
-    const embedUrl = `https://www.youtube.com/embed/${videoId}`;
-    return `
-      <div class="lecture-video">
-        <div class="video-container">
-          <iframe src="${embedUrl}" title="${escapeHtml(title)}" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-        </div>
-        <div class="lecture-meta">
-          <div>
-            <div class="lecture-title">${escapeHtml(title)}</div>
-            <div>YouTube Unlisted Video</div>
-          </div>
-          ${duration ? `<span class="lecture-duration">${escapeHtml(duration)}</span>` : ''}
-        </div>
-      </div>`;
-  }
-
-  // ── YOUTUBE PLAYER API & CUSTOM CONTROLS ───────────────────────────────
-  const youtubePlayers = {};
-
-  // Initialize YouTube player
-  function initializeYouTubePlayer(playerId, videoId, overlayId) {
-    const container = document.getElementById(`${playerId}-container`);
-    const wrapper = document.getElementById(`${playerId}-wrapper`);
-    const loading = document.getElementById(`${playerId}-loading`);
-    
-    if (!container || !wrapper) return;
-    
-    // Check if YouTube API is loaded
-    if (typeof YT === 'undefined' || typeof YT.Player === 'undefined') {
-      // Retry after 500ms
-      setTimeout(() => initializeYouTubePlayer(playerId, videoId, overlayId), 500);
+      document.getElementById('mainPlayerArea').innerHTML = `
+        <div style="height:100%; display:grid; place-items:center; color:var(--muted);">
+          Invalid or Non-YouTube Video URL
+        </div>`;
       return;
     }
-    
-    // Create iframe
-    const player = new YT.Player(`${playerId}-iframe`, {
-      width: '100%',
-      height: '100%',
-      videoId: videoId,
-      playerVars: {
-        autoplay: 0,
-        controls: 0,          // Hide native controls
-        modestbranding: 1,    // Reduce YouTube branding
-        rel: 0,              // Don't show related videos
-        showinfo: 0,         // Hide video title and uploader
-        iv_load_policy: 3,   // Hide annotations
-        disablekb: 1,        // Disable keyboard controls
-        fs: 0,               // Disable fullscreen button
-        playsinline: 1       // Play inline on iOS
-      },
-      events: {
-        onReady: (event) => {
-          youtubePlayers[playerId] = event.target;
-          if (loading) loading.style.display = 'none';
-          
-          // Set initial volume
-          event.target.setVolume(80);
-          
-          // Update duration display
-          const duration = formatTime(event.target.getDuration());
-          container.querySelector('.duration').textContent = duration;
-          
-          // Start update interval
-          startPlayerUpdateInterval(playerId);
+
+    // If API isn't ready, it will catch up in onYouTubeIframeAPIReady
+    if (!isPlayerReady || typeof YT === 'undefined' || !YT.Player) return;
+
+    if (mainPlayer) {
+      mainPlayer.loadVideoById(videoId);
+      resetCustomUI();
+    } else {
+      mainPlayer = new YT.Player('main-yt-iframe', {
+        videoId: videoId,
+        playerVars: {
+          autoplay: 0,
+          controls: 0,       // Absolutely hide native controls
+          modestbranding: 1, // Remove logo
+          rel: 0,            // No related videos
+          showinfo: 0,       // Hide title
+          disablekb: 1,      // Disable native keyboard to block skipping via keys
+          fs: 0              // Block native fullscreen
         },
-        onStateChange: (event) => {
-          const playPauseBtn = container.querySelector('.play-pause');
-          if (playPauseBtn) {
-            playPauseBtn.textContent = event.data === YT.PlayerState.PLAYING ? '⏸' : '▶';
-          }
-        },
-        onError: (error) => {
-          console.error('YouTube player error:', error);
-          if (loading) {
-            loading.innerHTML = '<div style="color: #ff4d8d;">⚠️ Video failed to load</div>';
-          }
+        events: {
+          onReady: onPlayerReady,
+          onStateChange: onPlayerStateChange
         }
-      }
-    });
-    
-    // Inject iframe into wrapper
-    wrapper.appendChild(player.getIframe());
-    
-    // Store reference
-    youtubePlayers[playerId] = player;
+      });
+    }
   }
 
-  // Start interval to update timeline
-  function startPlayerUpdateInterval(playerId) {
-    setInterval(() => {
-      const player = youtubePlayers[playerId];
-      if (!player || player.getPlayerState() !== YT.PlayerState.PLAYING) return;
+  function onPlayerReady(event) {
+    // Set default volume
+    mainPlayer.setVolume(80);
+    startUIInterval();
+  }
+
+  function onPlayerStateChange(event) {
+    const btn = document.getElementById('btnPlayPause');
+    if (event.data === YT.PlayerState.PLAYING) {
+      btn.textContent = '⏸';
+      startUIInterval();
+    } else {
+      btn.textContent = '▶';
+    }
+    
+    // Update duration once video starts metadata load
+    if (event.data === YT.PlayerState.PLAYING || event.data === YT.PlayerState.PAUSED) {
+       document.getElementById('timeDuration').textContent = formatTime(mainPlayer.getDuration());
+    }
+  }
+
+  // ── CUSTOM PLAYER CONTROLS ─────────────────────────────────────────────
+  function startUIInterval() {
+    if (updateInterval) clearInterval(updateInterval);
+    updateInterval = setInterval(() => {
+      if (!mainPlayer || mainPlayer.getPlayerState() !== YT.PlayerState.PLAYING) return;
+      if (isDraggingTimeline) return; // Don't fight the user drag
+
+      const cur = mainPlayer.getCurrentTime();
+      const dur = mainPlayer.getDuration();
       
-      const currentTime = player.getCurrentTime();
-      const duration = player.getDuration();
-      const percent = (currentTime / duration) * 100;
-      
-      const container = document.getElementById(`${playerId}-container`);
-      if (!container) return;
-      
-      // Update slider
-      const slider = container.querySelector('.timeline-slider');
-      if (slider) slider.value = percent;
-      
-      // Update time display
-      const currentTimeEl = container.querySelector('.current-time');
-      if (currentTimeEl) currentTimeEl.textContent = formatTime(currentTime);
+      document.getElementById('timeCurrent').textContent = formatTime(cur);
+      if (dur > 0) {
+        document.getElementById('timelineSlider').value = (cur / dur) * 100;
+      }
     }, 500);
   }
 
-  // Format seconds to MM:SS
+  function resetCustomUI() {
+    document.getElementById('btnPlayPause').textContent = '▶';
+    document.getElementById('timelineSlider').value = 0;
+    document.getElementById('timeCurrent').textContent = '0:00';
+    document.getElementById('timeDuration').textContent = '0:00';
+  }
+
+  function toggleMainPlayPause() {
+    if (!mainPlayer) return;
+    const state = mainPlayer.getPlayerState();
+    if (state === YT.PlayerState.PLAYING) {
+      mainPlayer.pauseVideo();
+    } else {
+      mainPlayer.playVideo();
+    }
+  }
+
+  function onTimelineDrag() {
+    isDraggingTimeline = true;
+    if (!mainPlayer) return;
+    const dur = mainPlayer.getDuration();
+    const val = document.getElementById('timelineSlider').value;
+    document.getElementById('timeCurrent').textContent = formatTime((val / 100) * dur);
+  }
+
+  function onTimelineDrop(value) {
+    if (!mainPlayer) return;
+    const dur = mainPlayer.getDuration();
+    mainPlayer.seekTo((value / 100) * dur, true);
+    isDraggingTimeline = false;
+  }
+
+  function setMainVolume(val) {
+    if (!mainPlayer) return;
+    mainPlayer.setVolume(val);
+    const btn = document.getElementById('btnMute');
+    if (val == 0) btn.textContent = '🔇';
+    else if (val < 40) btn.textContent = '🔈';
+    else btn.textContent = '🔊';
+  }
+
+  function toggleMainMute() {
+    if (!mainPlayer) return;
+    if (mainPlayer.isMuted()) {
+      mainPlayer.unMute();
+      setMainVolume(document.getElementById('volumeSlider').value);
+    } else {
+      mainPlayer.mute();
+      document.getElementById('btnMute').textContent = '🔇';
+    }
+  }
+
+  function toggleMainFullscreen() {
+    const container = document.getElementById('yt-container');
+    if (!document.fullscreenElement) {
+      if (container.requestFullscreen) container.requestFullscreen();
+      else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+    } else {
+      if (document.exitFullscreen) document.exitFullscreen();
+      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+    }
+  }
+
   function formatTime(seconds) {
-    if (isNaN(seconds)) return '0:00';
+    if (isNaN(seconds) || seconds < 0) return '0:00';
     const mins = Math.floor(seconds / 60);
     const secs = Math.floor(seconds % 60);
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   }
 
-  // Control functions
-  function togglePlayPause(playerId) {
-    const player = youtubePlayers[playerId];
-    if (!player) return;
-    
-    if (player.getPlayerState() === YT.PlayerState.PLAYING) {
-      player.pauseVideo();
-    } else {
-      player.playVideo();
-    }
-  }
+  // ── TAB SWITCHING ──────────────────────────────────────────────────────
+  const TABS = ['module','assignment','resources','leaderboard','announcements'];
 
-  function seekVideo(playerId, percent) {
-    const player = youtubePlayers[playerId];
-    if (!player) return;
-    
-    const duration = player.getDuration();
-    const targetTime = (percent / 100) * duration;
-    player.seekTo(targetTime, true);
-    
-    // Update current time display
-    const container = document.getElementById(`${playerId}-container`);
-    if (container) {
-      const currentTimeEl = container.querySelector('.current-time');
-      if (currentTimeEl) currentTimeEl.textContent = formatTime(targetTime);
-    }
-  }
-
-  function setVolume(playerId, volume) {
-    const player = youtubePlayers[playerId];
-    if (!player) return;
-    
-    player.setVolume(volume);
-    
-    // Update volume button icon
-    const container = document.getElementById(`${playerId}-container`);
-    if (container) {
-      const volumeBtn = container.querySelector('.volume-btn');
-      if (volumeBtn) {
-        if (volume == 0) {
-          volumeBtn.textContent = '🔇';
-        } else if (volume < 30) {
-          volumeBtn.textContent = '🔈';
-        } else if (volume < 70) {
-          volumeBtn.textContent = '🔉';
-        } else {
-          volumeBtn.textContent = '🔊';
-        }
-      }
-    }
-  }
-
-  function toggleMute(playerId) {
-    const player = youtubePlayers[playerId];
-    if (!player) return;
-    
-    const isMuted = player.isMuted();
-    if (isMuted) {
-      player.unMute();
-      setVolume(playerId, player.getVolume());
-    } else {
-      player.mute();
-      const container = document.getElementById(`${playerId}-container`);
-      if (container) {
-        const volumeBtn = container.querySelector('.volume-btn');
-        if (volumeBtn) volumeBtn.textContent = '🔇';
-      }
-    }
-  }
-
-  function toggleFullscreen(containerId) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    
-    if (!document.fullscreenElement) {
-      if (container.requestFullscreen) {
-        container.requestFullscreen();
-      } else if (container.webkitRequestFullscreen) {
-        container.webkitRequestFullscreen();
-      } else if (container.msRequestFullscreen) {
-        container.msRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen();
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen();
-      }
-    }
-  }
-
-  // Settings dropdown toggle
-  function toggleSettings(playerId) {
-    const dropdown = document.getElementById(`settings-${playerId}`);
-    if (!dropdown) return;
-    
-    // Close all other settings dropdowns
-    document.querySelectorAll('.settings-dropdown').forEach(d => {
-      if (d !== dropdown) d.style.display = 'none';
+  function switchTab(name) {
+    TABS.forEach(t => {
+      const panel = document.getElementById(`panel${capitalize(t)}`);
+      if (panel) panel.classList.toggle('active', t === name);
+      const btn = document.getElementById(`tab${capitalize(t)}`);
+      if (btn) btn.classList.toggle('active', t === name);
+      const side = document.getElementById(`sideNav${capitalize(t)}`);
+      if (side) side.classList.toggle('active', t === name);
     });
-    
-    dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    document.getElementById('userMenu').classList.remove('show');
   }
 
-  // Close settings dropdown when clicking elsewhere
-  document.addEventListener('click', (e) => {
-    if (!e.target.closest('.settings-group')) {
-      document.querySelectorAll('.settings-dropdown').forEach(d => {
-        d.style.display = 'none';
-      });
-    }
-  });
+  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-  // Change playback rate
-  function changePlaybackRate(playerId, rate) {
-    const player = youtubePlayers[playerId];
-    if (!player) return;
-    
-    player.setPlaybackRate(rate);
-    
-    // Update UI to show selected rate
-    const dropdown = document.getElementById(`settings-${playerId}`);
-    if (dropdown) {
-      const items = dropdown.querySelectorAll('.settings-item');
-      items.forEach(item => {
-        if (item.textContent.includes('x')) {
-          item.style.color = '';
-          item.style.fontWeight = '';
-          if (item.textContent.includes(`${rate}x`)) {
-            item.style.color = 'var(--accent)';
-            item.style.fontWeight = 'bold';
-          }
-        }
-      });
-    }
-  }
-
-  // Toggle captions
-  function toggleCaptions(playerId) {
-    const player = youtubePlayers[playerId];
-    if (!player) return;
-    
-    const trackModule = player.getModule('captions');
-    if (trackModule) {
-      // This is a simplified approach - actual caption toggling requires more complex API usage
-      const isOn = trackModule.isVisible();
-      if (isOn) {
-        trackModule.hide();
-        updateCaptionButton(playerId, false);
-      } else {
-        trackModule.show();
-        updateCaptionButton(playerId, true);
-      }
-    } else {
-      // Fallback: toggle captions via player API
-      const captions = player.getOption('captions', 'track');
-      if (captions) {
-        player.setOption('captions', 'track', {});
-        updateCaptionButton(playerId, false);
-      } else {
-        player.setOption('captions', 'track', { languageCode: 'en' });
-        updateCaptionButton(playerId, true);
-      }
-    }
-  }
-
-  function updateCaptionButton(playerId, isOn) {
-    const dropdown = document.getElementById(`settings-${playerId}`);
-    if (dropdown) {
-      const captionItem = Array.from(dropdown.querySelectorAll('.settings-item')).find(item =>
-        item.textContent.includes('Captions:')
-      );
-      if (captionItem) {
-        captionItem.textContent = `Captions: ${isOn ? 'On' : 'Off'}`;
-      }
-    }
-  }
-
-  // Show quality menu
-  function showQualityMenu(playerId, event) {
-    event.stopPropagation();
-    
-    const dropdown = document.getElementById(`settings-${playerId}`);
-    if (!dropdown) return;
-    
-    // Create or show quality submenu
-    let qualityMenu = dropdown.querySelector('.quality-menu');
-    if (!qualityMenu) {
-      qualityMenu = document.createElement('div');
-      qualityMenu.className = 'quality-menu';
-      qualityMenu.innerHTML = `
-        <div class="settings-item" onclick="setQuality('${playerId}', 'auto')">Auto</div>
-        <div class="settings-item" onclick="setQuality('${playerId}', 'hd2160')">4K</div>
-        <div class="settings-item" onclick="setQuality('${playerId}', 'hd1440')">1440p</div>
-        <div class="settings-item" onclick="setQuality('${playerId}', 'hd1080')">1080p</div>
-        <div class="settings-item" onclick="setQuality('${playerId}', 'hd720')">720p</div>
-        <div class="settings-item" onclick="setQuality('${playerId}', 'large')">480p</div>
-        <div class="settings-item" onclick="setQuality('${playerId}', 'medium')">360p</div>
-        <div class="settings-item" onclick="setQuality('${playerId}', 'small')">240p</div>
-      `;
-      dropdown.appendChild(qualityMenu);
-    }
-    
-    qualityMenu.style.display = qualityMenu.style.display === 'block' ? 'none' : 'block';
-    
-    // Position it
-    const qualityItem = event.target.closest('.settings-item');
-    if (qualityItem) {
-      qualityMenu.style.left = '100%';
-      qualityMenu.style.top = '0';
-    }
-  }
-
-  function setQuality(playerId, quality) {
-    const player = youtubePlayers[playerId];
-    if (!player) return;
-    
-    // Note: YouTube API doesn't directly expose quality setting in embed.
-    // This would require custom implementation or using player.setPlaybackQuality
-    try {
-      player.setPlaybackQuality(quality);
-      
-      // Update UI
-      const dropdown = document.getElementById(`settings-${playerId}`);
-      if (dropdown) {
-        const qualityItem = Array.from(dropdown.querySelectorAll('.settings-item')).find(item =>
-          item.textContent.includes('Quality:')
-        );
-        if (qualityItem) {
-          const qualityMap = {
-            'auto': 'Auto',
-            'hd2160': '4K',
-            'hd1440': '1440p',
-            'hd1080': '1080p',
-            'hd720': '720p',
-            'large': '480p',
-            'medium': '360p',
-            'small': '240p'
-          };
-          qualityItem.textContent = `Quality: ${qualityMap[quality] || quality}`;
-        }
-      }
-    } catch (e) {
-      console.warn('Quality setting not supported:', e);
-    }
-  }
-
-  // YouTube API global callback
-  window.onYouTubeIframeAPIReady = function() {
-    console.log('YouTube API ready');
-    // Players are initialized individually via initializeYouTubePlayer
-  };
-
-  // ── ASSIGNMENT TAB ─────────────────────────────────────────────────────
+  // ── OTHER TABS RENDER ──────────────────────────────────────────────────
   function renderAssignments(count, content, curriculum) {
     const container = document.getElementById('assignmentsList');
     const tasks = [];
-
-    // Pull named assignments/exercises from curriculum topics
     if (curriculum && curriculum.length) {
       curriculum.forEach(mod => {
         const topics = Array.isArray(mod.topics) ? mod.topics : [];
@@ -2190,172 +1336,66 @@
         });
       });
     }
-
-    // Fallback: use assignments count from admin
-    if (tasks.length === 0) {
-      if (count > 0) {
-        for (let i = 1; i <= Math.min(count, 5); i++) {
-          tasks.push({ title: `Assignment ${i}`, module: 'Course Assignment', badge: i === 1 ? 'open' : 'pending' });
-        }
+    if (tasks.length === 0 && count > 0) {
+      for (let i = 1; i <= Math.min(count, 5); i++) {
+        tasks.push({ title: `Assignment ${i}`, module: 'Course Assignment', badge: i === 1 ? 'open' : 'pending' });
       }
     }
-
     if (tasks.length === 0) {
-      container.innerHTML = `
-        <div class="module-empty">
-          <div class="empty-icon">📝</div>
-          <h3>No Assignments Yet</h3>
-          <p>Your instructor hasn't posted assignments yet. They'll appear here once added.</p>
-        </div>`;
+      container.innerHTML = `<div class="lb-coming-soon"><div class="empty-icon">📝</div><h3>No Assignments Yet</h3></div>`;
       return;
     }
-
     container.innerHTML = tasks.map((t, i) => `
       <div class="assignment-card" style="animation-delay:${i*.05}s">
         <div class="assignment-card-header">
           <div class="assignment-title">${escapeHtml(t.title)}</div>
-          <span class="assignment-badge badge-${t.badge || 'open'}">${
-            t.badge === 'done' ? '✓ Completed' : t.badge === 'pending' ? '⏳ Upcoming' : '● Open'
-          }</span>
+          <span class="assignment-badge badge-${t.badge || 'open'}">${t.badge === 'done' ? '✓ Completed' : t.badge === 'pending' ? '⏳ Upcoming' : '● Open'}</span>
         </div>
         <div class="assignment-desc">${t.module ? `From module: <strong style="color:var(--text)">${escapeHtml(t.module)}</strong>` : 'Course Assignment'}</div>
       </div>`).join('');
   }
 
-  // ── RESOURCES TAB ──────────────────────────────────────────────────────
   function renderResources() {
     const container = document.getElementById('resourcesGrid');
     const resources = [];
-
     if (activeCourse.whatsapp) {
-      resources.push({
-        icon: '💬', iconClass: 'green',
-        title: 'WhatsApp Community',
-        desc: 'Join the course WhatsApp group to collaborate with fellow students and get direct support.',
-        label: 'Join Group',
-        href: activeCourse.whatsapp
-      });
+      resources.push({ icon: '💬', iconClass: 'green', title: 'WhatsApp Community', desc: 'Join the course WhatsApp group to collaborate.', label: 'Join Group', href: activeCourse.whatsapp });
     }
-
-    // Static helpful resources
-    resources.push({
-      icon: '📖', iconClass: 'cyan',
-      title: 'Course Notes',
-      desc: 'Study materials, notes, and reference documents will be shared here by your instructor.',
-      label: 'Coming Soon',
-      href: null
-    }, {
-      icon: '🎥', iconClass: 'purple',
-      title: 'Video Lectures',
-      desc: 'All recorded lectures and live session replays are accessible directly in the Module tab.',
-      label: 'Go to Modules',
-      href: null,
-      action: () => switchTab('module')
-    }, {
-      icon: '🔗', iconClass: 'pink',
-      title: 'External Links',
-      desc: 'Useful references, documentation, and tools recommended by the instructor.',
-      label: 'Coming Soon',
-      href: null
-    });
-
+    resources.push({ icon: '📖', iconClass: 'cyan', title: 'Course Notes', desc: 'Study materials and notes.', label: 'Coming Soon', href: null });
     container.innerHTML = resources.map(r => `
       <div class="resource-card">
         <div class="resource-icon ${r.iconClass}">${r.icon}</div>
         <h4>${r.title}</h4>
         <p>${r.desc}</p>
-        ${r.href
-          ? `<a class="resource-link" href="${escapeHtml(r.href)}" target="_blank">${r.label} →</a>`
-          : `<span class="resource-link" style="opacity:.5;cursor:default;">${r.label}</span>`}
+        ${r.href ? `<a class="resource-link" href="${escapeHtml(r.href)}" target="_blank">${r.label} →</a>` : `<span class="resource-link" style="opacity:.5;cursor:default;">${r.label}</span>`}
       </div>`).join('');
   }
 
-  // ── ANNOUNCEMENTS TAB ──────────────────────────────────────────────────
   function renderAnnouncements(content, course) {
     const container = document.getElementById('announcementsList');
     const announcements = [];
-
-    // Use admin's course content field as the primary "welcome" announcement
     if (content && content.trim().length > 10) {
-      announcements.push({
-        title: `Welcome to ${course.title || 'the Course'}`,
-        date: formatDate(course.created_at || new Date().toISOString()),
-        body: content.trim(),
-        tag: 'info'
-      });
+      announcements.push({ title: `Welcome to ${course.title || 'the Course'}`, date: formatDate(course.created_at || new Date().toISOString()), body: content.trim(), tag: 'info' });
     }
-
-    // Add status-based announcement
-    const status = (course.status || '').toLowerCase();
-    if (status === 'ongoing') {
-      announcements.push({
-        title: '🚀 Course is Now Live!',
-        date: formatDate(course.created_at || new Date().toISOString()),
-        body: 'This course is currently ongoing. New content and lectures are being added regularly. Stay tuned and keep learning!',
-        tag: 'update'
-      });
-    } else if (status === 'upcoming') {
-      announcements.push({
-        title: '📅 Course Starting Soon',
-        date: formatDate(new Date().toISOString()),
-        body: 'This course will launch soon. In the meantime, review any available materials and prepare your setup.',
-        tag: 'important'
-      });
+    if ((course.status || '').toLowerCase() === 'ongoing') {
+      announcements.push({ title: '🚀 Course is Now Live!', date: formatDate(course.created_at || new Date().toISOString()), body: 'New content is being added regularly.', tag: 'update' });
     }
-
-    // Badge
     if (announcements.length > 0) {
-      const badge = document.getElementById('announceBadge');
-      const sideBadge = document.getElementById('sideAnnounceBadge');
-      badge.textContent     = announcements.length;
-      badge.style.display   = '';
-      sideBadge.textContent = announcements.length;
-      sideBadge.style.display = '';
+      document.getElementById('announceBadge').textContent = announcements.length;
+      document.getElementById('announceBadge').style.display = '';
+      document.getElementById('sideAnnounceBadge').textContent = announcements.length;
+      document.getElementById('sideAnnounceBadge').style.display = '';
     }
-
     if (announcements.length === 0) {
-      container.innerHTML = `
-        <div class="no-announcement">
-          <div class="empty-icon">📢</div>
-          <h3>No Announcements Yet</h3>
-          <p>Your instructor hasn't posted any announcements. Check back later.</p>
-        </div>`;
+      container.innerHTML = `<div class="lb-coming-soon"><div class="empty-icon">📢</div><h3>No Announcements Yet</h3></div>`;
       return;
     }
-
     container.innerHTML = announcements.map((a, i) => `
       <div class="announcement-card" style="animation-delay:${i*.08}s">
-        <div class="announcement-card-header">
-          <div class="announcement-title">${escapeHtml(a.title)}</div>
-          <div class="announcement-date">${a.date}</div>
-        </div>
-        <div class="announcement-body">${escapeHtml(a.body)}</div>
-        <span class="announcement-tag tag-${a.tag}">${a.tag === 'info' ? 'Info' : a.tag === 'update' ? 'Update' : 'Important'}</span>
+        <div class="announcement-card-header"><div class="announcement-title">${escapeHtml(a.title)}</div><div class="announcement-date">${a.date}</div></div>
+        <div class="announcement-body">${escapeHtml(a.body)}</div><span class="announcement-tag tag-${a.tag}">${a.tag === 'info' ? 'Info' : 'Update'}</span>
       </div>`).join('');
   }
-
-  // ── TAB SWITCHING ──────────────────────────────────────────────────────
-  const TABS = ['module','assignment','resources','leaderboard','announcements'];
-
-  function switchTab(name) {
-    TABS.forEach(t => {
-      // Content panels
-      const panel = document.getElementById(`panel${capitalize(t)}`);
-      if (panel) panel.classList.toggle('active', t === name);
-
-      // Top tab buttons
-      const btn = document.getElementById(`tab${capitalize(t)}`);
-      if (btn) btn.classList.toggle('active', t === name);
-
-      // Sidebar nav buttons
-      const side = document.getElementById(`sideNav${capitalize(t)}`);
-      if (side) side.classList.toggle('active', t === name);
-    });
-    // Close dropdown
-    document.getElementById('userMenu').classList.remove('show');
-  }
-
-  function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
   // ── HELPERS ────────────────────────────────────────────────────────────
   function escapeHtml(text) {
@@ -2363,50 +1403,29 @@
     d.textContent = text;
     return d.innerHTML;
   }
-
   function formatDate(iso) {
-    try {
-      return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' });
-    } catch(e) { return ''; }
+    try { return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); } catch(e) { return ''; }
   }
-
   function showError(msg) {
-    document.getElementById('pageLoader').innerHTML = `
-      <div style="text-align:center;padding:60px 20px;">
-        <div style="font-size:2.5rem;margin-bottom:12px;">⚠️</div>
-        <h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;margin-bottom:6px;">${msg}</h3>
-        <a href="my-courses.html" style="color:var(--accent);font-size:.9rem;text-decoration:none;">← Back to My Courses</a>
-      </div>`;
+    document.getElementById('pageLoader').innerHTML = `<div style="text-align:center;padding:60px 20px;"><div style="font-size:2.5rem;margin-bottom:12px;">⚠️</div><h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;margin-bottom:6px;">${msg}</h3><a href="my-courses.html" style="color:var(--accent);font-size:.9rem;text-decoration:none;">← Back to My Courses</a></div>`;
   }
+  function toggleDropdown(e) { e.stopPropagation(); document.getElementById('userMenu').classList.toggle('show'); }
+  document.addEventListener('click', e => { if (!e.target.closest('.avatar-wrapper')) document.getElementById('userMenu').classList.remove('show'); });
+  async function logoutUser() { try { await fetch('/api/auth/logout', { method:'POST', credentials:'include' }); } catch(e){} window.location.href = 'login.html'; }
 
-  // ── DROPDOWN & AUTH ────────────────────────────────────────────────────
-  function toggleDropdown(e) {
-    e.stopPropagation();
-    document.getElementById('userMenu').classList.toggle('show');
-  }
-  document.addEventListener('click', e => {
-    if (!e.target.closest('.avatar-wrapper')) {
-      document.getElementById('userMenu').classList.remove('show');
-    }
-  });
-  async function logoutUser() {
-    try { await fetch('/api/auth/logout', { method:'POST', credentials:'include' }); } catch(e){}
-    window.location.href = 'login.html';
-  }
-
-  // ── EXPOSE GLOBALS ─────────────────────────────────────────────────────
   window.toggleDropdown = toggleDropdown;
   window.logoutUser     = logoutUser;
   window.switchTab      = switchTab;
-  window.toggleModule   = toggleModule;
-  window.togglePlayPause = togglePlayPause;
-  window.seekVideo = seekVideo;
-  window.setVolume = setVolume;
-  window.toggleMute = toggleMute;
-  window.toggleFullscreen = toggleFullscreen;
-  window.scrollToModule = scrollToModule;
+  window.toggleAccordion = toggleAccordion;
+  window.loadLecture    = loadLecture;
+  window.navigateLecture= navigateLecture;
+  window.toggleMainPlayPause = toggleMainPlayPause;
+  window.toggleMainMute = toggleMainMute;
+  window.setMainVolume  = setMainVolume;
+  window.onTimelineDrag = onTimelineDrag;
+  window.onTimelineDrop = onTimelineDrop;
+  window.toggleMainFullscreen = toggleMainFullscreen;
 
-  // ── BOOT ───────────────────────────────────────────────────────────────
   document.addEventListener('DOMContentLoaded', initApp);
 </script>
 </body>
