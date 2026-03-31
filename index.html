@@ -1376,10 +1376,19 @@ window.addEventListener('storage', (e) => {
         // Extract category if available in modules JSON
         let categoryTag = 'Blockchain';
         let levelTag = index % 3 === 0 ? 'Beginner' : index % 3 === 1 ? 'Intermediate' : 'Advanced';
+        let moduleCount = 0;
         try {
           const modulesObj = typeof course.modules === 'string' ? JSON.parse(course.modules) : course.modules;
           if (modulesObj && modulesObj.category) categoryTag = modulesObj.category;
           if (modulesObj && modulesObj.level) levelTag = modulesObj.level;
+          // Calculate module count
+          if (Array.isArray(modulesObj)) {
+            moduleCount = modulesObj.length;
+          } else if (modulesObj && typeof modulesObj === 'object') {
+            // Count keys excluding metadata
+            const exclude = ['category', 'level', 'assignments'];
+            moduleCount = Object.keys(modulesObj).filter(k => !exclude.includes(k.toLowerCase())).length;
+          }
         } catch(e) {}
 
         // Handle Image rendering dynamically
@@ -1398,6 +1407,7 @@ window.addEventListener('storage', (e) => {
             <div class="card-meta">
               <span class="tag tag-blue">${categoryTag}</span>
               <span class="tag tag-purple">${status.charAt(0).toUpperCase() + status.slice(1)}</span>
+              <span class="tag tag-green">📦 ${moduleCount || 0} Lectures</span>
             </div>
             <h3>${course.title || 'Untitled Course'}</h3>
             <p>${course.description ? (course.description.length > 100 ? course.description.substring(0, 100) + '...' : course.description) : 'Learn essential skills in this comprehensive course.'}</p>
