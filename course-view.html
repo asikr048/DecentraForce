@@ -8,7 +8,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Course — DecentraForce</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
-<script src="https://www.youtube.com/iframe_api"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -39,7 +38,6 @@
     min-height: 100vh;
   }
 
-  /* Grid bg */
   body::after {
     content: '';
     position: fixed; inset: 0; z-index: 0; pointer-events: none;
@@ -49,12 +47,10 @@
     background-size: 60px 60px;
   }
 
-  /* Blobs */
   .blob { position: fixed; border-radius: 50%; filter: blur(130px); pointer-events: none; z-index: 0; }
   .blob-1 { width: 500px; height: 500px; background: rgba(123,92,255,.1); top: -150px; right: -100px; }
   .blob-2 { width: 400px; height: 400px; background: rgba(0,229,255,.06); bottom: 0; left: 200px; }
 
-  /* ─── LAYOUT ─── */
   .app-shell { display: flex; min-height: 100vh; position: relative; z-index: 1; }
 
   /* ─── SIDEBAR ─── */
@@ -86,7 +82,6 @@
 
   .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
 
-  /* Course info in sidebar */
   .sidebar-course-info {
     padding: 16px; margin: 0 12px 12px; border-radius: 12px;
     background: rgba(0,229,255,.05); border: 1px solid var(--border);
@@ -143,10 +138,9 @@
   }
   .back-btn:hover { color: var(--text); border-color: var(--border); background: var(--surface2); }
 
-  /* ─── MAIN CONTENT ─── */
+  /* ─── MAIN ─── */
   .main { margin-left: var(--sidebar-w); flex: 1; display: flex; flex-direction: column; min-height: 100vh; }
 
-  /* ─── TOP BAR ─── */
   .topbar {
     height: 66px; background: rgba(5,10,24,.88); backdrop-filter: blur(20px);
     border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
@@ -169,7 +163,6 @@
   .student-id-badge .label { color: var(--muted); }
   .student-id-badge .id { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--accent); letter-spacing: .05em; }
 
-  /* Avatar & dropdown */
   .avatar-wrapper { position: relative; }
   .avatar-btn {
     width: 38px; height: 38px; border-radius: 50%;
@@ -202,10 +195,8 @@
   .dropdown-item.logout { color: var(--accent3); }
   .dropdown-item.logout:hover { background: rgba(255,77,141,.1); }
 
-  /* ─── PAGE BODY ─── */
   .page-body { padding: 0; flex: 1; }
 
-  /* ─── COURSE HEADER BANNER ─── */
   .course-header {
     background: linear-gradient(135deg, var(--surface), var(--surface2));
     border-bottom: 1px solid var(--border);
@@ -247,7 +238,6 @@
   .ch-progress-track { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; border: 1px solid var(--border2); }
   .ch-progress-fill { height: 100%; border-radius: 3px; background: linear-gradient(90deg, var(--accent2), var(--accent)); box-shadow: 0 0 10px rgba(0,229,255,.3); transition: width 1.2s cubic-bezier(.16,1,.3,1); }
 
-  /* ─── TAB BAR ─── */
   .tab-nav {
     display: flex; align-items: stretch; gap: 0;
     border-bottom: 1px solid var(--border);
@@ -276,12 +266,9 @@
   }
   .tab-btn.active .tab-badge { background: var(--accent); color: #000; }
 
-  /* ─── CONTENT AREA ─── */
   .content-area { display: none; padding: 32px 36px 60px; max-width: 1200px; margin: 0 auto; }
   .content-area.active { display: block; animation: fadeUp .4s cubic-bezier(.16,1,.3,1) both; }
 
-
-  /* ─── ASSIGNMENT & RESOURCES TAB ─── */
   .assignment-header { margin-bottom: 24px; }
   .stat-cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 28px; }
   .stat-card {
@@ -293,8 +280,7 @@
 
   .assignment-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 22px; margin-bottom: 14px;
-    transition: border-color .2s;
+    padding: 22px; margin-bottom: 14px; transition: border-color .2s;
   }
   .assignment-card:hover { border-color: rgba(123,92,255,.2); }
   .assignment-card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
@@ -322,60 +308,21 @@
   .resource-link {
     display: inline-flex; align-items: center; gap: 6px;
     font-size: .82rem; color: var(--accent); font-weight: 600;
-    text-decoration: none; margin-top: auto;
-    transition: gap .2s;
+    text-decoration: none; margin-top: auto; transition: gap .2s;
   }
   .resource-link:hover { gap: 10px; }
 
-  /* ─── LEADER BOARD TAB ─── */
   .leaderboard-header {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-    padding: 24px; margin-bottom: 20px;
-    text-align: center;
+    padding: 24px; margin-bottom: 20px; text-align: center;
   }
   .leaderboard-header h3 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.2rem; margin-bottom: 6px; }
   .leaderboard-header p { color: var(--muted); font-size: .88rem; }
 
-  .leaderboard-table { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
-  .lb-row {
-    display: flex; align-items: center; gap: 16px;
-    padding: 14px 20px; border-bottom: 1px solid var(--border2);
-    transition: background .2s;
-  }
-  .lb-row:last-child { border-bottom: none; }
-  .lb-row:hover { background: var(--surface2); }
-  .lb-row.me { background: rgba(0,229,255,.05); border-left: 3px solid var(--accent); }
-  .lb-rank {
-    width: 32px; text-align: center; font-family: 'Syne', sans-serif;
-    font-weight: 800; font-size: .95rem;
-  }
-  .lb-rank.gold { color: #fbbf24; }
-  .lb-rank.silver { color: #94a3b8; }
-  .lb-rank.bronze { color: #b45309; }
-  .lb-rank.other { color: var(--muted); }
-  .lb-avatar {
-    width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
-    background: linear-gradient(135deg, var(--accent2), var(--accent));
-    display: grid; place-items: center; font-size: .8rem; font-weight: 800; color: #fff;
-  }
-  .lb-name { flex: 1; font-weight: 500; font-size: .9rem; }
-  .lb-score { font-family: 'Syne', sans-serif; font-weight: 700; font-size: .9rem; color: var(--accent); }
-  .lb-bar-wrap { width: 100px; height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
-  .lb-bar { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--accent2), var(--accent)); }
-  .lb-coming-soon {
-    text-align: center; padding: 50px 20px;
-    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
-  }
-  .lb-coming-soon .empty-icon { font-size: 3rem; margin-bottom: 12px; }
-  .lb-coming-soon h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
-  .lb-coming-soon p { color: var(--muted); font-size: .88rem; }
-
-  /* ─── ANNOUNCEMENTS TAB ─── */
   .announcement-card {
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
     padding: 24px; margin-bottom: 16px;
-    position: relative; overflow: hidden;
-    transition: border-color .2s;
+    position: relative; overflow: hidden; transition: border-color .2s;
   }
   .announcement-card::before {
     content: ''; position: absolute; left: 0; top: 0; bottom: 0;
@@ -395,21 +342,24 @@
   .tag-update { background: rgba(123,92,255,.1); color: var(--accent2); border: 1px solid rgba(123,92,255,.15); }
   .tag-important { background: rgba(255,77,141,.1); color: var(--accent3); border: 1px solid rgba(255,77,141,.15); }
 
+  .lb-coming-soon {
+    text-align: center; padding: 50px 20px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
+  }
+  .lb-coming-soon .empty-icon { font-size: 3rem; margin-bottom: 12px; }
+  .lb-coming-soon h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
+  .lb-coming-soon p { color: var(--muted); font-size: .88rem; }
+
   .no-announcement {
     text-align: center; padding: 60px 20px;
     background: var(--surface); border: 1px solid var(--border); border-radius: 14px;
   }
-  .no-announcement .empty-icon { font-size: 3rem; margin-bottom: 12px; }
-  .no-announcement h3 { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; margin-bottom: 6px; }
-  .no-announcement p { color: var(--muted); font-size: .88rem; }
 
-  /* ─── SECTION HEADER ─── */
   .section-header { margin-bottom: 22px; }
   .section-header h2 { font-family: 'Syne', sans-serif; font-weight: 800; font-size: 1.25rem; margin-bottom: 4px; }
   .section-header h2 em { font-style: normal; background: linear-gradient(90deg, var(--accent), var(--accent2)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .section-header p { font-size: .88rem; color: var(--muted); }
 
-  /* ─── LOADING ─── */
   .loader {
     display: flex; align-items: center; justify-content: center;
     gap: 10px; padding: 60px; color: var(--muted); font-size: .9rem;
@@ -422,7 +372,6 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* ─── RESPONSIVE ─── */
   @media (max-width: 768px) {
     :root { --sidebar-w: 0px; }
     .sidebar { display: none; }
@@ -437,26 +386,10 @@
     .course-header h1 { font-size: 1.25rem; }
   }
 
-
-  /* ─── NEW UNIFIED MODULE LAYOUT ─── */
-  .unified-course-layout {
-    display: flex;
-    gap: 24px;
-    align-items: flex-start;
-  }
-
-  .video-main {
-    flex: 1;
-    min-width: 0;
-  }
-
-  .video-sidebar {
-    width: 380px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+  /* ─── UNIFIED MODULE LAYOUT ─── */
+  .unified-course-layout { display: flex; gap: 24px; align-items: flex-start; }
+  .video-main { flex: 1; min-width: 0; }
+  .video-sidebar { width: 380px; flex-shrink: 0; display: flex; flex-direction: column; gap: 16px; }
 
   .video-player-area {
     background: #000;
@@ -468,11 +401,11 @@
     box-shadow: 0 8px 30px rgba(0,0,0,0.5);
   }
 
-  /* ─── CUSTOM YOUTUBE OVERLAY & CONTROLS ─── */
+  /* ─── YOUTUBE PLAYER STRUCTURE ─── */
   .youtube-player-container {
     position: relative;
     width: 100%;
-    padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+    padding-bottom: 56.25%;
     height: 0;
     background: #000;
   }
@@ -481,66 +414,74 @@
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
     z-index: 1;
-    pointer-events: none; /* Crucial: Iframe receives NO clicks */
+    pointer-events: none;
   }
 
   .youtube-iframe-wrapper iframe {
     width: 100%; height: 100%; border: none;
   }
 
-  /* The Shield: Blocks all right clicks and catches play/pause toggles */
+  /* Click shield — stops user clicking into iframe, handles play/pause */
   .youtube-click-shield {
     position: absolute;
-    top: 0; left: 0; width: 100%; height: calc(100% - 60px); /* Leaves room for controls */
+    top: 0; left: 0; width: 100%; height: calc(100% - 56px);
     z-index: 5;
     cursor: pointer;
   }
 
-  /* --- FIXED: TRANSPARENT ONE-TIME BIG PLAY BUTTON --- */
+  /* ─── BIG CENTER PLAY BUTTON ─── 
+     Only visible at initial load. Fully transparent bg.
+     Once video has started (.has-started), this whole overlay is hidden. */
   .big-play-overlay {
-    position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 70px);
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
     display: flex; justify-content: center; align-items: center;
-    z-index: 6; pointer-events: none; /* Let shield handle the actual click */
-  }
-  
-  .big-play-btn {
-    width: 60px; height: 60px; border-radius: 50%;
-    background: transparent; color: var(--accent);
-    border: 2px solid var(--accent);
-    display: grid; place-items: center; font-size: 1.8rem;
-    padding-left: 4px; /* optic center alignment for play triangle */
-    box-shadow: none; /* Removed background and shadow */
-    opacity: 1; transition: opacity 0.3s ease, transform 0.3s ease;
-  }
-  
-  /* Hide when playing OR after it has started once (so it doesn't overlap on pause) */
-  .is-playing .big-play-btn, .has-started .big-play-btn {
-    opacity: 0; transform: scale(1.2); visibility: hidden;
+    z-index: 6;
+    pointer-events: none;
+    background: transparent; /* NO background ever */
+    transition: opacity 0.2s ease;
   }
 
+  .big-play-btn {
+    width: 60px; height: 60px; border-radius: 50%;
+    background: rgba(0,0,0,0.18); /* very subtle so you see video behind */
+    color: rgba(255,255,255,0.92);
+    border: 2px solid rgba(255,255,255,0.4);
+    display: grid; place-items: center; font-size: 1.4rem;
+    padding-left: 3px;
+    opacity: 1;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+
+  /* After video has ever started — hide the overlay permanently */
+  .has-started .big-play-overlay {
+    display: none;
+  }
+
+  /* ─── OVERLAY & CONTROLS ─── */
   .youtube-overlay {
     position: absolute;
     top: 0; left: 0; width: 100%; height: 100%;
     z-index: 10;
-    pointer-events: none; /* Let clicks pass through to shield, except on controls */
+    pointer-events: none;
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
   }
 
-  /* --- UPGRADED DESIGN: GLASSMORPHISM CONTROL BAR --- */
+  /* ─── GLASSMORPHISM CONTROL BAR ─── */
   .custom-controls-bar {
-    pointer-events: auto; /* Controls MUST be clickable */
-    background: rgba(5, 10, 24, 0.75);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1px solid rgba(255,255,255,0.08);
-    padding: 14px 20px;
+    pointer-events: auto;
+    background: linear-gradient(to top, rgba(2,6,18,0.92) 0%, rgba(2,6,18,0.6) 100%);
+    padding: 10px 16px 12px;
     display: flex;
     align-items: center;
-    gap: 16px;
-    transition: opacity 0.3s ease;
+    gap: 10px;
+    transition: opacity 0.25s ease;
     opacity: 0;
+    height: 56px;
   }
 
   .video-player-area:hover .custom-controls-bar,
@@ -548,81 +489,127 @@
     opacity: 1;
   }
 
-  /* REDUCED GAP TO ENSURE ICONS DONT PUSH INTO CC BUTTON */
-  .control-group { display: flex; align-items: center; gap: 8px; }
+  /* ─── TIMELINE ─── */
+  .timeline-slider-container { flex: 1; display: flex; align-items: center; gap: 8px; }
+  .timeline-slider {
+    flex: 1; height: 3px; background: rgba(255,255,255,0.18);
+    border-radius: 2px; outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;
+    transition: height 0.15s;
+  }
+  .timeline-slider:hover { height: 5px; }
+  .timeline-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
+    box-shadow: 0 0 6px rgba(0,229,255,0.8);
+  }
 
+  .time-display {
+    font-size: 0.75rem; color: rgba(255,255,255,0.85);
+    font-family: 'DM Sans', monospace; min-width: 36px;
+    text-align: center; font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+  }
+
+  /* ─── CONTROL BUTTONS ─── */
   .control-btn {
-    background: transparent; border: none; color: var(--text);
-    font-size: 1.2rem; cursor: pointer; opacity: 0.85;
-    transition: all 0.2s; width: 40px; height: 40px;
+    background: transparent; border: none; color: rgba(255,255,255,0.85);
+    font-size: 1rem; cursor: pointer; opacity: 0.9;
+    transition: all 0.18s; width: 34px; height: 34px;
     border-radius: 50%; display: grid; place-items: center;
+    flex-shrink: 0;
   }
-  .control-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); transform: scale(1.05); }
-  .control-btn.play-pause { background: var(--accent); color: #000; font-size: 1rem; }
-  .control-btn.play-pause:hover { background: #00cce5; box-shadow: 0 0 10px rgba(0,229,255,0.4); }
+  .control-btn:hover { opacity: 1; background: rgba(255,255,255,0.1); transform: scale(1.08); }
 
-  /* Subtitle (CC) and Settings Styling */
-  .cc-btn { font-size: 0.9rem; font-weight: 700; font-family: sans-serif; }
-  .cc-btn.active { color: var(--accent); position: relative; }
-  .cc-btn.active::after { 
-    content:''; position:absolute; bottom:4px; left:50%; transform:translateX(-50%); 
-    width:12px; height:2px; background:var(--accent); border-radius:2px; 
+  /* Play/Pause — clean, no accent bg, just icon */
+  .control-btn.play-pause {
+    background: transparent;
+    color: rgba(255,255,255,0.92);
+    font-size: 1rem;
+    width: 34px; height: 34px;
+  }
+  .control-btn.play-pause:hover { background: rgba(255,255,255,0.12); }
+
+  /* Buffering spinner inside play/pause area */
+  .control-btn.play-pause.buffering::after {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .control-btn.play-pause.buffering .btn-icon { display: none; }
+
+  /* Mute icon — same size as others */
+  .control-btn.mute-btn { font-size: 0.95rem; }
+
+  /* ─── VOLUME (compact, after CC) ─── */
+  .volume-group {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    flex-shrink: 0;
   }
 
-  .settings-menu-container { position: relative; display: flex; align-items: center; }
+  .volume-slider {
+    width: 52px; height: 3px;
+    background: rgba(255,255,255,0.18);
+    border-radius: 2px; outline: none;
+    -webkit-appearance: none; appearance: none; cursor: pointer;
+    transition: width 0.2s;
+  }
+  .volume-slider:hover { height: 4px; }
+  .volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none; appearance: none;
+    width: 10px; height: 10px; border-radius: 50%;
+    background: rgba(255,255,255,0.85); cursor: pointer;
+  }
+
+  /* ─── CC BUTTON ─── */
+  .cc-btn {
+    font-size: 0.7rem; font-weight: 800; font-family: 'DM Sans', sans-serif;
+    letter-spacing: 0.03em; color: rgba(255,255,255,0.75);
+    border: 1px solid rgba(255,255,255,0.25); border-radius: 4px;
+    width: auto; padding: 0 6px; height: 22px; line-height: 22px;
+    display: grid; place-items: center;
+  }
+  .cc-btn:hover { border-color: rgba(255,255,255,0.5); color: #fff; background: rgba(255,255,255,0.08); }
+  .cc-btn.active {
+    border-color: var(--accent); color: var(--accent);
+    background: rgba(0,229,255,0.12);
+  }
+
+  /* ─── SETTINGS ─── */
+  .settings-menu-container { position: relative; display: flex; align-items: center; flex-shrink: 0; }
   .settings-popup {
-    position: absolute; bottom: calc(100% + 15px); right: -10px; background: rgba(5, 10, 24, 0.95);
-    border: 1px solid var(--border); border-radius: 10px; padding: 8px 0;
-    min-width: 170px; display: none; flex-direction: column; z-index: 100;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+    position: absolute; bottom: calc(100% + 12px); right: -6px;
+    background: rgba(5,10,24,0.97);
+    border: 1px solid var(--border); border-radius: 10px; padding: 6px 0;
+    min-width: 165px; display: none; flex-direction: column; z-index: 100;
+    box-shadow: 0 10px 40px rgba(0,0,0,.8);
   }
   .settings-popup.show { display: flex; }
-  
   .settings-item {
-    padding: 10px 18px; font-size: 0.85rem; color: var(--text); cursor: pointer;
+    padding: 9px 16px; font-size: 0.83rem; color: var(--text); cursor: pointer;
     display: flex; justify-content: space-between; align-items: center; transition: background 0.2s;
+    position: relative;
   }
-  .settings-item:hover { background: rgba(255,255,255,0.1); color: var(--accent); }
-  .settings-item-value { color: var(--muted); font-size: 0.75rem; pointer-events: none; }
-
+  .settings-item:hover { background: rgba(255,255,255,0.07); color: var(--accent); }
+  .settings-item-value { color: var(--muted); font-size: 0.72rem; pointer-events: none; }
   .settings-submenu {
-    position: absolute; bottom: 0; right: 100%; background: rgba(5, 10, 24, 0.95);
-    border: 1px solid var(--border); border-radius: 10px; padding: 8px 0;
-    min-width: 140px; display: none; flex-direction: column; margin-right: 4px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.8); backdrop-filter: blur(10px);
+    position: absolute; bottom: 0; right: 100%; background: rgba(5,10,24,0.97);
+    border: 1px solid var(--border); border-radius: 10px; padding: 6px 0;
+    min-width: 130px; display: none; flex-direction: column; margin-right: 4px;
+    box-shadow: 0 10px 40px rgba(0,0,0,.8);
   }
   .settings-item.has-submenu:hover .settings-submenu { display: flex; }
 
-  /* Timeline slider */
-  .timeline-slider-container { flex: 1; display: flex; align-items: center; gap: 10px; }
-  .timeline-slider, .volume-slider {
-    flex: 1; height: 4px; background: rgba(255,255,255,0.15);
-    border-radius: 2px; outline: none; -webkit-appearance: none; appearance: none; cursor: pointer;
-    transition: height 0.2s;
-  }
-  .timeline-slider:hover { height: 6px; }
-  
-  .timeline-slider::-webkit-slider-thumb, .volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none; appearance: none; width: 14px; height: 14px;
-    border-radius: 50%; background: var(--accent); cursor: pointer; 
-    box-shadow: 0 0 8px rgba(0,229,255,0.8); transition: transform 0.2s;
-  }
-  .timeline-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
-  .volume-slider::-webkit-slider-thumb { background: var(--accent2); box-shadow: none; }
-  .volume-slider::-webkit-slider-thumb:hover { transform: scale(1.3); }
+  /* Fullscreen */
+  .control-btn.fullscreen { margin-left: 2px; font-size: 1rem; }
 
-  .time-display {
-    font-size: 0.85rem; color: rgba(255,255,255,0.9);
-    font-family: 'DM Sans', monospace; min-width: 45px;
-    text-align: center; font-variant-numeric: tabular-nums;
-  }
-  
-  /* REDUCED WIDTH TO FIX CC BUTTON OVERLAP */
-  .volume-slider-container { display: flex; align-items: center; gap: 4px; width: 35px; }
-  
-  .control-btn.fullscreen { margin-left: auto; }
-
-  /* Meta under video */
+  /* ─── BELOW VIDEO ─── */
   .lesson-title-main {
     font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.3rem;
     color: var(--text); margin: 0 0 12px;
@@ -633,34 +620,29 @@
     font-weight: 600; font-size: 0.9rem; cursor: pointer; transition: all 0.2s;
     border: 1px solid var(--border); background: var(--surface2); color: var(--text);
   }
-  .nav-btn:hover:not(:disabled) { background: var(--surface3); border-color: var(--accent); color: var(--accent); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-  .nav-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .nav-btn:hover:not(:disabled) { background: var(--surface3); border-color: var(--accent); color: var(--accent); }
+  .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
   .description-tab {
     padding: 20px; border-radius: 12px; background: var(--surface);
     border: 1px solid var(--border2);
   }
-  .description-label {
-    font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem;
-    color: var(--text); margin-bottom: 8px;
-  }
+  .description-label { font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.95rem; color: var(--text); margin-bottom: 8px; }
   .description-content { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
 
-  /* Sidebar Modules List */
+  /* ─── SIDEBAR MODULES ─── */
   .sidebar-progress {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; padding: 16px;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px;
   }
   .sidebar-progress-label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); margin-bottom: 8px; }
   .sidebar-progress-bar { height: 6px; background: var(--bg); border-radius: 3px; overflow: hidden; }
   .sidebar-progress-fill { height: 100%; background: linear-gradient(90deg, #00e599, #00cc88); border-radius: 3px; width: 0%; transition: width 0.3s; }
 
   .module-accordion-list {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 12px; overflow: hidden;
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
     max-height: 800px; overflow-y: auto;
   }
-  .module-accordion-list::-webkit-scrollbar { width: 6px; }
+  .module-accordion-list::-webkit-scrollbar { width: 5px; }
   .module-accordion-list::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
 
   .acc-module-item { border-bottom: 1px solid var(--border2); }
@@ -674,7 +656,6 @@
   .acc-module-meta { font-size: 0.75rem; color: var(--muted); }
   .acc-chevron { transition: transform 0.3s; color: var(--muted); }
   .acc-module-item.open .acc-chevron { transform: rotate(180deg); color: var(--accent); }
-  
   .acc-module-body { display: none; background: var(--bg); border-top: 1px solid var(--border2); }
   .acc-module-item.open .acc-module-body { display: block; }
 
@@ -684,7 +665,6 @@
   }
   .acc-lecture-item:hover { background: rgba(0,229,255,0.05); }
   .acc-lecture-item.active { background: rgba(0,229,255,0.1); border-left: 3px solid var(--accent); padding-left: 21px; }
-  
   .acc-lecture-icon { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
   .acc-lecture-item.active .acc-lecture-icon { color: var(--accent); }
   .acc-lecture-info { flex: 1; }
@@ -697,8 +677,9 @@
     .video-sidebar { width: 100%; }
   }
   @media (max-width: 768px) {
-    .custom-controls-bar { padding: 12px 10px; flex-wrap: wrap; justify-content: space-between; }
-    .timeline-slider-container { order: -1; flex: 1 1 100%; margin-bottom: 8px; }
+    .custom-controls-bar { height: auto; padding: 8px 10px; flex-wrap: wrap; }
+    .timeline-slider-container { order: -1; flex: 1 1 100%; margin-bottom: 4px; }
+    .volume-slider { width: 44px; }
   }
 </style>
 </head>
@@ -732,31 +713,24 @@
     <nav class="sidebar-nav">
       <div class="nav-section-label" style="margin-top:6px;">Navigate</div>
       <button class="nav-item active" id="sideNavModule" onclick="switchTab('module')">
-        <div class="nav-icon">📚</div>
-        Module
+        <div class="nav-icon">📚</div> Module
       </button>
       <button class="nav-item" id="sideNavAssignment" onclick="switchTab('assignment')">
-        <div class="nav-icon">📝</div>
-        Assignment
+        <div class="nav-icon">📝</div> Assignment
       </button>
       <button class="nav-item" id="sideNavResources" onclick="switchTab('resources')">
-        <div class="nav-icon">🔗</div>
-        Resources
+        <div class="nav-icon">🔗</div> Resources
       </button>
       <button class="nav-item" id="sideNavLeaderboard" onclick="switchTab('leaderboard')">
-        <div class="nav-icon">🏆</div>
-        Leader Board
+        <div class="nav-icon">🏆</div> Leader Board
       </button>
       <button class="nav-item" id="sideNavAnnouncements" onclick="switchTab('announcements')">
-        <div class="nav-icon">📢</div>
-        Announcements
+        <div class="nav-icon">📢</div> Announcements
         <span class="tab-badge" id="sideAnnounceBadge" style="display:none;margin-left:auto;"></span>
       </button>
-
       <div class="nav-divider"></div>
       <a href="my-courses.html" class="nav-item">
-        <div class="nav-icon">⊞</div>
-        My Courses
+        <div class="nav-icon">⊞</div> My Courses
       </a>
     </nav>
 
@@ -827,7 +801,8 @@
             <span>🎥 <span id="headerLectures">0</span> Lectures</span>
             <span>⚡ <span id="headerExercises">0</span> Exercises</span>
           </div>
-          <div class="course-header-progress" style="display:none;"> <div class="ch-progress-label">
+          <div class="course-header-progress" style="display:none;">
+            <div class="ch-progress-label">
               <span>Your Progress</span>
               <span id="headerPct" style="color:var(--accent);font-weight:700;">0%</span>
             </div>
@@ -858,58 +833,70 @@
         </button>
       </nav>
 
+      <!-- MODULE TAB -->
       <div class="content-area active" id="panelModule">
         <div class="unified-course-layout">
           
           <div class="video-main">
             <div class="video-player-area" id="mainPlayerArea">
               <div class="youtube-player-container" id="yt-container">
+
+                <!-- The iframe lives here, pointer-events: none so WE control everything -->
                 <div class="youtube-iframe-wrapper" id="yt-wrapper">
                   <div id="main-yt-iframe"></div>
                 </div>
-                
+
+                <!-- Transparent shield: captures clicks for play/pause, leaves bottom 56px for controls -->
                 <div class="youtube-click-shield" onclick="toggleMainPlayPause()"></div>
-                
+
+                <!-- BIG CENTER PLAY: transparent bg, no overlay, gone once .has-started is set -->
                 <div class="big-play-overlay">
                   <div class="big-play-btn" id="bigPlayBtn">▶</div>
                 </div>
 
+                <!-- Overlay wrapping the control bar -->
                 <div class="youtube-overlay">
                   <div class="custom-controls-bar" id="customControls">
-                    <button class="control-btn play-pause" id="btnPlayPause" onclick="toggleMainPlayPause()">▶</button>
-                    
+
+                    <!-- Play / Pause (handles buffering state too) -->
+                    <button class="control-btn play-pause" id="btnPlayPause" onclick="toggleMainPlayPause()">
+                      <span class="btn-icon">▶</span>
+                    </button>
+
+                    <!-- Timeline -->
                     <div class="timeline-slider-container">
                       <span class="time-display" id="timeCurrent">0:00</span>
-                      <input type="range" class="timeline-slider" id="timelineSlider" min="0" max="100" value="0" oninput="onTimelineDrag()" onchange="onTimelineDrop(this.value)">
+                      <input type="range" class="timeline-slider" id="timelineSlider" min="0" max="100" value="0"
+                        oninput="onTimelineDrag()" onchange="onTimelineDrop(this.value)">
                       <span class="time-display" id="timeDuration">0:00</span>
                     </div>
 
-                    <div class="control-group">
-                      <button class="control-btn" id="btnMute" onclick="toggleMainMute()">🔉</button>
-                      <div class="volume-slider-container">
-                        <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="40" oninput="setMainVolume(this.value)">
-                      </div>
+                    <!-- CC button -->
+                    <button class="control-btn cc-btn" id="btnCC" onclick="toggleMainCaptions()">CC</button>
+
+                    <!-- Volume group (compact, after CC) -->
+                    <div class="volume-group">
+                      <button class="control-btn mute-btn" id="btnMute" onclick="toggleMainMute()">🔉</button>
+                      <input type="range" class="volume-slider" id="volumeSlider" min="0" max="100" value="40"
+                        oninput="setMainVolume(this.value)">
                     </div>
 
-                    <button class="control-btn cc-btn" id="btnCC" onclick="toggleMainCaptions()">CC</button>
-                    
+                    <!-- Settings -->
                     <div class="settings-menu-container">
                       <button class="control-btn" id="btnSettings" onclick="toggleSettingsMenu()">⚙️</button>
                       <div class="settings-popup" id="settingsPopup">
-                        
                         <div class="settings-item has-submenu">
-                          <span>Playback Speed</span>
+                          <span>Speed</span>
                           <span class="settings-item-value" id="currentSpeed">Normal</span>
                           <div class="settings-submenu">
-                            <div class="settings-item" onclick="setMainPlaybackRate(0.5)">0.5x</div>
-                            <div class="settings-item" onclick="setMainPlaybackRate(0.75)">0.75x</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(0.5)">0.5×</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(0.75)">0.75×</div>
                             <div class="settings-item" onclick="setMainPlaybackRate(1)">Normal</div>
-                            <div class="settings-item" onclick="setMainPlaybackRate(1.25)">1.25x</div>
-                            <div class="settings-item" onclick="setMainPlaybackRate(1.5)">1.5x</div>
-                            <div class="settings-item" onclick="setMainPlaybackRate(2)">2x</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(1.25)">1.25×</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(1.5)">1.5×</div>
+                            <div class="settings-item" onclick="setMainPlaybackRate(2)">2×</div>
                           </div>
                         </div>
-
                         <div class="settings-item has-submenu">
                           <span>Quality</span>
                           <span class="settings-item-value" id="currentQuality">Auto</span>
@@ -921,15 +908,17 @@
                             <div class="settings-item" onclick="setMainQuality('default')">Auto</div>
                           </div>
                         </div>
-
                       </div>
                     </div>
-                    
+
+                    <!-- Fullscreen -->
                     <button class="control-btn fullscreen" onclick="toggleMainFullscreen()">⛶</button>
-                  </div>
-                </div>
-              </div>
-            </div>
+
+                  </div><!-- /custom-controls-bar -->
+                </div><!-- /youtube-overlay -->
+
+              </div><!-- /youtube-player-container -->
+            </div><!-- /video-player-area -->
 
             <h2 class="lesson-title-main" id="displayLessonTitle">Select a lecture to begin</h2>
             <div class="video-navigation">
@@ -939,11 +928,9 @@
 
             <div class="description-tab">
               <div class="description-label">Description:</div>
-              <div class="description-content" id="displayLessonDesc">
-                Course description and notes will appear here.
-              </div>
+              <div class="description-content" id="displayLessonDesc">Course description and notes will appear here.</div>
             </div>
-          </div>
+          </div><!-- /video-main -->
 
           <div class="video-sidebar">
             <div class="sidebar-progress">
@@ -955,14 +942,13 @@
                 <div class="sidebar-progress-fill" id="sideModFill"></div>
               </div>
             </div>
-
-            <div class="module-accordion-list" id="accordionList">
-              </div>
+            <div class="module-accordion-list" id="accordionList"></div>
           </div>
 
         </div>
-      </div>
+      </div><!-- /panelModule -->
 
+      <!-- ASSIGNMENT TAB -->
       <div class="content-area" id="panelAssignment">
         <div class="section-header">
           <h2>Assignments &amp; <em>Exercises</em></h2>
@@ -976,15 +962,16 @@
         <div id="assignmentsList"></div>
       </div>
 
+      <!-- RESOURCES TAB -->
       <div class="content-area" id="panelResources">
         <div class="section-header">
           <h2>Course <em>Resources</em></h2>
           <p>Useful links and materials for this course.</p>
         </div>
-        <div class="resources-grid" id="resourcesGrid">
-          </div>
+        <div class="resources-grid" id="resourcesGrid"></div>
       </div>
 
+      <!-- LEADERBOARD TAB -->
       <div class="content-area" id="panelLeaderboard">
         <div class="section-header">
           <h2>Leader <em>Board</em></h2>
@@ -997,6 +984,7 @@
         </div>
       </div>
 
+      <!-- ANNOUNCEMENTS TAB -->
       <div class="content-area" id="panelAnnouncements">
         <div class="section-header">
           <h2>Course <em>Announcements</em></h2>
@@ -1005,25 +993,23 @@
         <div id="announcementsList"></div>
       </div>
 
-    </div></main>
+    </div><!-- /page-body -->
+  </main>
 </div>
 
 <script>
   // ── STATE ──────────────────────────────────────────────────────────────
-  let currentUser  = null;
-  let activeCourse = null;
+  let currentUser   = null;
+  let activeCourse  = null;
   let courseModules = {};
-  
-  // Flat list of all lectures for Next/Prev navigation
-  let flatLectures = []; 
+  let flatLectures  = [];
   let currentLectureIndex = -1;
 
-  // YouTube Player State
-  let mainPlayer = null;
-  let isPlayerReady = false;
-  let updateInterval = null;
+  let mainPlayer      = null;
+  let isPlayerReady   = false;
+  let updateInterval  = null;
   let isDraggingTimeline = false;
-  let captionsEnabled = false; // Tracks custom CC state
+  let captionsEnabled = false;
 
   // ── INIT ───────────────────────────────────────────────────────────────
   async function initApp() {
@@ -1033,17 +1019,15 @@
       if (data.success && data.user) {
         currentUser = data.user;
         const initials = currentUser.username.substring(0,2).toUpperCase();
-        document.getElementById('navAvatar').textContent     = initials;
-        document.getElementById('dropName').textContent      = currentUser.username;
-        document.getElementById('dropEmail').textContent     = currentUser.email;
+        document.getElementById('navAvatar').textContent      = initials;
+        document.getElementById('dropName').textContent       = currentUser.username;
+        document.getElementById('dropEmail').textContent      = currentUser.email;
         document.getElementById('topbarStudentId').textContent = `DF-${currentUser.id.toString().padStart(6,'0')}`;
       } else {
-        window.location.href = 'login.html';
-        return;
+        window.location.href = 'login.html'; return;
       }
     } catch(e) {
-      window.location.href = 'login.html';
-      return;
+      window.location.href = 'login.html'; return;
     }
 
     const params   = new URLSearchParams(window.location.search);
@@ -1055,7 +1039,6 @@
       const data = await res.json();
       activeCourse = (data.courses || []).find(c => String(c.id) === String(courseId));
       if (!activeCourse) { showError('Course not found.'); return; }
-
       populatePage();
     } catch(e) {
       showError('Failed to load course data.');
@@ -1071,12 +1054,12 @@
     } catch(e) { courseModules = {}; }
     if (!courseModules || typeof courseModules !== 'object') courseModules = {};
 
-    const curriculum   = Array.isArray(courseModules.curriculum) ? courseModules.curriculum : [];
-    const lectures     = parseInt(courseModules.lectures)   || 0;
-    const exercises    = parseInt(courseModules.exercises)  || 0;
-    const assignCount  = parseInt(courseModules.assignments)|| 0;
-    const content      = courseModules.content || '';
-    const status       = activeCourse.status   || 'ongoing';
+    const curriculum  = Array.isArray(courseModules.curriculum) ? courseModules.curriculum : [];
+    const lectures    = parseInt(courseModules.lectures)    || 0;
+    const exercises   = parseInt(courseModules.exercises)   || 0;
+    const assignCount = parseInt(courseModules.assignments) || 0;
+    const content     = courseModules.content || '';
+    const status      = activeCourse.status  || 'ongoing';
 
     document.getElementById('headerTitle').textContent      = activeCourse.title || 'Untitled Course';
     document.getElementById('topbarTitle').textContent      = activeCourse.title || 'Course';
@@ -1086,8 +1069,8 @@
 
     const statusChip = document.getElementById('courseStatusChip');
     if (status && status !== 'ongoing') {
-      statusChip.textContent  = status.charAt(0).toUpperCase() + status.slice(1);
-      statusChip.className    = `status-chip ${status}`;
+      statusChip.textContent   = status.charAt(0).toUpperCase() + status.slice(1);
+      statusChip.className     = `status-chip ${status}`;
       statusChip.style.display = '';
     }
 
@@ -1098,13 +1081,13 @@
       document.getElementById('sidebarThumb').innerHTML = `<img src="${activeCourse.thumbnail_url}" alt="thumbnail">`;
     }
 
-    document.getElementById('pageLoader').style.display  = 'none';
+    document.getElementById('pageLoader').style.display   = 'none';
     document.getElementById('courseHeader').style.display = '';
     document.getElementById('tabNav').style.display       = '';
 
-    document.getElementById('statLectures').textContent   = lectures   || '—';
-    document.getElementById('statExercises').textContent  = exercises  || '—';
-    document.getElementById('statAssignments').textContent= assignCount|| '—';
+    document.getElementById('statLectures').textContent    = lectures    || '—';
+    document.getElementById('statExercises').textContent   = exercises   || '—';
+    document.getElementById('statAssignments').textContent = assignCount || '—';
 
     const ab = document.getElementById('assignBadge');
     ab.textContent = assignCount;
@@ -1116,10 +1099,10 @@
     renderAnnouncements(content, activeCourse);
   }
 
-  // ── UNIFIED MODULE TAB LOGIC ───────────────────────────────────────────
+  // ── MODULES ────────────────────────────────────────────────────────────
   function renderUnifiedModules(curriculum) {
     const listContainer = document.getElementById('accordionList');
-    flatLectures = []; // Reset
+    flatLectures = [];
 
     if (!curriculum || curriculum.length === 0) {
       listContainer.innerHTML = `<div style="padding:20px;text-align:center;color:var(--muted);">No modules available yet.</div>`;
@@ -1130,25 +1113,22 @@
     let globalIndex = 0;
 
     curriculum.forEach((mod, mIdx) => {
-      const title = mod.moduleTitle || mod.title || `Module ${mIdx+1}`;
+      const title      = mod.moduleTitle || mod.title || `Module ${mIdx+1}`;
       const modLectures = Array.isArray(mod.lectures) ? mod.lectures : [];
-      const topics = Array.isArray(mod.topics) ? mod.topics : (typeof mod.topics === 'string' && mod.topics ? [mod.topics] : []);
-      
-      const countL = modLectures.length;
-      const duration = mod.duration || '00:00:00';
+      const topics      = Array.isArray(mod.topics) ? mod.topics : (typeof mod.topics === 'string' && mod.topics ? [mod.topics] : []);
+      const countL      = modLectures.length;
+      const duration    = mod.duration || '00:00:00';
 
       let lecturesHtml = '';
       modLectures.forEach((lec, lIdx) => {
         const flatIdx = globalIndex++;
         flatLectures.push({
-          flatIdx: flatIdx,
-          moduleIdx: mIdx,
+          flatIdx, moduleIdx: mIdx,
           title: lec.title || `Lecture ${lIdx+1}`,
           url: lec.url || '',
           desc: lec.description || 'No description provided.',
           duration: lec.duration || '0:00'
         });
-
         lecturesHtml += `
           <div class="acc-lecture-item" id="lec-item-${flatIdx}" onclick="loadLecture(${flatIdx})">
             <div class="acc-lecture-icon">▶</div>
@@ -1156,20 +1136,17 @@
               <div class="acc-lecture-title">${escapeHtml(lec.title || `Lecture ${lIdx+1}`)}</div>
               <div class="acc-lecture-dur">${escapeHtml(lec.duration || '0:00')}</div>
             </div>
-          </div>
-        `;
+          </div>`;
       });
 
-      // Topics appended at end of module if they exist
-      topics.forEach((t, tIdx) => {
+      topics.forEach(t => {
         lecturesHtml += `
-          <div class="acc-lecture-item" style="opacity:0.7; cursor:default;">
+          <div class="acc-lecture-item" style="opacity:0.7;cursor:default;">
             <div class="acc-lecture-icon">📌</div>
             <div class="acc-lecture-info">
               <div class="acc-lecture-title">${escapeHtml(t)}</div>
             </div>
-          </div>
-        `;
+          </div>`;
       });
 
       if (!lecturesHtml) lecturesHtml = `<div style="padding:12px 16px;color:var(--muted);font-size:0.8rem;">No lectures.</div>`;
@@ -1183,19 +1160,12 @@
             </div>
             <div class="acc-chevron">▼</div>
           </div>
-          <div class="acc-module-body">
-            ${lecturesHtml}
-          </div>
-        </div>
-      `;
+          <div class="acc-module-body">${lecturesHtml}</div>
+        </div>`;
     });
 
     listContainer.innerHTML = html;
-
-    // Load first lecture automatically if it exists
-    if (flatLectures.length > 0) {
-      loadLecture(0);
-    }
+    if (flatLectures.length > 0) loadLecture(0);
   }
 
   function toggleAccordion(mIdx) {
@@ -1203,12 +1173,12 @@
     if (el) el.classList.toggle('open');
   }
 
-  // ── VIDEO LOADING & YOUTUBE API ────────────────────────────────────────
+  // ── VIDEO LOADING ──────────────────────────────────────────────────────
   function extractYouTubeVideoId(url) {
     if (!url) return null;
     const patterns = [
       /(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
-      /(?:youtube\.com\/v\/|youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
+      /(?:youtube\.com\/v\/)([a-zA-Z0-9_-]{11})/,
       /(?:youtube\.com\/watch\?.*v=([a-zA-Z0-9_-]{11}))/,
     ];
     for (const pattern of patterns) {
@@ -1218,29 +1188,27 @@
     return null;
   }
 
-  // Load YouTube API script globally
-  const tag = document.createElement('script');
-  tag.src = "https://www.youtube.com/iframe_api";
-  const firstScriptTag = document.getElementsByTagName('script')[0];
-  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+  // Load YouTube IFrame API
+  (function() {
+    const tag = document.createElement('script');
+    tag.src = "https://www.youtube.com/iframe_api";
+    document.head.appendChild(tag);
+  })();
 
   window.onYouTubeIframeAPIReady = function() {
     isPlayerReady = true;
-    // If a lecture was selected before API was ready, load it now
     if (currentLectureIndex >= 0 && flatLectures[currentLectureIndex]) {
-       initOrUpdatePlayer(flatLectures[currentLectureIndex].url);
+      initOrUpdatePlayer(flatLectures[currentLectureIndex].url);
     }
   };
 
   function loadLecture(flatIdx) {
     if (flatIdx < 0 || flatIdx >= flatLectures.length) return;
-    
-    // Update active UI state
+
     document.querySelectorAll('.acc-lecture-item').forEach(el => el.classList.remove('active'));
     const activeEl = document.getElementById(`lec-item-${flatIdx}`);
     if (activeEl) {
       activeEl.classList.add('active');
-      // Ensure module is open
       const modEl = activeEl.closest('.acc-module-item');
       if (modEl && !modEl.classList.contains('open')) modEl.classList.add('open');
     }
@@ -1248,48 +1216,40 @@
     currentLectureIndex = flatIdx;
     const lec = flatLectures[flatIdx];
 
-    // Update Text Data
     document.getElementById('displayLessonTitle').textContent = lec.title;
-    document.getElementById('displayLessonDesc').textContent = lec.desc;
-
-    // Update Nav Buttons
+    document.getElementById('displayLessonDesc').textContent  = lec.desc;
     document.getElementById('btnPrevLec').disabled = (flatIdx === 0);
     document.getElementById('btnNextLec').disabled = (flatIdx === flatLectures.length - 1);
 
-    // Update Progress Bar roughly based on lecture index
     const pct = Math.round(((flatIdx + 1) / flatLectures.length) * 100);
     document.getElementById('sideModPct').textContent = `${pct}%`;
     document.getElementById('sideModFill').style.width = `${pct}%`;
 
-    // Reset visibility states so the big button shows up again for the NEW video
-    document.getElementById('yt-container').classList.remove('is-playing');
-    document.getElementById('yt-container').classList.remove('has-started');
+    // Reset: remove has-started so big play button shows again for new video
+    const ytContainer = document.getElementById('yt-container');
+    ytContainer.classList.remove('is-playing');
+    ytContainer.classList.remove('has-started');
 
-    // Load Video
     initOrUpdatePlayer(lec.url);
   }
 
   function navigateLecture(direction) {
-    const newIdx = currentLectureIndex + direction;
-    loadLecture(newIdx);
+    loadLecture(currentLectureIndex + direction);
   }
 
   function initOrUpdatePlayer(url) {
     const videoId = extractYouTubeVideoId(url);
     if (!videoId) {
       document.getElementById('mainPlayerArea').innerHTML = `
-        <div style="height:100%; display:grid; place-items:center; color:var(--muted);">
-          Invalid or Non-YouTube Video URL
+        <div style="height:200px;display:grid;place-items:center;color:var(--muted);font-size:0.9rem;">
+          ⚠️ Invalid or non-YouTube video URL
         </div>`;
       return;
     }
 
-    // If API isn't ready, it will catch up in onYouTubeIframeAPIReady
     if (!isPlayerReady || typeof YT === 'undefined' || !YT.Player) return;
 
     if (mainPlayer) {
-      // Load the video. Browsers often block autoplay on dynamic loads without interaction,
-      // which is why the big play button resets and waits for user click.
       mainPlayer.loadVideoById(videoId);
       resetCustomUI();
     } else {
@@ -1297,12 +1257,12 @@
         videoId: videoId,
         playerVars: {
           autoplay: 0,
-          controls: 0,       // Absolutely hide native controls
-          modestbranding: 1, // Remove logo
-          rel: 0,            // No related videos
-          showinfo: 0,       // Hide title
-          disablekb: 1,      // Disable native keyboard to block skipping via keys
-          fs: 0              // Block native fullscreen
+          controls: 0,
+          modestbranding: 1,
+          rel: 0,
+          showinfo: 0,
+          disablekb: 1,
+          fs: 0
         },
         events: {
           onReady: onPlayerReady,
@@ -1313,67 +1273,66 @@
   }
 
   function onPlayerReady(event) {
-    // Set default volume significantly lower per request (40)
     mainPlayer.setVolume(40);
     startUIInterval();
   }
 
   function onPlayerStateChange(event) {
-    const btnPlayPause = document.getElementById('btnPlayPause');
     const ytContainer = document.getElementById('yt-container');
+    const btn         = document.getElementById('btnPlayPause');
+    const btnIcon     = btn.querySelector('.btn-icon');
+
+    // Remove buffering spinner regardless of new state
+    btn.classList.remove('buffering');
 
     if (event.data === YT.PlayerState.PLAYING) {
-      btnPlayPause.textContent = '⏸';
-      
-      // Hides the big play button permanently for THIS video
-      ytContainer.classList.add('is-playing'); 
-      ytContainer.classList.add('has-started'); 
-
+      btnIcon.textContent = '⏸';
+      // Mark as started — hides big center play button permanently for this video
+      ytContainer.classList.add('is-playing');
+      ytContainer.classList.add('has-started');
       startUIInterval();
-      // Ensure duration is grabbed accurately
       document.getElementById('timeDuration').textContent = formatTime(mainPlayer.getDuration());
-    } else {
-      btnPlayPause.textContent = '▶';
-      ytContainer.classList.remove('is-playing'); 
-      // Notice: 'has-started' is NOT removed here. 
-      // This means the big play button stays hidden when you pause.
-    }
-    
-    // Catch duration on metadata load even if paused
-    if (event.data === YT.PlayerState.PAUSED || event.data === YT.PlayerState.CUED) {
-       document.getElementById('timeDuration').textContent = formatTime(mainPlayer.getDuration());
+
+    } else if (event.data === YT.PlayerState.BUFFERING) {
+      // Show spinner in place of play/pause icon while buffering
+      btn.classList.add('buffering');
+      btnIcon.textContent = '';
+
+    } else if (event.data === YT.PlayerState.PAUSED) {
+      btnIcon.textContent = '▶';
+      ytContainer.classList.remove('is-playing');
+      document.getElementById('timeDuration').textContent = formatTime(mainPlayer.getDuration());
+
+    } else if (event.data === YT.PlayerState.ENDED) {
+      btnIcon.textContent = '▶';
+      ytContainer.classList.remove('is-playing');
+
+    } else if (event.data === YT.PlayerState.CUED) {
+      btnIcon.textContent = '▶';
+      document.getElementById('timeDuration').textContent = formatTime(mainPlayer.getDuration());
     }
   }
 
-  // ── CUSTOM PLAYER CONTROLS ─────────────────────────────────────────────
+  // ── CUSTOM CONTROLS ────────────────────────────────────────────────────
   function startUIInterval() {
     if (updateInterval) clearInterval(updateInterval);
     updateInterval = setInterval(() => {
       if (!mainPlayer || mainPlayer.getPlayerState() !== YT.PlayerState.PLAYING) return;
-      if (isDraggingTimeline) return; // Don't fight the user drag
-
+      if (isDraggingTimeline) return;
       const cur = mainPlayer.getCurrentTime();
       const dur = mainPlayer.getDuration();
-      
       document.getElementById('timeCurrent').textContent = formatTime(cur);
-      if (dur > 0) {
-        document.getElementById('timelineSlider').value = (cur / dur) * 100;
-      }
+      if (dur > 0) document.getElementById('timelineSlider').value = (cur / dur) * 100;
     }, 500);
   }
 
   function resetCustomUI() {
-    document.getElementById('btnPlayPause').textContent = '▶';
+    const btnIcon = document.getElementById('btnPlayPause').querySelector('.btn-icon');
+    if (btnIcon) btnIcon.textContent = '▶';
+    document.getElementById('btnPlayPause').classList.remove('buffering');
     document.getElementById('timelineSlider').value = 0;
     document.getElementById('timeCurrent').textContent = '0:00';
     document.getElementById('timeDuration').textContent = '0:00';
-    
-    // Reset Captions State visually if changing videos
-    if(captionsEnabled) {
-      document.getElementById('btnCC').classList.add('active');
-    } else {
-      document.getElementById('btnCC').classList.remove('active');
-    }
   }
 
   function toggleMainPlayPause() {
@@ -1396,8 +1355,7 @@
 
   function onTimelineDrop(value) {
     if (!mainPlayer) return;
-    const dur = mainPlayer.getDuration();
-    mainPlayer.seekTo((value / 100) * dur, true);
+    mainPlayer.seekTo((value / 100) * mainPlayer.getDuration(), true);
     isDraggingTimeline = false;
   }
 
@@ -1405,9 +1363,9 @@
     if (!mainPlayer) return;
     mainPlayer.setVolume(val);
     const btn = document.getElementById('btnMute');
-    if (val == 0) btn.textContent = '🔇';
-    else if (val < 40) btn.textContent = '🔈';
-    else btn.textContent = '🔊';
+    if (val == 0)       btn.textContent = '🔇';
+    else if (val < 40)  btn.textContent = '🔈';
+    else                btn.textContent = '🔊';
   }
 
   function toggleMainMute() {
@@ -1424,16 +1382,12 @@
   function toggleMainFullscreen() {
     const container = document.getElementById('yt-container');
     if (!document.fullscreenElement) {
-      if (container.requestFullscreen) container.requestFullscreen();
-      else if (container.webkitRequestFullscreen) container.webkitRequestFullscreen();
+      (container.requestFullscreen || container.webkitRequestFullscreen).call(container);
     } else {
-      if (document.exitFullscreen) document.exitFullscreen();
-      else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
     }
   }
 
-  // ── NEW: SETTINGS & CAPTIONS LOGIC ──────────────────────────────────────
-  
   function toggleMainCaptions() {
     if (!mainPlayer) return;
     const btn = document.getElementById('btnCC');
@@ -1443,54 +1397,38 @@
       btn.classList.remove('active');
     } else {
       mainPlayer.loadModule('captions');
-      mainPlayer.setOption('captions', 'track', {languageCode: 'en'}); // Best attempt to force English
+      mainPlayer.setOption('captions', 'track', { languageCode: 'en' });
       captionsEnabled = true;
       btn.classList.add('active');
     }
   }
 
   function toggleSettingsMenu() {
-    const popup = document.getElementById('settingsPopup');
-    popup.classList.toggle('show');
+    document.getElementById('settingsPopup').classList.toggle('show');
   }
 
   function setMainPlaybackRate(rate) {
     if (!mainPlayer) return;
     mainPlayer.setPlaybackRate(rate);
-    document.getElementById('currentSpeed').textContent = rate === 1 ? 'Normal' : rate + 'x';
-    toggleSettingsMenu(); // auto-close popup
+    document.getElementById('currentSpeed').textContent = rate === 1 ? 'Normal' : rate + '×';
+    document.getElementById('settingsPopup').classList.remove('show');
   }
 
   function setMainQuality(quality) {
     if (!mainPlayer) return;
-    // Firing the command. Note: YouTube frequently ignores this on modern HTML5 embedded players.
-    mainPlayer.setPlaybackQuality(quality); 
-    
-    // Update the UI label
-    let label = 'Auto';
-    if(quality === 'highres') label = '1080p';
-    if(quality === 'hd720') label = '720p';
-    if(quality === 'large') label = '480p';
-    if(quality === 'medium') label = '360p';
-    document.getElementById('currentQuality').textContent = label;
-    toggleSettingsMenu(); // auto-close popup
+    mainPlayer.setPlaybackQuality(quality);
+    const labels = { highres: '1080p', hd720: '720p', large: '480p', medium: '360p', default: 'Auto' };
+    document.getElementById('currentQuality').textContent = labels[quality] || 'Auto';
+    document.getElementById('settingsPopup').classList.remove('show');
   }
 
-  // Listen for clicks outside the settings menu to close it
-  document.addEventListener('click', function(e) {
-    if(!e.target.closest('.settings-menu-container')) {
+  // Close settings on outside click
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.settings-menu-container')) {
       const popup = document.getElementById('settingsPopup');
-      if(popup && popup.classList.contains('show')) popup.classList.remove('show');
+      if (popup) popup.classList.remove('show');
     }
   });
-
-  // ── MISC FORMATTING ──────────────────────────────────────────────────
-  function formatTime(seconds) {
-    if (isNaN(seconds) || seconds < 0) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
-  }
 
   // ── TAB SWITCHING ──────────────────────────────────────────────────────
   const TABS = ['module','assignment','resources','leaderboard','announcements'];
@@ -1499,17 +1437,17 @@
     TABS.forEach(t => {
       const panel = document.getElementById(`panel${capitalize(t)}`);
       if (panel) panel.classList.toggle('active', t === name);
-      const btn = document.getElementById(`tab${capitalize(t)}`);
-      if (btn) btn.classList.toggle('active', t === name);
-      const side = document.getElementById(`sideNav${capitalize(t)}`);
-      if (side) side.classList.toggle('active', t === name);
+      const btn   = document.getElementById(`tab${capitalize(t)}`);
+      if (btn)   btn.classList.toggle('active', t === name);
+      const side  = document.getElementById(`sideNav${capitalize(t)}`);
+      if (side)  side.classList.toggle('active', t === name);
     });
     document.getElementById('userMenu').classList.remove('show');
   }
 
   function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
-  // ── OTHER TABS RENDER ──────────────────────────────────────────────────
+  // ── OTHER TABS ─────────────────────────────────────────────────────────
   function renderAssignments(count, content, curriculum) {
     const container = document.getElementById('assignmentsList');
     const tasks = [];
@@ -1580,8 +1518,12 @@
     }
     container.innerHTML = announcements.map((a, i) => `
       <div class="announcement-card" style="animation-delay:${i*.08}s">
-        <div class="announcement-card-header"><div class="announcement-title">${escapeHtml(a.title)}</div><div class="announcement-date">${a.date}</div></div>
-        <div class="announcement-body">${escapeHtml(a.body)}</div><span class="announcement-tag tag-${a.tag}">${a.tag === 'info' ? 'Info' : 'Update'}</span>
+        <div class="announcement-card-header">
+          <div class="announcement-title">${escapeHtml(a.title)}</div>
+          <div class="announcement-date">${a.date}</div>
+        </div>
+        <div class="announcement-body">${escapeHtml(a.body)}</div>
+        <span class="announcement-tag tag-${a.tag}">${a.tag === 'info' ? 'Info' : 'Update'}</span>
       </div>`).join('');
   }
 
@@ -1591,33 +1533,47 @@
     d.textContent = text;
     return d.innerHTML;
   }
+  function formatTime(seconds) {
+    if (isNaN(seconds) || seconds < 0) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  }
   function formatDate(iso) {
     try { return new Date(iso).toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }); } catch(e) { return ''; }
   }
   function showError(msg) {
     document.getElementById('pageLoader').innerHTML = `<div style="text-align:center;padding:60px 20px;"><div style="font-size:2.5rem;margin-bottom:12px;">⚠️</div><h3 style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;margin-bottom:6px;">${msg}</h3><a href="my-courses.html" style="color:var(--accent);font-size:.9rem;text-decoration:none;">← Back to My Courses</a></div>`;
   }
-  function toggleDropdown(e) { e.stopPropagation(); document.getElementById('userMenu').classList.toggle('show'); }
-  document.addEventListener('click', e => { if (!e.target.closest('.avatar-wrapper')) document.getElementById('userMenu').classList.remove('show'); });
-  async function logoutUser() { try { await fetch('/api/auth/logout', { method:'POST', credentials:'include' }); } catch(e){} window.location.href = 'login.html'; }
+  function toggleDropdown(e) {
+    e.stopPropagation();
+    document.getElementById('userMenu').classList.toggle('show');
+  }
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.avatar-wrapper')) document.getElementById('userMenu').classList.remove('show');
+  });
+  async function logoutUser() {
+    try { await fetch('/api/auth/logout', { method:'POST', credentials:'include' }); } catch(e){}
+    window.location.href = 'login.html';
+  }
 
-  // Expose to window for inline onclicks
-  window.toggleDropdown = toggleDropdown;
-  window.logoutUser     = logoutUser;
-  window.switchTab      = switchTab;
-  window.toggleAccordion = toggleAccordion;
-  window.loadLecture    = loadLecture;
-  window.navigateLecture= navigateLecture;
+  // Expose to window for inline handlers
+  window.toggleDropdown    = toggleDropdown;
+  window.logoutUser        = logoutUser;
+  window.switchTab         = switchTab;
+  window.toggleAccordion   = toggleAccordion;
+  window.loadLecture       = loadLecture;
+  window.navigateLecture   = navigateLecture;
   window.toggleMainPlayPause = toggleMainPlayPause;
-  window.toggleMainMute = toggleMainMute;
-  window.setMainVolume  = setMainVolume;
-  window.onTimelineDrag = onTimelineDrag;
-  window.onTimelineDrop = onTimelineDrop;
+  window.toggleMainMute    = toggleMainMute;
+  window.setMainVolume     = setMainVolume;
+  window.onTimelineDrag    = onTimelineDrag;
+  window.onTimelineDrop    = onTimelineDrop;
   window.toggleMainFullscreen = toggleMainFullscreen;
   window.toggleMainCaptions = toggleMainCaptions;
   window.toggleSettingsMenu = toggleSettingsMenu;
   window.setMainPlaybackRate = setMainPlaybackRate;
-  window.setMainQuality = setMainQuality;
+  window.setMainQuality    = setMainQuality;
 
   document.addEventListener('DOMContentLoaded', initApp);
 </script>
