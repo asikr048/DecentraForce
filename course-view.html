@@ -496,23 +496,26 @@
     cursor: pointer;
   }
 
-  /* --- NEW: BIG PLAY BUTTON TO FIX "BLACK SCREEN/STUCK" --- */
+  /* --- FIXED: TRANSPARENT ONE-TIME BIG PLAY BUTTON --- */
   .big-play-overlay {
     position: absolute; top: 0; left: 0; width: 100%; height: calc(100% - 70px);
     display: flex; justify-content: center; align-items: center;
     z-index: 6; pointer-events: none; /* Let shield handle the actual click */
   }
+  
   .big-play-btn {
-    width: 76px; height: 76px; border-radius: 50%;
-    background: rgba(0, 229, 255, 0.85); color: #000;
-    display: grid; place-items: center; font-size: 2.2rem;
-    padding-left: 6px; /* optic center alignment for play triangle */
-    box-shadow: 0 0 30px rgba(0, 229, 255, 0.4);
+    width: 60px; height: 60px; border-radius: 50%;
+    background: transparent; color: var(--accent);
+    border: 2px solid var(--accent);
+    display: grid; place-items: center; font-size: 1.8rem;
+    padding-left: 4px; /* optic center alignment for play triangle */
+    box-shadow: none; /* Removed background and shadow */
     opacity: 1; transition: opacity 0.3s ease, transform 0.3s ease;
   }
-  /* When video is playing, hide the big button */
-  .is-playing .big-play-btn {
-    opacity: 0; transform: scale(1.3);
+  
+  /* Hide when playing OR after it has started once (so it doesn't overlap on pause) */
+  .is-playing .big-play-btn, .has-started .big-play-btn {
+    opacity: 0; transform: scale(1.2); visibility: hidden;
   }
 
   .youtube-overlay {
@@ -615,7 +618,7 @@
   }
   
   /* REDUCED WIDTH TO FIX CC BUTTON OVERLAP */
-  .volume-slider-container { display: flex; align-items: center; gap: 8px; width: 50px; }
+  .volume-slider-container { display: flex; align-items: center; gap: 4px; width: 35px; }
   
   .control-btn.fullscreen { margin-left: auto; }
 
@@ -1258,8 +1261,9 @@
     document.getElementById('sideModPct').textContent = `${pct}%`;
     document.getElementById('sideModFill').style.width = `${pct}%`;
 
-    // Make sure we show the play button state before loading
+    // Reset visibility states so the big button shows up again for the NEW video
     document.getElementById('yt-container').classList.remove('is-playing');
+    document.getElementById('yt-container').classList.remove('has-started');
 
     // Load Video
     initOrUpdatePlayer(lec.url);
@@ -1285,7 +1289,7 @@
 
     if (mainPlayer) {
       // Load the video. Browsers often block autoplay on dynamic loads without interaction,
-      // which is why the 'is-playing' class and Big Play Button are essential.
+      // which is why the big play button resets and waits for user click.
       mainPlayer.loadVideoById(videoId);
       resetCustomUI();
     } else {
@@ -1320,13 +1324,19 @@
 
     if (event.data === YT.PlayerState.PLAYING) {
       btnPlayPause.textContent = '⏸';
-      ytContainer.classList.add('is-playing'); // Hides big play button
+      
+      // Hides the big play button permanently for THIS video
+      ytContainer.classList.add('is-playing'); 
+      ytContainer.classList.add('has-started'); 
+
       startUIInterval();
       // Ensure duration is grabbed accurately
       document.getElementById('timeDuration').textContent = formatTime(mainPlayer.getDuration());
     } else {
       btnPlayPause.textContent = '▶';
-      ytContainer.classList.remove('is-playing'); // Shows big play button
+      ytContainer.classList.remove('is-playing'); 
+      // Notice: 'has-started' is NOT removed here. 
+      // This means the big play button stays hidden when you pause.
     }
     
     // Catch duration on metadata load even if paused
