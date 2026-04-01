@@ -178,6 +178,10 @@
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
         Courses
       </button>
+      <button onclick="showTab('roles')" class="tab-btn" data-tab="roles" data-role-hide="task_manager">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+        Roles
+      </button>
       <button onclick="showTab('users')" class="tab-btn" data-tab="users">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/></svg>
         Users
@@ -224,8 +228,11 @@
     <div class="px-5 py-4 border-t border-[rgba(0,229,255,0.07)] flex-shrink-0">
       <div class="flex items-center justify-between">
         <div class="flex items-center gap-2.5 min-w-0">
-          <div class="w-7 h-7 rounded-full bg-gradient-to-br from-accent2 to-accent flex items-center justify-center text-white font-black text-xs flex-shrink-0">A</div>
-          <span class="text-xs font-medium text-[#5a7095] truncate" id="adminEmailDisplay">admin</span>
+          <div id="adminAvatarLetter" class="w-7 h-7 rounded-full bg-gradient-to-br from-accent2 to-accent flex items-center justify-center text-white font-black text-xs flex-shrink-0">A</div>
+          <div class="min-w-0">
+            <span class="text-xs font-medium text-[#5a7095] truncate block" id="adminEmailDisplay">admin</span>
+            <span class="text-[10px] font-bold" id="adminRoleBadge" style="color:#ff6b6b;">Admin</span>
+          </div>
         </div>
         <button onclick="logout()" title="Logout" class="text-[#3d5070] hover:text-accent3 transition-colors ml-2 flex-shrink-0">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
@@ -308,7 +315,7 @@
         <div class="card overflow-hidden">
           <table class="data-table">
             <thead><tr>
-              <th>User</th><th>Email</th><th>Joined</th><th>Status</th><th>Courses</th><th>Actions</th>
+              <th>User</th><th>Email</th><th>Joined</th><th>Status</th><th>Role</th><th>Courses</th><th>Actions</th>
             </tr></thead>
             <tbody id="usersTableBody"></tbody>
           </table>
@@ -323,7 +330,7 @@
             <h1 class="page-title">Manage Courses</h1>
             <p class="page-subtitle">Create, edit and publish your courses</p>
           </div>
-          <button onclick="openAddCourse()" class="btn-primary px-5 py-2.5 rounded-lg text-sm flex items-center gap-2">
+          <button onclick="openAddCourse()" class="btn-primary px-5 py-2.5 rounded-lg text-sm flex items-center gap-2" data-role-hide="task_manager">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
             Add Course
           </button>
@@ -978,6 +985,81 @@
       </div>
 
       <!-- ═══ PROFILE / SETTINGS ═══ -->
+      <!-- ═══ ROLES ═══ -->
+      <div id="tab-roles" class="hidden">
+        <div class="flex items-center justify-between mb-7">
+          <div>
+            <h1 class="page-title">Role Management</h1>
+            <p class="page-subtitle">Assign Manager or Task Manager roles to users</p>
+          </div>
+        </div>
+
+        <!-- Permission summary cards -->
+        <div class="grid grid-cols-3 gap-4 mb-7">
+          <div class="card p-4" style="border-color:rgba(255,107,107,0.2);">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-black px-2 py-0.5 rounded" style="background:rgba(255,107,107,0.12);color:#ff6b6b;">Admin</span>
+            </div>
+            <ul class="text-xs text-[#5a7095] space-y-1">
+              <li>✓ All permissions</li>
+              <li>✓ Add / delete courses</li>
+              <li>✓ Assign any role</li>
+              <li>✓ Remove any role</li>
+            </ul>
+          </div>
+          <div class="card p-4" style="border-color:rgba(0,229,255,0.2);">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-black px-2 py-0.5 rounded" style="background:rgba(0,229,255,0.1);color:#00e5ff;">Manager</span>
+            </div>
+            <ul class="text-xs text-[#5a7095] space-y-1">
+              <li>✓ All permissions</li>
+              <li>✓ Add / delete courses</li>
+              <li>✓ Assign Task Manager</li>
+              <li>✗ Cannot assign/remove Manager</li>
+            </ul>
+          </div>
+          <div class="card p-4" style="border-color:rgba(167,139,250,0.2);">
+            <div class="flex items-center gap-2 mb-2">
+              <span class="text-xs font-black px-2 py-0.5 rounded" style="background:rgba(167,139,250,0.1);color:#a78bfa;">Task Manager</span>
+            </div>
+            <ul class="text-xs text-[#5a7095] space-y-1">
+              <li>✓ Most permissions</li>
+              <li>✗ Cannot add/delete courses</li>
+              <li>✗ Cannot assign any role</li>
+              <li>✗ Cannot remove any role</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Staff members table -->
+        <div class="card overflow-hidden mb-6">
+          <div class="px-5 py-3 border-b border-[rgba(0,229,255,0.07)]">
+            <h2 class="text-sm font-black text-white" style="font-family:'Syne',sans-serif;">Current Staff Members</h2>
+          </div>
+          <table class="data-table">
+            <thead><tr>
+              <th>User</th><th>Email</th><th>Current Role</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="rolesStaffTableBody"></tbody>
+          </table>
+          <div id="rolesStaffEmpty" class="hidden text-center py-10 text-[#3d5070] text-sm">No staff members yet.</div>
+        </div>
+
+        <!-- All users for promotion -->
+        <div class="card overflow-hidden">
+          <div class="px-5 py-3 border-b border-[rgba(0,229,255,0.07)] flex items-center justify-between">
+            <h2 class="text-sm font-black text-white" style="font-family:'Syne',sans-serif;">All Users</h2>
+            <input type="text" id="rolesUserSearch" placeholder="Search…" class="admin-input text-xs py-1.5 px-3 w-48" oninput="renderRolesTab()">
+          </div>
+          <table class="data-table">
+            <thead><tr>
+              <th>User</th><th>Email</th><th>Role</th><th>Actions</th>
+            </tr></thead>
+            <tbody id="rolesAllTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
       <div id="tab-profile" class="hidden">
         <div class="mb-7">
           <h1 class="page-title">Admin Settings</h1>
@@ -1054,6 +1136,22 @@
 <!-- Toast -->
 <div class="toast" id="toast"></div>
 
+<!-- ═══ ROLE MODAL ═══ -->
+<div class="modal-overlay" id="roleModal">
+  <div class="bg-surface rounded-xl shadow-2xl p-7 border border-[rgba(167,139,250,0.15)] w-full max-w-sm mx-4 relative">
+    <div class="flex items-center justify-between mb-5">
+      <h3 class="text-base font-black text-white" style="font-family:'Syne',sans-serif;">Set User Role</h3>
+      <button onclick="closeRoleModal()" class="text-[#4a6080] hover:text-white transition-colors">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+    <p class="text-xs text-[#4a6080] mb-1">Setting role for:</p>
+    <p class="font-bold text-[#a78bfa] mb-6 text-sm" id="roleModalUser"></p>
+    <div class="space-y-2.5 mb-6" id="roleOptionsList"></div>
+    <button onclick="saveRole()" class="w-full py-3 rounded-lg font-bold text-sm text-white transition-colors" style="background:rgba(167,139,250,0.2);border:1px solid rgba(167,139,250,0.4);" onmouseover="this.style.background='rgba(167,139,250,0.35)'" onmouseout="this.style.background='rgba(167,139,250,0.2)'">Save Role</button>
+  </div>
+</div>
+
 <!-- ════ JAVASCRIPT ════ -->
 <script>
 /* ─── STATE ─── */
@@ -1063,6 +1161,7 @@ let grantTargetUser = null;
 let pendingEmailCode = null;
 let pendingNewEmail  = null;
 let adminEmail = '';
+let currentUserRole = 'admin'; // 'admin' | 'manager' | 'task_manager'
 
 /* ─── INIT ─── */
 document.addEventListener('DOMContentLoaded', async () => {
@@ -1079,15 +1178,43 @@ async function checkAdminAuth() {
   try {
     const res  = await fetch('/api/auth/verify', { credentials: 'include' });
     const data = await res.json();
-    if (!data.success || !data.loggedIn || !data.user?.isAdmin) {
-      window.location.href = 'login.html'; return false;
-    }
-    adminEmail = data.user.email;
+    const u = data.user;
+    const isStaff = data.success && data.loggedIn && (u?.isAdmin || u?.role === 'manager' || u?.role === 'task_manager');
+    if (!isStaff) { window.location.href = 'login.html'; return false; }
+
+    adminEmail = u.email;
+    currentUserRole = u.isAdmin ? 'admin' : (u.role || 'user');
+
     document.getElementById('adminEmailDisplay').textContent = adminEmail;
     document.getElementById('currentEmailDisplay').textContent = adminEmail;
+
+    // Update sidebar role badge
+    const roleLabel = currentUserRole === 'admin' ? 'Admin' : currentUserRole === 'manager' ? 'Manager' : 'Task Manager';
+    const roleColor = currentUserRole === 'admin' ? '#ff6b6b' : currentUserRole === 'manager' ? '#00e5ff' : '#a78bfa';
+    document.getElementById('adminRoleBadge').textContent = roleLabel;
+    document.getElementById('adminRoleBadge').style.color = roleColor;
+    document.getElementById('adminAvatarLetter').textContent = roleLabel[0];
+
+    // Apply role-based restrictions
+    applyRoleRestrictions();
     return true;
   } catch {
     window.location.href = 'login.html'; return false;
+  }
+}
+
+function applyRoleRestrictions() {
+  // task_manager: hide add-course tab button, hide "Roles" admin section
+  if (currentUserRole === 'task_manager') {
+    document.querySelectorAll('[data-role-hide="task_manager"]').forEach(el => el.style.display = 'none');
+  }
+  // non-admin: hide admin-only elements (role management)
+  if (currentUserRole !== 'admin') {
+    document.querySelectorAll('[data-role-hide="non-admin"]').forEach(el => el.style.display = 'none');
+  }
+  // manager: hide admin-only elements but keep task_manager management visible
+  if (currentUserRole === 'manager') {
+    document.querySelectorAll('[data-role-hide="non-manager"]').forEach(el => el.style.display = 'none');
   }
 }
 
@@ -1097,12 +1224,12 @@ async function logout() {
 }
 
 /* ─── TAB NAVIGATION ─── */
-const ALL_TABS = ['overview','users','courses','add-course','coupons','purchases','feedback','mentors','footer','section-order','profile','assignments'];
+const ALL_TABS = ['overview','users','courses','add-course','coupons','purchases','feedback','mentors','footer','section-order','profile','assignments','roles'];
 const BREADCRUMBS = {
   'overview': 'Dashboard', 'users': 'Users', 'courses': 'Courses',
   'add-course': 'Courses → Add Course', 'coupons': 'Coupons', 'purchases': 'Purchases',
   'feedback': 'Feedback', 'mentors': 'Mentors', 'footer': 'Footer',
-  'section-order': 'Section Order', 'profile': 'Settings', 'assignments': 'Assignments'
+  'section-order': 'Section Order', 'profile': 'Settings', 'assignments': 'Assignments', 'roles': 'Role Management'
 };
 
 function showTab(name) {
@@ -1121,6 +1248,7 @@ function showTab(name) {
   if (name === 'coupons') { renderCouponsList(); populateCouponCourseDropdown(); }
   if (name === 'assignments') { renderAssignmentsList(); populateAssignmentCourseDropdown(); }
   if (name === 'footer') loadFooterSettings();
+  if (name === 'roles') renderRolesTab();
 }
 
 /* ─── DATA LOADING ─── */
@@ -1195,6 +1323,13 @@ function renderOverview() {
 }
 
 /* ─── USERS ─── */
+function getRoleBadge(u) {
+  if (u.is_admin) return '<span class="badge" style="background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.3);">Admin</span>';
+  if (u.role === 'manager') return '<span class="badge" style="background:rgba(0,229,255,0.1);color:#00e5ff;border:1px solid rgba(0,229,255,0.3);">Manager</span>';
+  if (u.role === 'task_manager') return '<span class="badge" style="background:rgba(167,139,250,0.1);color:#a78bfa;border:1px solid rgba(167,139,250,0.3);">Task Manager</span>';
+  return '<span class="badge badge-gray">User</span>';
+}
+
 function renderUsersTable(list = allUsers) {
   const tbody = document.getElementById('usersTableBody');
   const empty = document.getElementById('usersEmpty');
@@ -1206,9 +1341,23 @@ function renderUsersTable(list = allUsers) {
       <td class="text-[#4a6080]">${esc(u.email)}</td>
       <td class="text-[#4a6080]">${fmtDate(u.created_at)}</td>
       <td>${u.verified ? '<span class="badge badge-green">Verified</span>' : '<span class="badge badge-gray">Unverified</span>'}</td>
+      <td>${getRoleBadge(u)}</td>
       <td>${(u.courses||[]).map(c=>`<span class="badge badge-blue mr-1">${esc(c.title)}</span>`).join('')||'<span class="text-[#3d5070] text-xs">None</span>'}</td>
-      <td><button onclick='openGrantModal(${JSON.stringify(u)})' class="border border-[rgba(0,229,255,0.2)] text-accent px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[rgba(0,229,255,0.08)] transition-colors">MANAGE</button></td>
+      <td class="flex gap-1.5 flex-wrap">
+        <button onclick='openGrantModal(${JSON.stringify(u)})' class="border border-[rgba(0,229,255,0.2)] text-accent px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[rgba(0,229,255,0.08)] transition-colors">MANAGE</button>
+        ${canSetRole(u) ? `<button onclick='openRoleModal(${JSON.stringify(u)})' class="border border-[rgba(167,139,250,0.3)] text-[#a78bfa] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[rgba(167,139,250,0.08)] transition-colors">ROLE</button>` : ''}
+      </td>
     </tr>`).join('');
+}
+
+function canSetRole(u) {
+  if (u.is_admin) return false; // never change super admin
+  if (currentUserRole === 'admin') return true;
+  if (currentUserRole === 'manager') {
+    // manager can only set/remove task_manager; cannot touch other managers
+    return u.role !== 'manager';
+  }
+  return false; // task_manager cannot set roles
 }
 
 function filterUsers() {
@@ -1251,6 +1400,100 @@ async function saveAccess() {
   await loadUsers(); renderOverview();
 }
 
+/* ─── ROLE MANAGEMENT ─── */
+let roleTargetUser = null;
+let selectedRole   = null;
+
+function openRoleModal(user) {
+  roleTargetUser = user;
+  selectedRole   = user.role || 'user';
+  document.getElementById('roleModalUser').textContent = `${user.username} (${user.email})`;
+
+  // Build options based on current user's permissions
+  const roles = [
+    { value: 'user',         label: 'Regular User',  color: '#6a80a0', desc: 'No admin access' },
+    { value: 'task_manager', label: 'Task Manager',  color: '#a78bfa', desc: 'Can manage most things, cannot add/delete courses or assign roles' },
+  ];
+  if (currentUserRole === 'admin') {
+    roles.push({ value: 'manager', label: 'Manager', color: '#00e5ff', desc: 'Full access except assigning/removing Manager role' });
+  }
+
+  document.getElementById('roleOptionsList').innerHTML = roles.map(r => `
+    <label class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors role-option ${selectedRole===r.value?'selected-role':''}"
+           style="border-color:${selectedRole===r.value?r.color:'rgba(255,255,255,0.05)'};background:${selectedRole===r.value?'rgba(167,139,250,0.06)':'transparent'};"
+           onclick="selectRole('${r.value}')">
+      <input type="radio" name="roleChoice" value="${r.value}" ${selectedRole===r.value?'checked':''} class="mt-0.5" style="accent-color:${r.color};">
+      <div>
+        <p class="text-xs font-bold" style="color:${r.color};">${r.label}</p>
+        <p class="text-xs text-[#4a6080]">${r.desc}</p>
+      </div>
+    </label>`).join('');
+
+  document.getElementById('roleModal').classList.add('open');
+}
+
+function selectRole(val) {
+  selectedRole = val;
+  // Re-render options to update highlights
+  if (roleTargetUser) openRoleModal(roleTargetUser);
+}
+
+function closeRoleModal() {
+  document.getElementById('roleModal').classList.remove('open');
+  roleTargetUser = null; selectedRole = null;
+}
+
+async function saveRole() {
+  if (!roleTargetUser || !selectedRole) return;
+  try {
+    const res  = await fetch('/api/admin/set-role', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: roleTargetUser.id, role: selectedRole })
+    });
+    const data = await res.json();
+    if (!data.success) { showToast(data.error || 'Failed to update role', 'error'); return; }
+    showToast(data.message || 'Role updated!', 'success');
+    closeRoleModal();
+    await loadUsers();
+    renderRolesTab();
+    renderOverview();
+  } catch { showToast('Failed to update role', 'error'); }
+}
+
+function renderRolesTab() {
+  const q = (document.getElementById('rolesUserSearch')?.value || '').toLowerCase();
+  const staff = allUsers.filter(u => u.is_admin || u.role === 'manager' || u.role === 'task_manager');
+  const others = allUsers.filter(u => !u.is_admin && u.role !== 'manager' && u.role !== 'task_manager')
+    .filter(u => !q || u.username.toLowerCase().includes(q) || u.email.toLowerCase().includes(q));
+
+  // Staff table
+  const staffBody = document.getElementById('rolesStaffTableBody');
+  const staffEmpty = document.getElementById('rolesStaffEmpty');
+  if (!staff.length) { staffBody.innerHTML = ''; staffEmpty.classList.remove('hidden'); }
+  else {
+    staffEmpty.classList.add('hidden');
+    staffBody.innerHTML = staff.map(u => `
+      <tr>
+        <td class="font-semibold text-white">${esc(u.username)}</td>
+        <td class="text-[#4a6080]">${esc(u.email)}</td>
+        <td>${getRoleBadge(u)}</td>
+        <td>${canSetRole(u) ? `<button onclick='openRoleModal(${JSON.stringify(u)})' class="border border-[rgba(167,139,250,0.3)] text-[#a78bfa] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[rgba(167,139,250,0.08)] transition-colors">CHANGE ROLE</button>` : '<span class="text-[#3d5070] text-xs">—</span>'}</td>
+      </tr>`).join('');
+  }
+
+  // All users table
+  const allBody = document.getElementById('rolesAllTableBody');
+  allBody.innerHTML = others.length ? others.map(u => `
+    <tr>
+      <td class="font-semibold text-white">${esc(u.username)}</td>
+      <td class="text-[#4a6080]">${esc(u.email)}</td>
+      <td>${getRoleBadge(u)}</td>
+      <td><button onclick='openRoleModal(${JSON.stringify(u)})' class="border border-[rgba(167,139,250,0.3)] text-[#a78bfa] px-3 py-1.5 rounded-lg text-xs font-bold hover:bg-[rgba(167,139,250,0.08)] transition-colors">SET ROLE</button></td>
+    </tr>`).join('')
+    : '<tr><td colspan="4" class="text-center py-10 text-[#3d5070] text-sm">No regular users found.</td></tr>';
+}
+
 /* ─── COURSES GRID ─── */
 function renderCoursesGrid() {
   const grid  = document.getElementById('coursesGrid');
@@ -1285,8 +1528,9 @@ function renderCoursesGrid() {
           <span class="text-xs text-[#3d5070]">${esc(c.enrolled_count||0)} enrolled</span>
         </div>
         <div class="flex gap-2 flex-wrap">
-          <button onclick="openEditCourse(${c.id})" class="flex-1 bg-[#0a1228] border border-[rgba(0,229,255,0.1)] text-white py-2 rounded-lg text-xs font-bold hover:border-[rgba(0,229,255,0.3)] hover:text-accent transition-colors">EDIT</button>
-          <button onclick="deleteCourse(${c.id})" class="flex-1 bg-[rgba(255,77,141,0.06)] border border-[rgba(255,77,141,0.2)] text-accent3 py-2 rounded-lg text-xs font-bold hover:bg-[rgba(255,77,141,0.12)] transition-colors">DELETE</button>
+          ${currentUserRole !== 'task_manager' ? `<button onclick="openEditCourse(${c.id})" class="flex-1 bg-[#0a1228] border border-[rgba(0,229,255,0.1)] text-white py-2 rounded-lg text-xs font-bold hover:border-[rgba(0,229,255,0.3)] hover:text-accent transition-colors">EDIT</button>` : ''}
+          ${currentUserRole !== 'task_manager' ? `<button onclick="deleteCourse(${c.id})" class="flex-1 bg-[rgba(255,77,141,0.06)] border border-[rgba(255,77,141,0.2)] text-accent3 py-2 rounded-lg text-xs font-bold hover:bg-[rgba(255,77,141,0.12)] transition-colors">DELETE</button>` : ''}
+          ${currentUserRole === 'task_manager' ? `<span class="flex-1 text-center py-2 text-xs text-[#3d5070]">View Only</span>` : ''}
         </div>
         <div class="flex gap-2 mt-1.5">
           <button onclick="openManageExam(${c.id},'${esc(c.title)}')" class="flex-1 bg-[rgba(123,92,255,0.08)] border border-[rgba(123,92,255,0.25)] text-[#a98fff] py-2 rounded-lg text-xs font-bold hover:bg-[rgba(123,92,255,0.16)] transition-colors">🎯 EXAM</button>
@@ -1334,6 +1578,7 @@ function addLectureUI(container, title='', url='', duration='') {
 
 /* ─── ADD / EDIT COURSE ─── */
 function openAddCourse() {
+  if(currentUserRole==='task_manager'){showToast('Task Managers cannot add courses','error');return;}
   ['courseId','courseTitle','courseDesc','courseCategory','courseLectures','courseExercises','courseAssignments','coursePrice','courseDiscountPrice','courseWhatsapp','courseThumbnail','courseVideo','courseContent'].forEach(id => { document.getElementById(id).value=''; });
   document.getElementById('courseActive').checked = true;
   document.getElementById('imagePreviewContainer').classList.add('hidden');
@@ -1345,6 +1590,7 @@ function openAddCourse() {
 }
 
 function openEditCourse(id) {
+  if(currentUserRole==='task_manager'){showToast('Task Managers cannot edit courses','error');return;}
   const c = allCourses.find(x=>x.id===id); if(!c) return;
   document.getElementById('courseFormTitle').textContent='Edit Course';
   document.getElementById('courseId').value         = c.id;
@@ -1437,6 +1683,7 @@ async function saveCourse() {
 }
 
 async function deleteCourse(id) {
+  if(currentUserRole === 'task_manager') { showToast('Task Managers cannot delete courses','error'); return; }
   if(!confirm('Delete this course? Enrolled users will lose access.')) return;
   const res  = await fetch('/api/admin/courses',{method:'DELETE',credentials:'include',headers:{'Content-Type':'application/json'},body:JSON.stringify({id})});
   const data = await res.json();

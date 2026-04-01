@@ -18,15 +18,44 @@ function setCors(res) {
     'X-CSRF-Token,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Content-Type,Date,X-Api-Version');
 }
 
-// ─── Admin session check ──────────────────────────────────────────────────────
+// ─── Role-based session checks ────────────────────────────────────────────────
+// requireAdmin      → only is_admin=TRUE (super admin)
+// requireManagerOrAbove → is_admin OR role='manager'
+// requireStaff      → is_admin OR role IN ('manager','task_manager')
+
 async function requireAdmin(req, res) {
   const token = req.cookies?.session_token;
   if (!token) { res.status(401).json({ success: false, error: 'Unauthorized' }); return null; }
   const r = await query(
-    `SELECT id, email, password_hash FROM users WHERE session_token=$1 AND session_expires>NOW() AND is_admin=TRUE`,
+    `SELECT id, email, password_hash, role FROM users WHERE session_token=$1 AND session_expires>NOW() AND is_admin=TRUE`,
     [token]
   );
   if (!r.rows.length) { res.status(403).json({ success: false, error: 'Forbidden' }); return null; }
+  return r.rows[0];
+}
+
+async function requireManagerOrAbove(req, res) {
+  const token = req.cookies?.session_token;
+  if (!token) { res.status(401).json({ success: false, error: 'Unauthorized' }); return null; }
+  try { await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'user'`); } catch {}
+  const r = await query(
+    `SELECT id, email, password_hash, role, is_admin FROM users WHERE session_token=$1 AND session_expires>NOW() AND (is_admin=TRUE OR role='manager')`,
+    [token]
+  );
+  if (!r.rows.length) { res.status(403).json({ success: false, error: 'Forbidden: Manager or Admin required' }); return null; }
+  return r.rows[0];
+}
+
+async function requireStaff(req, res) {
+  const token = req.cookies?.session_token;
+  if (!token) { res.status(401).json({ success: false, error: 'Unauthorized' }); return null; }
+  // Self-heal: ensure role column exists
+  try { await query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'user'`); } catch {}
+  const r = await query(
+    `SELECT id, email, password_hash, role, is_admin FROM users WHERE session_token=$1 AND session_expires>NOW() AND (is_admin=TRUE OR role IN ('manager','task_manager'))`,
+    [token]
+  );
+  if (!r.rows.length) { res.status(403).json({ success: false, error: 'Forbidden: Staff access required' }); return null; }
   return r.rows[0];
 }
 
@@ -145,7 +174,7 @@ async function userPurchases(req, res) {
 
 // ── ADMIN: GET/PUT /api/admin/purchases ─────────────────────────────
 async function adminPurchases(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
 
   // Ensure purchases table exists (self-healing — no need to visit /api/admin/init first)
   await query(`CREATE TABLE IF NOT EXISTS purchases (
@@ -229,7 +258,7 @@ async function authLogin(req, res) {
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return res.status(400).json({ success: false, error: 'Invalid email format' });
 
   const r = await query(
-    'SELECT id,username,email,created_at,verified,password_hash,is_admin FROM users WHERE email=$1',
+    'SELECT id,username,email,created_at,verified,password_hash,is_admin,role FROM users WHERE email=$1',
     [email.toLowerCase().trim()]
   );
   if (!r.rows.length) return res.status(400).json({ success: false, error: 'Invalid email or password' });
@@ -242,11 +271,12 @@ async function authLogin(req, res) {
   const sessionExpires = new Date(Date.now() + 30*24*60*60*1000);
   await query('UPDATE users SET session_token=$1,session_expires=$2 WHERE id=$3', [sessionToken, sessionExpires, user.id]);
 
+  const isStaff = user.is_admin === true || user.role === 'manager' || user.role === 'task_manager';
   res.setHeader('Set-Cookie', `session_token=${sessionToken}; HttpOnly; Path=/; Max-Age=${30*24*60*60}; SameSite=Strict`);
   return res.status(200).json({
     success: true, message: 'Login successful',
-    user: { id: user.id, username: user.username, email: user.email, createdAt: user.created_at, verified: user.verified, isAdmin: user.is_admin === true },
-    redirectUrl: user.is_admin ? '/admin.html' : '/index.html'
+    user: { id: user.id, username: user.username, email: user.email, createdAt: user.created_at, verified: user.verified, isAdmin: user.is_admin === true, role: user.role || 'user' },
+    redirectUrl: isStaff ? '/admin.html' : '/index.html'
   });
 }
 
@@ -266,14 +296,14 @@ async function authVerify(req, res) {
   if (!match) return res.status(401).json({ success: false, error: 'No session', loggedIn: false });
 
   const r = await query(
-    `SELECT id,username,email,created_at,verified,is_admin FROM users WHERE session_token=$1 AND session_expires>NOW()`,
+    `SELECT id,username,email,created_at,verified,is_admin,role FROM users WHERE session_token=$1 AND session_expires>NOW()`,
     [match[1]]
   );
   if (!r.rows.length) return res.status(401).json({ success: false, error: 'Invalid or expired session', loggedIn: false });
   const u = r.rows[0];
   return res.status(200).json({
     success: true, loggedIn: true,
-    user: { id: u.id, username: u.username, email: u.email, createdAt: u.created_at, verified: u.verified, isAdmin: u.is_admin === true }
+    user: { id: u.id, username: u.username, email: u.email, createdAt: u.created_at, verified: u.verified, isAdmin: u.is_admin === true, role: u.role || 'user' }
   });
 }
 
@@ -388,6 +418,7 @@ async function adminInit(req, res) {
   if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
   const pool = await getPool();
   await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS is_admin BOOLEAN DEFAULT FALSE`);
+  await pool.query(`ALTER TABLE users ADD COLUMN IF NOT EXISTS role VARCHAR(20) DEFAULT 'user'`);
   await pool.query(`CREATE TABLE IF NOT EXISTS courses (
     id SERIAL PRIMARY KEY, title VARCHAR(255) NOT NULL, description TEXT DEFAULT '',
     thumbnail_url TEXT DEFAULT '', video_url TEXT DEFAULT '', price NUMERIC DEFAULT 0,
@@ -430,7 +461,16 @@ async function adminInit(req, res) {
 
 // ── ADMIN: GET/POST/PUT/DELETE /api/admin/courses ─────────────────────────────
 async function adminCourses(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  // GET allowed for all staff; write operations (POST/PUT/DELETE) require manager or admin
+  if (req.method === 'GET') {
+    const staff = await requireStaff(req, res); if (!staff) return;
+  } else {
+    const mgr = await requireManagerOrAbove(req, res); if (!mgr) return;
+  }
+  // Re-fetch actor for downstream use (id, etc.)
+  const token = req.cookies?.session_token;
+  const actorR = await query(`SELECT id,email,password_hash,role,is_admin FROM users WHERE session_token=$1 AND session_expires>NOW()`, [token]);
+  const admin = actorR.rows[0];
 
   // Ensure purchases table exists
   await query(`CREATE TABLE IF NOT EXISTS purchases (
@@ -487,10 +527,10 @@ async function adminCourses(req, res) {
 
 // ── ADMIN: GET /api/admin/users ───────────────────────────────────────────────
 async function adminUsers(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const staff = await requireStaff(req, res); if (!staff) return;
   if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
   const r = await query(`
-    SELECT u.id,u.username,u.email,u.created_at,u.verified,
+    SELECT u.id,u.username,u.email,u.created_at,u.verified,u.is_admin,u.role,
       COALESCE(json_agg(json_build_object('course_id',uc.course_id,'title',c.title,'granted_at',uc.granted_at))
         FILTER (WHERE uc.course_id IS NOT NULL),'[]') AS courses
     FROM users u
@@ -502,7 +542,7 @@ async function adminUsers(req, res) {
 
 // ── ADMIN: POST/DELETE /api/admin/grant-access ────────────────────────────────
 async function adminGrantAccess(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
   const { user_id, course_id } = req.body||{};
   if (!user_id || !course_id) return res.status(400).json({ success: false, error: 'user_id and course_id required' });
   if (req.method === 'POST') {
@@ -552,6 +592,41 @@ async function userUpdateProfile(req, res) {
 
   return res.status(400).json({ success: false, error: 'Invalid update type' });
 }
+
+// ── ADMIN: POST /api/admin/set-role ──────────────────────────────────────────
+// Admin can set/remove 'manager' or 'task_manager'.
+// Manager can only set/remove 'task_manager' (cannot touch 'manager' roles).
+async function adminSetRole(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const staff = await requireStaff(req, res); if (!staff) return;
+
+  const { user_id, role } = req.body || {};
+  if (!user_id) return res.status(400).json({ success: false, error: 'user_id required' });
+
+  // Valid role values: 'manager', 'task_manager', or 'user' (to remove role)
+  const validRoles = ['manager', 'task_manager', 'user'];
+  if (!validRoles.includes(role)) return res.status(400).json({ success: false, error: 'Invalid role. Use: manager, task_manager, or user' });
+
+  // Fetch the target user
+  const targetR = await query('SELECT id, username, email, is_admin, role FROM users WHERE id=$1', [user_id]);
+  if (!targetR.rows.length) return res.status(404).json({ success: false, error: 'User not found' });
+  const target = targetR.rows[0];
+
+  // Cannot modify super-admin
+  if (target.is_admin) return res.status(403).json({ success: false, error: 'Cannot change the super admin role' });
+
+  // Cannot modify yourself
+  if (target.id === staff.id) return res.status(403).json({ success: false, error: 'Cannot change your own role' });
+
+  // Manager restriction: cannot set or remove 'manager' role — only admin can
+  if (!staff.is_admin && (role === 'manager' || target.role === 'manager')) {
+    return res.status(403).json({ success: false, error: 'Only the super admin can assign or remove the Manager role' });
+  }
+
+  await query("UPDATE users SET role=$1 WHERE id=$2", [role, user_id]);
+  return res.status(200).json({ success: true, message: `Role updated to '${role}' for ${target.username}` });
+}
+
 
 // ── ADMIN: POST /api/admin/update-profile ─────────────────────────────────────
 async function adminUpdateProfile(req, res) {
@@ -608,7 +683,7 @@ async function publicTestimonials(req, res) {
 // ADMIN: MENTORS
 // ═══════════════════════════════════════════════════════════════════════════════
 async function adminMentors(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
   try {
     if (req.method === 'GET') {
       const result = await query(`SELECT * FROM mentors ORDER BY sort_order ASC, id ASC`);
@@ -657,7 +732,7 @@ async function adminMentors(req, res) {
 // ADMIN: TESTIMONIALS
 // ═══════════════════════════════════════════════════════════════════════════════
 async function adminTestimonials(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
   try {
     if (req.method === 'GET') {
       const result = await query(`SELECT * FROM testimonials ORDER BY sort_order ASC, id ASC`);
@@ -706,7 +781,7 @@ async function adminTestimonials(req, res) {
 // ADMIN: EXAMS  (MCQ or link-based, per course)
 // ═══════════════════════════════════════════════════════════════════════════════
 async function adminExams(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
 
   // Ensure tables exist
   await query(`CREATE TABLE IF NOT EXISTS exams (
@@ -860,7 +935,7 @@ async function submitExam(req, res) {
 // ADMIN: MARKS — assign assignment marks to users
 // ═══════════════════════════════════════════════════════════════════════════════
 async function adminMarks(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
 
   await query(`CREATE TABLE IF NOT EXISTS user_marks (
     id SERIAL PRIMARY KEY,
@@ -892,7 +967,7 @@ async function adminMarks(req, res) {
     );
     // Get ALL users so admin can assign marks to anyone
     const allUsers = await query(
-      `SELECT u.id, u.username, u.email FROM users u WHERE u.is_admin=FALSE ORDER BY u.username`
+      `SELECT u.id, u.username, u.email FROM users u WHERE u.is_admin=FALSE AND (u.role IS NULL OR u.role='user') ORDER BY u.username`
     );
     return res.status(200).json({ success: true, marks: r.rows, enrolled_users: allUsers.rows });
   }
@@ -944,7 +1019,7 @@ async function userMarks(req, res) {
 // ADMIN: DB-BACKED ASSIGNMENTS (stored in course modules JSON)
 // ═══════════════════════════════════════════════════════════════════════════════
 async function adminAssignmentsCrud(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
 
   if (req.method === 'POST') {
     const { course_id, title, description, due_date, max_marks } = req.body || {};
@@ -980,7 +1055,7 @@ async function adminAssignmentsCrud(req, res) {
 // ADMIN: GIVE POINTS to any user (bonus points, not tied to an assignment)
 // ═══════════════════════════════════════════════════════════════════════════════
 async function adminPoints(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
 
   await query(`CREATE TABLE IF NOT EXISTS user_marks (
     id SERIAL PRIMARY KEY,
@@ -1025,7 +1100,7 @@ async function adminPoints(req, res) {
 // ADMIN: RESOURCES (stored in course modules JSON field)
 // ═══════════════════════════════════════════════════════════════════════════════
 async function adminResources(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
 
   if (req.method === 'POST') {
     const { course_id, title, url, icon, description } = req.body || {};
@@ -1086,7 +1161,7 @@ async function publicLeaderboard(req, res) {
 // ADMIN: REORDER
 // ═══════════════════════════════════════════════════════════════════════════════
 async function adminReorder(req, res) {
-  const admin = await requireAdmin(req, res); if (!admin) return;
+  const admin = await requireStaff(req, res); if (!admin) return;
   if (req.method !== 'PUT') return res.status(405).json({ success: false, error: 'Method not allowed' });
   try {
     const { type, items } = req.body||{};
@@ -1145,6 +1220,7 @@ export default async function handler(req, res) {
     if (path.endsWith('/admin/init'))          return await adminInit(req, res);
     if (path.endsWith('/admin/courses'))       return await adminCourses(req, res);
     if (path.endsWith('/admin/users'))         return await adminUsers(req, res);
+    if (path.endsWith('/admin/set-role'))       return await adminSetRole(req, res);
     if (path.endsWith('/admin/grant-access'))  return await adminGrantAccess(req, res);
     if (path.endsWith('/user/update-profile'))  return await userUpdateProfile(req, res);
     if (path.endsWith('/admin/update-profile')) return await adminUpdateProfile(req, res);
