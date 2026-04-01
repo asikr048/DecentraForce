@@ -253,7 +253,25 @@
       </div>
     </div>
   </div>
-
+<div class="modal-overlay" id="loginPromptModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Authentication Required</h3>
+        <button class="modal-close" id="loginPromptClose">&times;</button>
+      </div>
+      <div class="modal-body" style="text-align: center; padding: 32px 24px;">
+        <div style="font-size: 3.5rem; margin-bottom: 16px;">🔒</div>
+        <h4 style="font-family:'Syne',sans-serif; font-weight:700; font-size:1.3rem; color:var(--text); margin-bottom:12px;">Login to Continue</h4>
+        <p style="color:var(--muted); font-size:0.95rem; line-height:1.6; margin-bottom:24px;">
+          You need to log in or create an account to enroll in this course, access the curriculum, and track your progress.
+        </p>
+        <div class="modal-actions" style="display: flex; gap: 12px;">
+          <button class="btn btn-ghost" id="loginPromptCancel" style="flex: 1;">Cancel</button>
+          <button class="btn" id="loginPromptRedirect" style="flex: 1; background: linear-gradient(135deg, var(--accent2), var(--accent)); color: #fff; border: none; border-radius: 10px; font-weight: 600; cursor: pointer;">Log In / Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </div>
 <script>
   let activeCourse = null;
 
@@ -366,16 +384,13 @@
       }
 
       // 5. Attach Purchase Action
+    // 5. Attach Purchase Action
       purchaseBtn.addEventListener('click', () => {
         // Check if user is logged in
         if (window.auth && !window.auth.isLoggedIn) {
-          const confirmLogin = confirm('You need to log in to purchase this course. Redirect to login page?');
-          if (confirmLogin) {
-            window.location.href = `login.html?return=${encodeURIComponent(window.location.href)}`;
-            return;
-          } else {
-            return;
-          }
+          document.getElementById('loginPromptModal').classList.add('open');
+          document.body.style.overflow = 'hidden';
+          return;
         }
         
         if (priceVal === 0) {
@@ -475,6 +490,29 @@
       btn.disabled = false;
     });
   });
+
+
+// === LOGIN PROMPT MODAL LOGIC ===
+  function closeLoginPromptModal() {
+    document.getElementById('loginPromptModal').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+
+  document.getElementById('loginPromptClose').addEventListener('click', closeLoginPromptModal);
+  document.getElementById('loginPromptCancel').addEventListener('click', closeLoginPromptModal);
+  
+  // Close if clicked outside the modal
+  document.getElementById('loginPromptModal').addEventListener('click', (e) => {
+    if (e.target.id === 'loginPromptModal') closeLoginPromptModal();
+  });
+
+  // Redirect to Login Page with Return URL
+  document.getElementById('loginPromptRedirect').addEventListener('click', () => {
+    window.location.href = `login.html?return=${encodeURIComponent(window.location.href)}`;
+  });
+
 </script>
+
+
 </body>
 </html>
