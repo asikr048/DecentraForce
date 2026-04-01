@@ -310,9 +310,8 @@ async function authForgotPassword(req, res) {
         template_id: 'template_2067o6n', 
         user_id: 'TxlilKkHJZDum1C5v',
         // If EmailJS complains about origin/security, uncomment the next line and add your Private Key:
-        // accessToken: process.env.EMAILJS_PRIVATE_KEY,
-        template_params: { to_email: email, pin, username: user.username, app_name: 'DecentraForce' } 
-      })
+        accessToken: process.env.EMAILJS_PRIVATE_KEY,
+        template_params: { to_email: email, pin, username: user.username, app_name: 'DecentraForce' }})
     });
 
     if (!emailRes.ok) {
