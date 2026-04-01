@@ -278,6 +278,7 @@ async function authVerify(req, res) {
 }
 
 // ── AUTH: POST /api/auth/forgot-password ──────────────────────────────────────
+// ── AUTH: POST /api/auth/forgot-password ──────────────────────────────────────
 async function authForgotPassword(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
   const { email } = req.body || {};
@@ -285,6 +286,8 @@ async function authForgotPassword(req, res) {
     return res.status(400).json({ success: false, error: 'Valid email required' });
 
   const r = await query('SELECT id,username,email FROM users WHERE email=$1', [email.toLowerCase().trim()]);
+  
+  // If the user doesn't exist, we still pretend it succeeded to prevent email enumeration
   if (!r.rows.length) return res.status(200).json({ success: true, message: 'If an account exists, a reset PIN was sent.' });
 
   const user = r.rows[0];
@@ -298,28 +301,33 @@ async function authForgotPassword(req, res) {
   await query('INSERT INTO password_reset_tokens (user_id,token,expires_at) VALUES ($1,$2,$3)', [user.id, pin, pinExpires]);
 
   // Send via EmailJS
- // Send via EmailJS
-try {
-  const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-    method: 'POST', 
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ 
-      service_id: 'service_wn7dn1f', 
-      template_id: 'template_2067o6n', 
-      user_id: 'TxlilKkHJZDum1C5v',
-      // If EmailJS complains about origin/security, uncomment the next line and add your Private Key:
-      // accessToken: process.env.EMAILJS_PRIVATE_KEY,
-      template_params: { to_email: email, pin, username: user.username, app_name: 'DecentraForce' } 
-    })
-  });
+  try {
+    const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+      method: 'POST', 
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        service_id: 'service_wn7dn1f', 
+        template_id: 'template_2067o6n', 
+        user_id: 'TxlilKkHJZDum1C5v',
+        // If EmailJS complains about origin/security, uncomment the next line and add your Private Key:
+        // accessToken: process.env.EMAILJS_PRIVATE_KEY,
+        template_params: { to_email: email, pin, username: user.username, app_name: 'DecentraForce' } 
+      })
+    });
 
-  if (!emailRes.ok) {
-    const errorText = await emailRes.text();
-    console.error('EmailJS Failed:', errorText); // Check your Vercel Logs for this!
+    if (!emailRes.ok) {
+      const errorText = await emailRes.text();
+      console.error('EmailJS Failed:', errorText); // Check your Vercel Logs for this!
+    }
+  } catch(e) { 
+    console.error('Network Error during EmailJS fetch:', e); 
   }
-} catch(e) { 
-  console.error('Network Error during EmailJS fetch:', e); 
-}
+
+  // ✅ FIX: Send the success response back to the frontend
+  return res.status(200).json({ success: true, message: 'Reset PIN sent successfully.' });
+} // ✅ FIX: Added the missing closing brace!
+
+// ── AUTH: POST /api/auth/reset-password ───────────────────────────────────────
 
 // ── AUTH: POST /api/auth/reset-password ───────────────────────────────────────
 async function authResetPassword(req, res) {
