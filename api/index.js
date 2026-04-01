@@ -298,15 +298,27 @@ async function authForgotPassword(req, res) {
   await query('INSERT INTO password_reset_tokens (user_id,token,expires_at) VALUES ($1,$2,$3)', [user.id, pin, pinExpires]);
 
   // Send via EmailJS
-  try {
-    await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ service_id: 'service_wn7dn1f', template_id: 'template_2067o6n', user_id: 'TxlilKkHJZDum1C5v',
-        template_params: { to_email: email, pin, username: user.username, app_name: 'DecentraForce' } })
-    });
-  } catch(e) { /* silent — still return success */ }
+ // Send via EmailJS
+try {
+  const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    method: 'POST', 
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ 
+      service_id: 'service_wn7dn1f', 
+      template_id: 'template_2067o6n', 
+      user_id: 'TxlilKkHJZDum1C5v',
+      // If EmailJS complains about origin/security, uncomment the next line and add your Private Key:
+      // accessToken: process.env.EMAILJS_PRIVATE_KEY,
+      template_params: { to_email: email, pin, username: user.username, app_name: 'DecentraForce' } 
+    })
+  });
 
-  return res.status(200).json({ success: true, message: 'If an account exists, a reset PIN was sent.' });
+  if (!emailRes.ok) {
+    const errorText = await emailRes.text();
+    console.error('EmailJS Failed:', errorText); // Check your Vercel Logs for this!
+  }
+} catch(e) { 
+  console.error('Network Error during EmailJS fetch:', e); 
 }
 
 // ── AUTH: POST /api/auth/reset-password ───────────────────────────────────────
