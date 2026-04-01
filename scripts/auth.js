@@ -1,4 +1,3 @@
-
 /**
  * Authentication utilities for DecentraForce
  * This script handles automatic login, session verification, and user state management
@@ -195,9 +194,6 @@ class AuthManager {
   /**
    * Logout current user
    */
- /**
-   * Logout current user
-   */
   async logout() {
     try {
       await fetch('/api/auth/logout', {
@@ -208,7 +204,7 @@ class AuthManager {
       this.currentUser = null;
       this.isLoggedIn = false;
       
-      // ADD THIS: Clear legacy local storage purchases so they don't leak to anonymous sessions
+      // Clear legacy local storage purchases so they don't leak to anonymous sessions
       localStorage.removeItem('purchases'); 
       
       this.updateUI();
@@ -262,6 +258,68 @@ class AuthManager {
         success: false,
         error: error.message || 'Network error'
       };
+    }
+  }
+
+  /**
+   * Request a password reset PIN (Triggers backend EmailJS)
+   */
+  async forgotPassword(email) {
+    try {
+      if (!email) {
+        return { success: false, error: 'Email is required' };
+      }
+
+      const response = await fetch('/api/auth/forgot-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email })
+      });
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`Invalid response: ${text}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Forgot password error:', error);
+      return { success: false, error: error.message || 'Network error' };
+    }
+  }
+
+  /**
+   * Reset password using PIN
+   */
+  async resetPassword(email, pin, newPassword) {
+    try {
+      if (!email || !pin || !newPassword) {
+        return { success: false, error: 'Email, PIN, and new password are required' };
+      }
+
+      const response = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, pin, newPassword })
+      });
+
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const text = await response.text();
+        throw new Error(`Invalid response: ${text}`);
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error('Reset password error:', error);
+      return { success: false, error: error.message || 'Network error' };
     }
   }
 
