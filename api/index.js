@@ -10,15 +10,9 @@ import crypto from 'crypto';
 import { v4 as uuidv4 } from 'uuid';
 
 // ─── CORS helper ──────────────────────────────────────────────────────────────
-function setCors(req, res) {
-  const origin = req.headers.origin;
-  // Allow credentials only for same-origin or trusted origins
-  // If origin is present and matches allowed patterns, use it; otherwise fallback to '*'
-  // For simplicity, we'll allow any origin but set credentials only when origin matches
-  // Since we need credentials, we must set a specific origin, not '*'
-  const allowedOrigin = origin || '*';
+function setCors(res) {
   res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Allow-Origin', allowedOrigin);
+  res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
   res.setHeader('Access-Control-Allow-Headers',
     'X-CSRF-Token,X-Requested-With,Accept,Accept-Version,Content-Length,Content-MD5,Content-Type,Date,X-Api-Version');
@@ -670,7 +664,7 @@ async function adminReorder(req, res) {
 // MAIN DISPATCHER
 // ═══════════════════════════════════════════════════════════════════════════════
 export default async function handler(req, res) {
-  setCors(req, res);
+  setCors(res);
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const path = req.url.split('?')[0].replace(/\/$/, '');

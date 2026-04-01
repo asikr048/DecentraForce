@@ -421,19 +421,7 @@
       
       document.getElementById('cardPrice').innerHTML = `${originalPriceText}${priceText}`;
       const purchaseBtn = document.getElementById('pagePurchaseBtn');
-      
-      // Determine button text based on course status
-      if (status === 'upcoming') {
-        purchaseBtn.textContent = 'Coming Soon';
-        purchaseBtn.disabled = true;
-        purchaseBtn.style.opacity = '0.6';
-        purchaseBtn.style.cursor = 'not-allowed';
-      } else {
-        purchaseBtn.textContent = priceVal === 0 ? 'Enroll for Free' : 'Purchase Course';
-        purchaseBtn.disabled = false;
-        purchaseBtn.style.opacity = '';
-        purchaseBtn.style.cursor = '';
-      }
+      purchaseBtn.textContent = priceVal === 0 ? 'Enroll for Free' : 'Purchase Course';
 
       if (activeCourse.thumbnail_url && activeCourse.thumbnail_url.length > 10) {
         document.getElementById('cardThumbnail').innerHTML = `<img src="${activeCourse.thumbnail_url}" alt="Course Thumbnail">`;
@@ -487,12 +475,6 @@
 
       // 5. Attach Purchase Action
       purchaseBtn.addEventListener('click', () => {
-        // Prevent enrollment for upcoming courses
-        if (status === 'upcoming') {
-          alert('This course is upcoming and cannot be enrolled yet. Please check back when the course becomes ongoing.');
-          return;
-        }
-        
         // Check if user is logged in
         if (window.auth && !window.auth.isLoggedIn) {
           const confirmLogin = confirm('You need to log in to purchase this course. Redirect to login page?');
@@ -602,6 +584,5 @@
     });
   });
 </script>
-<script src="scripts/auth.js"></script>
 </body>
 </html>

@@ -11,63 +11,11 @@ class AuthManager {
     this.init();
   }
 
-  /**
-   * Restore user data from localStorage (optimistic)
-   */
-  restoreFromStorage() {
-    try {
-      const stored = localStorage.getItem('auth_user');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        // Check if storage is not too old (e.g., within last 24 hours)
-        const storedAt = parsed._storedAt;
-        const maxAge = 24 * 60 * 60 * 1000; // 24 hours
-        if (storedAt && Date.now() - storedAt < maxAge) {
-          this.currentUser = parsed.user;
-          this.isLoggedIn = true;
-          console.log('Restored user from localStorage:', this.currentUser.username);
-          return true;
-        } else {
-          // Expired, clear storage
-          localStorage.removeItem('auth_user');
-        }
-      }
-    } catch (e) {
-      console.warn('Failed to restore from localStorage:', e);
-    }
-    return false;
-  }
-
-  /**
-   * Save current user to localStorage
-   */
-  saveToStorage() {
-    try {
-      if (this.isLoggedIn && this.currentUser) {
-        const data = {
-          user: this.currentUser,
-          _storedAt: Date.now()
-        };
-        localStorage.setItem('auth_user', JSON.stringify(data));
-      } else {
-        localStorage.removeItem('auth_user');
-      }
-    } catch (e) {
-      console.warn('Failed to save to localStorage:', e);
-    }
-  }
-
   async init() {
-    // Try to restore from localStorage for immediate UI update
-    this.restoreFromStorage();
-    
-    // Update UI immediately (optimistic)
-    this.updateUI();
-    
-    // Then verify session with server (will override if invalid)
+    // Check if user is already logged in on page load
     await this.checkSession();
     
-    // Update UI again with fresh data
+    // Update UI based on login state
     this.updateUI();
   }
 
@@ -93,7 +41,6 @@ class AuthManager {
       if (response.ok && data.success && data.loggedIn) {
         this.currentUser = data.user;
         this.isLoggedIn = true;
-        this.saveToStorage(); // Save to localStorage
         console.log('User is logged in:', this.currentUser.username);
         return true;
       }
@@ -101,8 +48,6 @@ class AuthManager {
       // Handle specific error cases
       if (response.status === 401) {
         console.log('Session expired or invalid');
-        // Clear storage on session expiration
-        localStorage.removeItem('auth_user');
       } else {
         console.error('Session verification failed:', data.error);
       }
@@ -112,7 +57,6 @@ class AuthManager {
     
     this.currentUser = null;
     this.isLoggedIn = false;
-    localStorage.removeItem('auth_user'); // Ensure storage is cleared
     return false;
   }
 
@@ -234,7 +178,6 @@ class AuthManager {
       if (data.success) {
         this.currentUser = data.user;
         this.isLoggedIn = true;
-        this.saveToStorage(); // Save to localStorage
         this.updateUI();
         return { success: true, user: data.user };
       } else {
@@ -261,7 +204,6 @@ class AuthManager {
       
       this.currentUser = null;
       this.isLoggedIn = false;
-      localStorage.removeItem('auth_user'); // Clear storage
       this.updateUI();
       
       return { success: true };
