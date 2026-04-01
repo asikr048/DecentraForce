@@ -195,6 +195,9 @@ class AuthManager {
   /**
    * Logout current user
    */
+ /**
+   * Logout current user
+   */
   async logout() {
     try {
       await fetch('/api/auth/logout', {
@@ -204,6 +207,10 @@ class AuthManager {
       
       this.currentUser = null;
       this.isLoggedIn = false;
+      
+      // ADD THIS: Clear legacy local storage purchases so they don't leak to anonymous sessions
+      localStorage.removeItem('purchases'); 
+      
       this.updateUI();
       
       return { success: true };

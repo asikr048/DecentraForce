@@ -1327,8 +1327,11 @@ window.addEventListener('storage', (e) => {
     }
 
     // Fetch user purchases from API (similar to my-courses.html)
+  // Fetch user purchases from API (similar to my-courses.html)
     async function fetchUserPurchases() {
       let dbPurchases = [];
+      let isAuthFailed = false; // Track if the API rejected us due to being logged out
+      
       try {
         const res = await fetch('/api/user/purchases', { credentials: 'include' });
         if (res.ok) {
@@ -1343,13 +1346,22 @@ window.addEventListener('storage', (e) => {
               timestamp: p.created_at,
               id: p.id?.toString()
             }));
+          } else {
+            isAuthFailed = true;
           }
+        } else if (res.status === 401 || res.status === 403) {
+          isAuthFailed = true; // User is definitively not logged in
         }
       } catch (error) {
         console.error('Failed to fetch purchases from API:', error);
       }
 
-      // Load from localStorage for free enrollments (legacy)
+      // STRICT CHECK: If the user is explicitly logged out, do NOT load local storage!
+      if (isAuthFailed || (window.auth && window.auth.isLoggedIn === false)) {
+        return [];
+      }
+
+      // Load from localStorage for free enrollments (legacy) ONLY if authenticated
       let localPurchases = [];
       try {
         const purchasesJson = localStorage.getItem('purchases');
@@ -1363,7 +1375,7 @@ window.addEventListener('storage', (e) => {
         console.error('Error loading purchases from localStorage:', error);
       }
 
-      // Merge: prefer DB purchases, but keep local purchases that are not in DB (by courseId and transactionId)
+      // Merge: prefer DB purchases, but keep local purchases that are not in DB
       const merged = [...dbPurchases];
       const existingIds = new Set(dbPurchases.map(p => `${p.courseId}-${p.transactionId}`));
       for (const local of localPurchases) {
@@ -1382,6 +1394,7 @@ window.addEventListener('storage', (e) => {
       }
       return merged;
     }
+
 
     // Fetch real courses from the Database via API
     async function fetchPublicCourses() {
