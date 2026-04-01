@@ -272,12 +272,10 @@
 </style>
 </head>
 <body>
-  <!-- Background blobs -->
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
 
-  <!-- Navigation -->
   <nav>
     <a href="index.html" class="logo">
       <div class="logo-icon">DF</div>
@@ -296,7 +294,6 @@
     </div>
   </nav>
 
-  <!-- Auth Container -->
   <div class="auth-container">
     <a href="index.html" class="back-home">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -353,7 +350,6 @@
 
     <div class="auth-footer">
       <p>Already have an account? <a href="login.html">Sign in here</a></p>
-      <p style="margin-top: 8px; font-size: 0.85rem;">We'll send a verification link to your email to activate your account.</p>
     </div>
   </div>
 
@@ -532,8 +528,8 @@
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          // Show success message
-          alert('Account created successfully! Please check your email for verification.');
+          // Show success message without requiring email check
+          alert('Account created successfully!');
           // Redirect to login page
           window.location.href = 'login.html';
         } else {

@@ -282,12 +282,10 @@
 </style>
 </head>
 <body>
-  <!-- Background blobs -->
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
   <div class="blob blob-3"></div>
 
-  <!-- Navigation -->
   <nav>
     <a href="index.html" class="logo">
       <div class="logo-icon">DF</div>
@@ -305,7 +303,6 @@
     </div>
   </nav>
 
-  <!-- Auth Container -->
   <div class="auth-container">
     <a href="index.html" class="back-home">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -340,20 +337,106 @@
       </button>
     </form>
 
-    <div class="auth-footer">
+    <form id="forgotForm" style="display: none;">
+      <div class="form-group">
+        <label for="forgotEmail" class="form-label">Email Address</label>
+        <input type="email" id="forgotEmail" class="form-input" placeholder="you@example.com" required>
+        <div class="input-hint">We'll send a 6-digit PIN to this email via EmailJS.</div>
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">
+        Send Reset PIN
+      </button>
+      <div class="form-options" style="justify-content: center; margin-top: 16px;">
+        <a href="#" id="backToLogin1" class="forgot-password">Back to Login</a>
+      </div>
+    </form>
+
+    <form id="resetForm" style="display: none;">
+      <div class="form-group">
+        <label for="resetPin" class="form-label">6-Digit PIN</label>
+        <input type="text" id="resetPin" class="form-input" placeholder="123456" required pattern="\d{6}" maxlength="6">
+      </div>
+      <div class="form-group">
+        <label for="newPassword" class="form-label">New Password</label>
+        <input type="password" id="newPassword" class="form-input" placeholder="Enter new password" required minlength="8">
+      </div>
+      <button type="submit" class="btn btn-primary btn-block">
+        Update Password
+      </button>
+      <div class="form-options" style="justify-content: center; margin-top: 16px;">
+        <a href="#" id="backToLogin2" class="forgot-password">Back to Login</a>
+      </div>
+    </form>
+
+    <div class="auth-footer" id="mainAuthFooter">
       <p>Don't have an account? <a href="register.html">Create account</a></p>
     </div>
   </div>
 
   <script>
+    // Elements for general use
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const emailError = document.getElementById('emailError');
     const passwordError = document.getElementById('passwordError');
     const forgotPasswordLink = document.getElementById('forgotPassword');
+    
+    // UI Elements for form toggling
+    const authHeaderH1 = document.querySelector('.auth-header h1');
+    const authHeaderP = document.querySelector('.auth-header p');
+    const authFooter = document.getElementById('mainAuthFooter');
+    const loginFormEl = document.getElementById('loginForm');
+    const forgotForm = document.getElementById('forgotForm');
+    const resetForm = document.getElementById('resetForm');
+    
+    let resetEmailValue = ''; // Stores email during the reset flow
 
-    // Form submission
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
+    // ── Form Visibility Controllers ──
+    function showForgotForm() {
+      loginFormEl.style.display = 'none';
+      forgotForm.style.display = 'block';
+      resetForm.style.display = 'none';
+      authFooter.style.display = 'none';
+      authHeaderH1.textContent = 'Reset Password';
+      authHeaderP.textContent = 'Enter your email to receive a recovery PIN';
+    }
+
+    function showResetForm() {
+      loginFormEl.style.display = 'none';
+      forgotForm.style.display = 'none';
+      resetForm.style.display = 'block';
+      authFooter.style.display = 'none';
+      authHeaderH1.textContent = 'Create New Password';
+      authHeaderP.textContent = 'Enter the 6-digit PIN sent to your email';
+    }
+
+    function showLoginForm() {
+      loginFormEl.style.display = 'block';
+      forgotForm.style.display = 'none';
+      resetForm.style.display = 'none';
+      authFooter.style.display = 'block';
+      authHeaderH1.textContent = 'Welcome Back';
+      authHeaderP.textContent = 'Sign in to your account with your email and password';
+    }
+
+    // ── Event Listeners for UI toggling ──
+    forgotPasswordLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      showForgotForm();
+    });
+
+    document.getElementById('backToLogin1').addEventListener('click', function(e) {
+      e.preventDefault();
+      showLoginForm();
+    });
+
+    document.getElementById('backToLogin2').addEventListener('click', function(e) {
+      e.preventDefault();
+      showLoginForm();
+    });
+
+    // ── Original Form submission ──
+    loginFormEl.addEventListener('submit', function(e) {
       e.preventDefault();
       const email = emailInput.value.trim();
       const password = passwordInput.value;
@@ -400,15 +483,14 @@
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(requestBody),
-        credentials: 'include' // Important for cookies
+        credentials: 'include'
       })
       .then(response => response.json())
       .then(data => {
         if (data.success) {
-          // Redirect based on role (admin → admin.html, users → dashboard.html)
+          // Redirect based on role
           window.location.href = data.redirectUrl || 'dashboard.html';
         } else {
-          // Show error message
           alert('Error: ' + data.error);
           submitBtn.textContent = originalText;
           submitBtn.disabled = false;
@@ -422,54 +504,93 @@
       });
     });
 
-    // Forgot password functionality
-    forgotPasswordLink.addEventListener('click', function(e) {
+    // ── Forgot Password form submission (Hits Backend that uses EmailJS) ──
+    forgotForm.addEventListener('submit', function(e) {
       e.preventDefault();
+      const forgotEmailInput = document.getElementById('forgotEmail');
+      const email = forgotEmailInput.value.trim();
       
-      const email = emailInput.value.trim();
       if (!email) {
-        alert('Please enter your email address to reset your password');
-        emailInput.focus();
+        alert('Please enter a valid email');
         return;
       }
       
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-      if (!emailRegex.test(email)) {
-        alert('Please enter a valid email address');
-        emailInput.focus();
-        return;
-      }
-      
-      // Show loading message
-      const originalText = forgotPasswordLink.textContent;
-      forgotPasswordLink.textContent = 'Sending reset code...';
-      forgotPasswordLink.style.pointerEvents = 'none';
-      
-      // Send password reset request
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Sending...';
+      submitBtn.disabled = true;
+
       fetch('/api/auth/forgot-password', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })
       })
-      .then(response => response.json())
+      .then(res => res.json())
       .then(data => {
         if (data.success) {
-          alert('A 6-digit PIN has been sent to your email. Please check your inbox.');
-          // In a real implementation, you would redirect to a PIN verification page
-          // For now, we'll just show an alert
+          resetEmailValue = email; // Store for the next step
+          showResetForm();
         } else {
           alert('Error: ' + data.error);
         }
-        forgotPasswordLink.textContent = originalText;
-        forgotPasswordLink.style.pointerEvents = 'auto';
       })
-      .catch(error => {
-        console.error('Error:', error);
+      .catch(err => {
+        console.error('Error:', err);
         alert('Network error. Please try again.');
-        forgotPasswordLink.textContent = originalText;
-        forgotPasswordLink.style.pointerEvents = 'auto';
+      })
+      .finally(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+      });
+    });
+
+    // ── Reset Password form submission ──
+    resetForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const pin = document.getElementById('resetPin').value.trim();
+      const newPassword = document.getElementById('newPassword').value;
+      
+      if (pin.length !== 6) {
+        alert('PIN must be 6 digits');
+        return;
+      }
+      if (newPassword.length < 8) {
+        alert('Password must be at least 8 characters');
+        return;
+      }
+
+      const submitBtn = e.target.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.textContent = 'Updating...';
+      submitBtn.disabled = true;
+
+      fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: resetEmailValue, pin, newPassword })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          alert('Password reset successfully! You can now log in.');
+          showLoginForm();
+          
+          // Clear sensitive fields
+          document.getElementById('resetPin').value = '';
+          document.getElementById('newPassword').value = '';
+          document.getElementById('forgotEmail').value = '';
+          document.getElementById('password').value = ''; 
+        } else {
+          alert('Error: ' + data.error);
+        }
+      })
+      .catch(err => {
+        console.error('Error:', err);
+        alert('Network error. Please try again.');
+      })
+      .finally(() => {
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
       });
     });
 
