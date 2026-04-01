@@ -79,6 +79,7 @@
     font-size: .6rem; color: var(--muted); letter-spacing: .08em;
     text-transform: uppercase; display: block; margin-top: 2px;
   }
+  .logo-line { display: block; line-height: 1.15; }
 
   .sidebar-nav { flex: 1; padding: 20px 12px; display: flex; flex-direction: column; gap: 4px; overflow-y: auto; }
 
@@ -769,6 +770,58 @@
     .timeline-slider-container { order: -1; flex: 1 1 100%; margin-bottom: 4px; }
     .volume-slider { width: 44px; }
   }
+  /* ── Mobile module toggle bar ── */
+  .mob-module-toggle-bar {
+    display: none;
+  }
+
+  @media (max-width: 768px) {
+    /* Video-sidebar hidden by default on mobile, toggled via JS */
+    #panelModule .video-sidebar {
+      display: none;
+    }
+    #panelModule .video-sidebar.mob-open {
+      display: flex;
+    }
+    .mob-module-toggle-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 16px; margin: 0 0 12px;
+      cursor: pointer; font-size: 0.88rem; font-weight: 600; color: var(--accent);
+      transition: background 0.2s;
+    }
+    .mob-module-toggle-bar:hover { background: var(--surface2); }
+    .mob-module-toggle-bar svg { transition: transform 0.25s; flex-shrink: 0; }
+    .mob-module-toggle-bar.open svg { transform: rotate(180deg); }
+    /* Make video fill full width on mobile */
+    #panelModule .video-main {
+      width: 100%;
+    }
+    .video-player-area {
+      border-radius: 0;
+      margin: 0 -20px 16px;
+      width: calc(100% + 40px);
+    }
+  }
+
+  @media (max-width: 480px) {
+    .topbar { height: 56px; padding: 0 14px; }
+    .course-header { padding: 16px 14px; }
+    .course-header h1 { font-size: 1.05rem; }
+    .tab-nav { padding: 0 12px; gap: 16px; }
+    .tab-btn { font-size: 0.82rem; padding: 10px 0; }
+    .content-area { padding: 18px 0 50px; }
+    .stat-cards { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .stat-card { padding: 14px; }
+    .stat-value { font-size: 1.4rem; }
+    .video-sidebar { gap: 12px; padding: 0 14px; }
+    .lesson-item { padding: 10px 12px; }
+    .video-player-area {
+      margin: 0 -14px 16px;
+      width: calc(100% + 28px);
+    }
+    .mob-module-toggle-bar { margin: 0 14px 12px; }
+  }
 </style>
 </head>
 <body>
@@ -782,7 +835,7 @@
     <a href="index.html" class="sidebar-logo">
       <div class="logo-icon">DF</div>
       <div>
-        Decentra<span>Force</span>
+        <span class="logo-line">Decentra<span>Force</span></span>
         <span class="tagline">Your Web3 University</span>
       </div>
     </a>
@@ -931,7 +984,12 @@
 
       <!-- MODULE TAB -->
       <div class="content-area active" id="panelModule">
-        <div class="unified-course-layout">
+        <!-- Mobile module toggle -->
+        <div class="mob-module-toggle-bar" id="mobToggleBar">
+          <span id="mobToggleLabel">📋 Show Modules</span>
+          <svg id="mobToggleChevron" width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+        <div class="unified-course-layout" id="unifiedLayout">
           
           <div class="video-main">
             <div class="video-player-area" id="mainPlayerArea">
@@ -1945,6 +2003,19 @@
   window.setMainQuality    = setMainQuality;
 
   document.addEventListener('DOMContentLoaded', initApp);
+
+  // ── Mobile module sidebar toggle ──
+  (function() {
+    var toggleBar = document.getElementById('mobToggleBar');
+    var sidebar   = document.querySelector('#panelModule .video-sidebar');
+    var label     = document.getElementById('mobToggleLabel');
+    if (!toggleBar || !sidebar) return;
+    toggleBar.addEventListener('click', function() {
+      var isOpen = sidebar.classList.toggle('mob-open');
+      toggleBar.classList.toggle('open', isOpen);
+      label.textContent = isOpen ? '📋 Hide Modules' : '📋 Show Modules';
+    });
+  })();
 </script>
 </body>
 </html>

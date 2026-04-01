@@ -25,7 +25,7 @@
     .btn-back:hover { color: var(--accent); }
 
     /* === HERO SECTION === */
-    .course-hero { background: linear-gradient(135deg, #0a1128, #050a18); padding: 130px 5% 60px; border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
+    .course-hero { background: linear-gradient(135deg, #0a1128, #050a18); padding: clamp(90px, 13vw, 130px) 5% clamp(36px, 5vw, 60px); border-bottom: 1px solid var(--border); position: relative; overflow: hidden; }
     .course-hero::before { content: ''; position: absolute; top: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, rgba(123,92,255,0.15), transparent 70%); border-radius: 50%; pointer-events: none; }
     .hero-container { max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; gap: 20px; position: relative; z-index: 1; }
     .course-badges { display: flex; gap: 10px; flex-wrap: wrap; }
@@ -104,6 +104,25 @@
     .btn-ghost { background: transparent; color: var(--muted); border: 1px solid var(--border); }
     .btn-success { background: linear-gradient(135deg, #00e599, #00e5ff); color: #111; }
     .btn-success:hover { box-shadow: 0 8px 32px rgba(0, 229, 153, 0.4); }
+    @media (max-width: 768px) {
+      .course-layout { padding: 30px 16px 60px; }
+      .price-display { font-size: 2rem; }
+      .btn-purchase { font-size: 1rem; padding: 14px; }
+    }
+    @media (max-width: 480px) {
+      nav { padding: 0 16px; height: 60px; }
+      .logo { font-size: 1.05rem; }
+      .logo-icon { width: 30px; height: 30px; font-size: 0.72rem; }
+      .hero-container { gap: 12px; }
+      .course-title { font-size: clamp(1.5rem, 6vw, 2rem); }
+      .course-meta { gap: 12px; font-size: 0.85rem; }
+      .course-layout { padding: 20px 14px 50px; gap: 28px; }
+      .tabs { gap: 18px; }
+      .tab { font-size: 0.9rem; }
+      .price-display { font-size: 1.7rem; }
+      .btn-purchase { font-size: 0.95rem; padding: 13px; }
+      .desc-text { font-size: 0.95rem; }
+    }
   </style>
 </head>
 <body>

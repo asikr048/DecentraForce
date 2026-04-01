@@ -147,6 +147,34 @@
     /* ── Section page header ── */
     .page-title { font-family: 'Syne', sans-serif; font-size: 1.4rem; font-weight: 800; color: #fff; }
     .page-subtitle { font-size: 0.82rem; color: #4a6080; margin-top: 3px; }
+
+    /* ── Mobile hamburger ── */
+    .mob-menu-btn { display: none; background: none; border: none; color: #e8eeff; cursor: pointer; padding: 8px; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; position: fixed; z-index: 50; height: 100%; }
+      .sidebar.mob-open { display: flex; }
+      .mob-menu-btn { display: block; }
+      main { margin-left: 0 !important; }
+      .data-table { font-size: 0.78rem; }
+      .data-table th, .data-table td { padding: 10px 12px; }
+    }
+    @media (max-width: 480px) {
+      header { padding: 10px 14px; }
+      .p-7 { padding: 16px 14px; }
+      .page-title { font-size: 1.2rem; }
+      .page-subtitle { font-size: 0.78rem; }
+      .grid-cols-3 { grid-template-columns: 1fr 1fr !important; }
+      .stat-card { padding: 14px; }
+      .data-table th { display: none; }
+      .data-table, .data-table tbody, .data-table tr, .data-table td { display: block; width: 100%; }
+      .data-table tr { margin-bottom: 12px; border: 1px solid rgba(0,229,255,0.1); border-radius: 10px; overflow: hidden; }
+      .data-table td { padding: 8px 14px; border-bottom: 1px solid rgba(0,229,255,0.05); font-size: 0.82rem; }
+      .data-table td:before { content: attr(data-label); font-size: 0.65rem; font-weight: 700; color: #3d5070; text-transform: uppercase; letter-spacing: 0.08em; display: block; margin-bottom: 2px; }
+      .badge { font-size: 0.68rem; }
+      .gap-5 { gap: 12px !important; }
+      .mb-7 { margin-bottom: 20px !important; }
+    }
   </style>
 </head>
 <body>
@@ -246,7 +274,12 @@
 
     <!-- Top bar -->
     <header class="flex justify-between items-center px-7 py-4 border-b border-[rgba(0,229,255,0.06)] bg-[#080f1f] sticky top-0 z-10">
-      <div id="breadcrumb" class="text-sm text-[#4a6080] font-medium">Dashboard</div>
+      <div class="flex items-center gap-3">
+        <button class="mob-menu-btn" onclick="document.querySelector('.sidebar').classList.toggle('mob-open')" aria-label="Menu">
+          <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <div id="breadcrumb" class="text-sm text-[#4a6080] font-medium">Dashboard</div>
+      </div>
       <div class="flex items-center gap-4">
         <a href="index.html" class="text-xs text-[#3d5070] hover:text-accent transition-colors font-medium">← Back to Site</a>
       </div>
