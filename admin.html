@@ -567,7 +567,7 @@
       <div id="tab-assignments" class="hidden">
         <div class="mb-7">
           <h1 class="page-title">Assignments</h1>
-          <p class="page-subtitle">Create and manage course assignments</p>
+          <p class="page-subtitle">Create assignments visible to enrolled students in their course view</p>
         </div>
         <div class="grid grid-cols-3 gap-6">
           <div class="card">
@@ -577,20 +577,30 @@
             </div>
             <div class="card-body space-y-4">
               <div>
+                <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Course</label>
+                <select id="assignmentCourse" class="admin-input" onchange="dbLoadAssignments()">
+                  <option value="">Select a course…</option>
+                </select>
+              </div>
+              <div>
                 <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Title</label>
                 <input type="text" id="assignmentTitle" placeholder="e.g., Build a Todo App" class="admin-input">
               </div>
               <div>
                 <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Description</label>
-                <textarea id="assignmentDescription" placeholder="Detailed instructions…" class="admin-input" rows="4" style="resize:vertical;"></textarea>
+                <textarea id="assignmentDescription" placeholder="Detailed instructions…" class="admin-input" rows="3" style="resize:vertical;"></textarea>
               </div>
-              <div>
-                <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Course</label>
-                <select id="assignmentCourse" class="admin-input">
-                  <option value="">All Courses</option>
-                </select>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Max Marks</label>
+                  <input type="number" id="assignmentMaxMarks" placeholder="100" value="100" min="1" class="admin-input">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Due Date</label>
+                  <input type="date" id="assignmentDueDate" class="admin-input">
+                </div>
               </div>
-              <button onclick="addNewAssignment()" class="btn-primary w-full py-3 rounded-lg text-sm font-bold">Create Assignment</button>
+              <button onclick="dbAddAssignment()" class="btn-primary w-full py-3 rounded-lg text-sm font-bold">Create Assignment</button>
             </div>
           </div>
 
@@ -598,13 +608,60 @@
             <div class="card-header justify-between">
               <div class="flex items-center gap-2.5">
                 <div class="card-icon bg-[rgba(0,229,255,0.08)]"><svg class="w-4 h-4 text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg></div>
-                <h2 class="text-sm font-bold text-white">All Assignments</h2>
+                <h2 class="text-sm font-bold text-white">Assignments for Selected Course</h2>
               </div>
-              <button onclick="refreshAssignments()" class="text-[#4a6080] hover:text-accent text-xs font-bold flex items-center gap-1 transition-colors">Refresh</button>
+              <button onclick="dbLoadAssignments()" class="text-[#4a6080] hover:text-accent text-xs font-bold flex items-center gap-1 transition-colors">↻ Refresh</button>
             </div>
             <div class="card-body">
-              <div id="assignmentsList" class="space-y-3 max-h-[420px] overflow-y-auto">
-                <div class="text-center py-8 text-[#3d5070] text-sm">No assignments yet.</div>
+              <div id="dbAssignmentsList" class="space-y-3 max-h-[420px] overflow-y-auto">
+                <div class="text-center py-8 text-[#3d5070] text-sm">Select a course to see its assignments.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Points section -->
+        <div class="mt-8">
+          <h2 class="text-base font-bold text-white mb-1" style="font-family:'Syne',sans-serif;">🏅 Give Bonus Points</h2>
+          <p class="text-xs text-[#4a6080] mb-5">Award bonus marks/points to any student on any course — appears on leaderboard and in their marks view.</p>
+          <div class="grid grid-cols-2 gap-6">
+            <div class="card">
+              <div class="card-body space-y-4">
+                <div>
+                  <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Student</label>
+                  <select id="pointsUserId" class="admin-input"><option value="">Select student…</option></select>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Course</label>
+                  <select id="pointsCourseId" class="admin-input"><option value="">Select course…</option></select>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                  <div>
+                    <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Points</label>
+                    <input type="number" id="pointsAmount" placeholder="50" min="1" class="admin-input">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Out Of</label>
+                    <input type="number" id="pointsTotal" placeholder="100" value="100" min="1" class="admin-input">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Label</label>
+                  <input type="text" id="pointsLabel" placeholder="e.g., Participation Bonus" class="admin-input">
+                </div>
+                <div>
+                  <label class="block text-xs font-bold text-[#6a80a0] mb-2 uppercase tracking-wider">Note (optional)</label>
+                  <input type="text" id="pointsNote" placeholder="Reason or feedback…" class="admin-input">
+                </div>
+                <button onclick="givePoints()" class="btn-primary w-full py-3 rounded-lg text-sm font-bold">🏅 Give Points</button>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-header">
+                <h2 class="text-sm font-bold text-white">Recent Points Given</h2>
+              </div>
+              <div class="card-body max-h-72 overflow-y-auto" id="recentPointsList">
+                <div class="text-center py-6 text-[#3d5070] text-sm">Points given will appear here.</div>
               </div>
             </div>
           </div>
@@ -1234,6 +1291,7 @@ function renderCoursesGrid() {
         <div class="flex gap-2 mt-1.5">
           <button onclick="openManageExam(${c.id},'${esc(c.title)}')" class="flex-1 bg-[rgba(123,92,255,0.08)] border border-[rgba(123,92,255,0.25)] text-[#a98fff] py-2 rounded-lg text-xs font-bold hover:bg-[rgba(123,92,255,0.16)] transition-colors">🎯 EXAM</button>
           <button onclick="openManageMarks(${c.id},'${esc(c.title)}')" class="flex-1 bg-[rgba(0,229,255,0.06)] border border-[rgba(0,229,255,0.2)] text-accent py-2 rounded-lg text-xs font-bold hover:bg-[rgba(0,229,255,0.12)] transition-colors">📊 MARKS</button>
+          <button onclick="openManageResources(${c.id},'${esc(c.title)}')" class="flex-1 bg-[rgba(255,200,0,0.06)] border border-[rgba(255,200,0,0.2)] text-yellow-400 py-2 rounded-lg text-xs font-bold hover:bg-[rgba(255,200,0,0.12)] transition-colors">🔗 RESOURCES</button>
         </div>
       </div>
     </div>`;
@@ -1856,92 +1914,7 @@ function adminMoveFeedback2(id,dir) { adminMoveFeedback(id,dir); renderFeedbackO
 function saveFeedbackOrder() { showToast('Feedback order saved! Refresh homepage.','success'); }
 
 /* ─── ASSIGNMENTS ─── */
-function getAssignments() { try { return JSON.parse(localStorage.getItem('assignments')||'[]'); } catch { return []; } }
-function saveAssignments(a) { try { localStorage.setItem('assignments',JSON.stringify(a)); return true; } catch { return false; } }
-
-function addNewAssignment() {
-  const title = document.getElementById('assignmentTitle').value.trim();
-  const desc  = document.getElementById('assignmentDescription').value.trim();
-  const course= document.getElementById('assignmentCourse').value;
-  if(!title||!desc) { showToast('Title and description required','error'); return; }
-  const list = getAssignments();
-  list.push({id:Date.now().toString(),title,description:desc,course:course||null,createdAt:new Date().toISOString(),submissions:[]});
-  if(saveAssignments(list)) {
-    showToast('Assignment created!','success');
-    document.getElementById('assignmentTitle').value='';
-    document.getElementById('assignmentDescription').value='';
-    document.getElementById('assignmentCourse').value='';
-    renderAssignmentsList();
-  } else showToast('Failed','error');
-}
-
-function renderAssignmentsList() {
-  const el = document.getElementById('assignmentsList'); if(!el) return;
-  const list = getAssignments();
-  if(!list.length) { el.innerHTML='<div class="text-center py-6 text-[#3d5070] text-sm">No assignments yet.</div>'; return; }
-  el.innerHTML = list.map(a=>`
-    <div class="bg-[#0a1228] rounded-lg p-4 border border-[rgba(0,229,255,0.07)] hover:border-[rgba(0,229,255,0.15)] transition-colors">
-      <div class="flex items-start justify-between">
-        <div class="flex-1 min-w-0">
-          <div class="flex items-center gap-2 mb-1.5">
-            <h4 class="font-bold text-white text-sm truncate">${esc(a.title)}</h4>
-            <span class="badge badge-blue text-[10px]">${a.course||'All'}</span>
-          </div>
-          <p class="text-xs text-[#4a6080] mb-2">${esc(a.description)}</p>
-          <div class="flex items-center gap-4 text-[10px] text-[#3d5070]">
-            <span>📅 ${new Date(a.createdAt).toLocaleDateString()}</span>
-            <span>📬 ${a.submissions?.length||0} submissions</span>
-          </div>
-        </div>
-        <div class="flex items-center gap-1.5 ml-3">
-          <button onclick="editAssignmentUI('${a.id}')" class="text-[#4a6080] hover:text-accent p-1.5 transition-colors text-sm">✏️</button>
-          <button onclick="deleteAssignmentUI('${a.id}')" class="text-[#4a6080] hover:text-accent3 p-1.5 transition-colors text-sm">🗑️</button>
-        </div>
-      </div>
-    </div>`).join('');
-}
-
-function editAssignmentUI(id) {
-  const a = getAssignments().find(x=>x.id===id); if(!a) { showToast('Not found','error'); return; }
-  document.getElementById('assignmentTitle').value       = a.title;
-  document.getElementById('assignmentDescription').value = a.description;
-  document.getElementById('assignmentCourse').value      = a.course||'';
-  const btn = document.querySelector('#tab-assignments button[onclick="addNewAssignment()"]');
-  if(btn) { btn.textContent='Update Assignment'; btn.setAttribute('onclick',`updateExistingAssignment('${id}')`); }
-  showToast('Editing — update and click Update','info');
-}
-
-function updateExistingAssignment(id) {
-  const title = document.getElementById('assignmentTitle').value.trim();
-  const desc  = document.getElementById('assignmentDescription').value.trim();
-  const course= document.getElementById('assignmentCourse').value;
-  if(!title||!desc) { showToast('Title and description required','error'); return; }
-  const list = getAssignments(); const idx=list.findIndex(a=>a.id===id);
-  if(idx===-1) { showToast('Not found','error'); return; }
-  list[idx]={...list[idx],title,description:desc,course:course||null};
-  if(saveAssignments(list)) {
-    showToast('Updated!','success');
-    document.getElementById('assignmentTitle').value='';
-    document.getElementById('assignmentDescription').value='';
-    document.getElementById('assignmentCourse').value='';
-    const btn=document.querySelector('#tab-assignments button');
-    if(btn){btn.textContent='Create Assignment';btn.setAttribute('onclick','addNewAssignment()');}
-    renderAssignmentsList();
-  } else showToast('Failed','error');
-}
-
-function deleteAssignmentUI(id) {
-  if(!confirm('Delete this assignment?')) return;
-  const filtered=getAssignments().filter(a=>a.id!==id);
-  if(saveAssignments(filtered)) { showToast('Deleted','success'); renderAssignmentsList(); } else showToast('Failed','error');
-}
-
-function refreshAssignments() { renderAssignmentsList(); }
-
-function populateAssignmentCourseDropdown() {
-  const sel=document.getElementById('assignmentCourse');
-  if(sel&&allCourses) sel.innerHTML='<option value="">All Courses</option>'+allCourses.map(c=>`<option value="${c.id}">${esc(c.title)}</option>`).join('');
-}
+/* populateAssignmentCourseDropdown now in assignments JS block */
 
 /* ─── FOOTER ─── */
 const defaultFooterData = {
@@ -2430,6 +2403,318 @@ function showAdminToast(msg, type) {
   if (typeof showToast === 'function') { showToast(msg, type); return; }
   alert(msg);
 }
+</script>
+
+
+<!-- ══ RESOURCES MANAGEMENT MODAL ══════════════════════════════════════════ -->
+<div id="resourcesModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);overflow-y:auto;">
+  <div style="max-width:640px;margin:40px auto;padding:20px;">
+    <div style="background:#0d1630;border:1px solid rgba(0,229,255,.15);border-radius:18px;padding:32px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div>
+          <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#e8eeff;">Manage Resources</h2>
+          <p id="resourcesModalCourseName" style="color:#7d8fb3;font-size:.85rem;margin-top:2px;"></p>
+        </div>
+        <button onclick="closeResourcesModal()" style="background:rgba(255,255,255,.06);border:none;color:#7d8fb3;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:1.1rem;">✕</button>
+      </div>
+
+      <!-- Add resource form -->
+      <div style="background:#0a1228;border:1px solid rgba(0,229,255,.08);border-radius:12px;padding:20px;margin-bottom:24px;">
+        <h3 style="font-size:.85rem;font-weight:700;color:#e8eeff;margin-bottom:16px;">Add New Resource</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Title</label>
+            <input id="resTitle" type="text" placeholder="e.g., Course Slides" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.85rem;outline:none;">
+          </div>
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Icon (emoji)</label>
+            <input id="resIcon" type="text" placeholder="📄 🎥 🔗 📁" value="🔗" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.85rem;outline:none;">
+          </div>
+        </div>
+        <div style="margin-bottom:12px;">
+          <label style="display:block;font-size:.72rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">URL</label>
+          <input id="resUrl" type="url" placeholder="https://drive.google.com/..." style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.85rem;outline:none;">
+        </div>
+        <div style="margin-bottom:16px;">
+          <label style="display:block;font-size:.72rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Description (optional)</label>
+          <input id="resDesc" type="text" placeholder="Brief description of this resource" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.85rem;outline:none;">
+        </div>
+        <button onclick="addResource()" style="background:linear-gradient(135deg,#7b5cff,#00e5ff);border:none;color:#fff;padding:11px 28px;border-radius:9px;font-weight:700;font-size:.85rem;cursor:pointer;">+ Add Resource</button>
+      </div>
+
+      <!-- Existing resources -->
+      <div>
+        <h3 style="font-size:.85rem;font-weight:700;color:#e8eeff;margin-bottom:12px;">Current Resources</h3>
+        <div id="resourcesList" style="display:flex;flex-direction:column;gap:10px;">
+          <p style="color:#3d5070;font-size:.85rem;text-align:center;padding:20px;">Loading…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// RESOURCES MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+let currentResourcesState = { courseId: null, courseTitle: '', resources: [] };
+
+async function openManageResources(courseId, courseTitle) {
+  currentResourcesState = { courseId, courseTitle, resources: [] };
+  document.getElementById('resourcesModalCourseName').textContent = courseTitle;
+  document.getElementById('resourcesModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  document.getElementById('resTitle').value = '';
+  document.getElementById('resUrl').value = '';
+  document.getElementById('resIcon').value = '🔗';
+  document.getElementById('resDesc').value = '';
+  await loadResourcesList(courseId);
+}
+
+function closeResourcesModal() {
+  document.getElementById('resourcesModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+async function loadResourcesList(courseId) {
+  const container = document.getElementById('resourcesList');
+  // Load from allCourses cache (resources stored in modules JSON)
+  const course = allCourses.find(c => c.id === courseId);
+  let resources = [];
+  if (course) {
+    try {
+      const mods = typeof course.modules === 'string' ? JSON.parse(course.modules) : (course.modules || {});
+      resources = Array.isArray(mods.resources) ? mods.resources : [];
+    } catch(e) {}
+  }
+  currentResourcesState.resources = resources;
+  renderResourcesList(resources);
+}
+
+function renderResourcesList(resources) {
+  const container = document.getElementById('resourcesList');
+  if (!resources || resources.length === 0) {
+    container.innerHTML = '<p style="color:#3d5070;font-size:.85rem;text-align:center;padding:20px;">No resources yet. Add one above.</p>';
+    return;
+  }
+  container.innerHTML = resources.map(r => `
+    <div style="background:#0a1228;border:1px solid rgba(0,229,255,.1);border-radius:10px;padding:14px 16px;display:flex;align-items:center;gap:14px;">
+      <div style="font-size:1.6rem;flex-shrink:0;">${escAdm(r.icon||'🔗')}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-weight:600;color:#e8eeff;font-size:.9rem;">${escAdm(r.title)}</div>
+        ${r.description ? `<div style="color:#7d8fb3;font-size:.78rem;margin-top:2px;">${escAdm(r.description)}</div>` : ''}
+        <a href="${escAdm(r.url)}" target="_blank" style="color:#00e5ff;font-size:.75rem;word-break:break-all;">${escAdm(r.url)}</a>
+      </div>
+      <button onclick="deleteResource('${escAdm(r.id)}')" style="background:rgba(255,77,141,.08);border:1px solid rgba(255,77,141,.2);color:#ff4d8d;border-radius:8px;padding:7px 12px;cursor:pointer;font-size:.8rem;flex-shrink:0;">✕</button>
+    </div>`).join('');
+}
+
+async function addResource() {
+  const title = document.getElementById('resTitle').value.trim();
+  const url   = document.getElementById('resUrl').value.trim();
+  const icon  = document.getElementById('resIcon').value.trim() || '🔗';
+  const desc  = document.getElementById('resDesc').value.trim();
+  if (!title) { showAdminToast('Title is required', 'error'); return; }
+  if (!url)   { showAdminToast('URL is required', 'error'); return; }
+  try { new URL(url); } catch(e) { showAdminToast('Please enter a valid URL', 'error'); return; }
+
+  const res  = await fetch('/api/admin/resources', {
+    method: 'POST', credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ course_id: currentResourcesState.courseId, title, url, icon, description: desc })
+  });
+  const data = await res.json();
+  if (data.success) {
+    showAdminToast('Resource added!', 'success');
+    document.getElementById('resTitle').value = '';
+    document.getElementById('resUrl').value = '';
+    document.getElementById('resIcon').value = '🔗';
+    document.getElementById('resDesc').value = '';
+    currentResourcesState.resources = data.resources;
+    renderResourcesList(data.resources);
+    // Refresh course cache so resources show immediately
+    localStorage.removeItem('courses'); localStorage.removeItem('courses_timestamp');
+    await loadCourses();
+  } else showAdminToast(data.error || 'Failed to add resource', 'error');
+}
+
+async function deleteResource(resourceId) {
+  if (!confirm('Remove this resource?')) return;
+  const res  = await fetch('/api/admin/resources', {
+    method: 'DELETE', credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ course_id: currentResourcesState.courseId, resource_id: resourceId })
+  });
+  const data = await res.json();
+  if (data.success) {
+    showAdminToast('Resource removed', 'success');
+    currentResourcesState.resources = data.resources;
+    renderResourcesList(data.resources);
+    localStorage.removeItem('courses'); localStorage.removeItem('courses_timestamp');
+    await loadCourses();
+  } else showAdminToast(data.error || 'Failed', 'error');
+}
+
+document.getElementById('resourcesModal').addEventListener('click', function(e) { if (e.target === this) closeResourcesModal(); });
+</script>
+
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DB-BACKED ASSIGNMENTS
+// ═══════════════════════════════════════════════════════════
+function populateAssignmentCourseDropdown() {
+  const selA = document.getElementById('assignmentCourse');
+  const selP = document.getElementById('pointsCourseId');
+  if (selA && allCourses) {
+    selA.innerHTML = '<option value="">Select a course…</option>' +
+      allCourses.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('');
+  }
+  if (selP && allCourses) {
+    selP.innerHTML = '<option value="">Select course…</option>' +
+      allCourses.map(c => `<option value="${c.id}">${esc(c.title)}</option>`).join('');
+  }
+}
+
+async function dbLoadAssignments() {
+  const courseId = document.getElementById('assignmentCourse').value;
+  const container = document.getElementById('dbAssignmentsList');
+  if (!courseId) {
+    container.innerHTML = '<div class="text-center py-8 text-[#3d5070] text-sm">Select a course to see its assignments.</div>';
+    return;
+  }
+  const course = allCourses.find(c => c.id === parseInt(courseId));
+  let assignments = [];
+  if (course) {
+    try {
+      const mods = typeof course.modules === 'string' ? JSON.parse(course.modules) : (course.modules || {});
+      assignments = Array.isArray(mods.assignments_list) ? mods.assignments_list : [];
+    } catch(e) {}
+  }
+  if (!assignments.length) {
+    container.innerHTML = '<div class="text-center py-8 text-[#3d5070] text-sm">No assignments yet for this course.</div>';
+    return;
+  }
+  container.innerHTML = assignments.map(a => `
+    <div class="bg-[#0a1228] rounded-lg p-4 border border-[rgba(0,229,255,0.07)] hover:border-[rgba(0,229,255,0.15)] transition-colors">
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex-1 min-w-0">
+          <div class="flex items-center gap-2 mb-1.5">
+            <h4 class="font-bold text-white text-sm">${esc(a.title)}</h4>
+            <span class="badge badge-blue text-[10px]">${a.max_marks} marks</span>
+            ${a.due_date ? `<span class="badge badge-gray text-[10px]">Due: ${new Date(a.due_date).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}</span>` : ''}
+          </div>
+          ${a.description ? `<p class="text-xs text-[#4a6080]">${esc(a.description)}</p>` : ''}
+        </div>
+        <button onclick="dbDeleteAssignment('${courseId}','${a.id}')" class="text-[#3d5070] hover:text-accent3 transition-colors text-sm flex-shrink-0">🗑️</button>
+      </div>
+    </div>`).join('');
+}
+
+async function dbAddAssignment() {
+  const courseId = document.getElementById('assignmentCourse').value;
+  const title    = document.getElementById('assignmentTitle').value.trim();
+  const desc     = document.getElementById('assignmentDescription').value.trim();
+  const maxMarks = parseInt(document.getElementById('assignmentMaxMarks').value) || 100;
+  const dueDate  = document.getElementById('assignmentDueDate').value;
+  if (!courseId) { showToast('Select a course first', 'error'); return; }
+  if (!title)    { showToast('Title is required', 'error'); return; }
+
+  const res  = await fetch('/api/admin/assignments-crud', {
+    method: 'POST', credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ course_id: parseInt(courseId), title, description: desc, max_marks: maxMarks, due_date: dueDate || null })
+  });
+  const data = await res.json();
+  if (data.success) {
+    showToast('Assignment created!', 'success');
+    document.getElementById('assignmentTitle').value = '';
+    document.getElementById('assignmentDescription').value = '';
+    document.getElementById('assignmentDueDate').value = '';
+    document.getElementById('assignmentMaxMarks').value = '100';
+    localStorage.removeItem('courses'); localStorage.removeItem('courses_timestamp');
+    await loadCourses();
+    dbLoadAssignments();
+  } else showToast(data.error || 'Failed', 'error');
+}
+
+async function dbDeleteAssignment(courseId, assignmentId) {
+  if (!confirm('Delete this assignment?')) return;
+  const res  = await fetch('/api/admin/assignments-crud', {
+    method: 'DELETE', credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ course_id: parseInt(courseId), assignment_id: assignmentId })
+  });
+  const data = await res.json();
+  if (data.success) {
+    showToast('Deleted', 'success');
+    localStorage.removeItem('courses'); localStorage.removeItem('courses_timestamp');
+    await loadCourses();
+    dbLoadAssignments();
+  } else showToast(data.error || 'Failed', 'error');
+}
+
+// ═══════════════════════════════════════════════════════════
+// POINTS SYSTEM
+// ═══════════════════════════════════════════════════════════
+async function initPointsDropdowns() {
+  try {
+    const res  = await fetch('/api/admin/points', { credentials: 'include' });
+    const data = await res.json();
+    if (!data.success) return;
+    const userSel = document.getElementById('pointsUserId');
+    if (userSel) {
+      userSel.innerHTML = '<option value="">Select student…</option>' +
+        data.users.map(u => `<option value="${u.id}">${esc(u.username)} (${esc(u.email)})</option>`).join('');
+    }
+  } catch(e) {}
+}
+
+async function givePoints() {
+  const userId   = document.getElementById('pointsUserId').value;
+  const courseId = document.getElementById('pointsCourseId').value;
+  const points   = parseFloat(document.getElementById('pointsAmount').value);
+  const total    = parseFloat(document.getElementById('pointsTotal').value) || 100;
+  const label    = document.getElementById('pointsLabel').value.trim();
+  const note     = document.getElementById('pointsNote').value.trim();
+  if (!userId)          { showToast('Select a student', 'error'); return; }
+  if (!courseId)        { showToast('Select a course', 'error'); return; }
+  if (!label)           { showToast('Label is required', 'error'); return; }
+  if (isNaN(points) || points < 0) { showToast('Enter valid points', 'error'); return; }
+
+  const res  = await fetch('/api/admin/points', {
+    method: 'POST', credentials: 'include',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ user_id: parseInt(userId), course_id: parseInt(courseId), label, points, total_marks: total, notes: note || null })
+  });
+  const data = await res.json();
+  if (data.success) {
+    showToast('Points given! 🏅', 'success');
+    document.getElementById('pointsAmount').value = '';
+    document.getElementById('pointsLabel').value = '';
+    document.getElementById('pointsNote').value = '';
+    document.getElementById('pointsUserId').value = '';
+    document.getElementById('pointsCourseId').value = '';
+    // Show in recent list
+    const m = data.mark;
+    const list = document.getElementById('recentPointsList');
+    const existing = list.querySelector('.text-center');
+    if (existing) existing.remove();
+    const div = document.createElement('div');
+    div.className = 'bg-[#0a1228] rounded-lg p-3 border border-[rgba(0,229,255,0.07)] mb-2';
+    div.innerHTML = `<div class="flex items-center justify-between"><div><div class="text-sm font-bold text-white">${esc(label)}</div><div class="text-xs text-[#4a6080] mt-0.5">User #${m.user_id} · Course #${m.course_id}</div></div><span class="text-accent font-bold text-sm">${points} / ${total}</span></div>`;
+    list.insertBefore(div, list.firstChild);
+  } else showToast(data.error || 'Failed', 'error');
+}
+
+// Hook into existing init flow
+const _origLoadCourses = typeof loadCourses === 'function' ? loadCourses : null;
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(() => {
+    populateAssignmentCourseDropdown();
+    initPointsDropdowns();
+  }, 1500);
+});
 </script>
 
 </body>

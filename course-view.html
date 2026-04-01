@@ -1548,57 +1548,58 @@
       if (side)  side.classList.toggle('active', t === name);
     });
     document.getElementById('userMenu').classList.remove('show');
+    // Refresh live data tabs on every switch
+    if (name === 'leaderboard') loadLeaderboard();
+    if (name === 'assignment')  loadUserMarks();
+    if (name === 'exam' && !examData) loadExam();
   }
 
   function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
 
   // ── OTHER TABS ─────────────────────────────────────────────────────────
   function renderAssignments(count, content, curriculum) {
+    // Load assignments from DB (stored in modules.assignments_list)
     const container = document.getElementById('assignmentsList');
-    const tasks = [];
-    if (curriculum && curriculum.length) {
-      curriculum.forEach(mod => {
-        const topics = Array.isArray(mod.topics) ? mod.topics : [];
-        topics.forEach(t => {
-          const lower = (t || '').toLowerCase();
-          if (lower.includes('assignment') || lower.includes('project') || lower.includes('exercise') || lower.includes('task')) {
-            tasks.push({ title: t, module: mod.moduleTitle || mod.title, badge: 'open' });
-          }
-        });
-      });
-    }
-    if (tasks.length === 0 && count > 0) {
-      for (let i = 1; i <= Math.min(count, 5); i++) {
-        tasks.push({ title: `Assignment ${i}`, module: 'Course Assignment', badge: i === 1 ? 'open' : 'pending' });
-      }
-    }
-    if (tasks.length === 0) {
-      container.innerHTML = `<div class="lb-coming-soon"><div class="empty-icon">📝</div><h3>No Assignments Yet</h3></div>`;
+    const dbAssignments = Array.isArray(courseModules.assignments_list) ? courseModules.assignments_list : [];
+
+    if (dbAssignments.length === 0) {
+      container.innerHTML = `<div class="lb-coming-soon"><div class="empty-icon">📝</div><h3>No Assignments Yet</h3><p>Your instructor hasn't posted any assignments yet.</p></div>`;
       return;
     }
-    container.innerHTML = tasks.map((t, i) => `
-      <div class="assignment-card" style="animation-delay:${i*.05}s">
+    container.innerHTML = dbAssignments.map((a, i) => {
+      const due = a.due_date ? `Due: <strong>${new Date(a.due_date).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</strong>` : '';
+      return `<div class="assignment-card" style="animation-delay:${i*.05}s">
         <div class="assignment-card-header">
-          <div class="assignment-title">${escapeHtml(t.title)}</div>
-          <span class="assignment-badge badge-${t.badge || 'open'}">${t.badge === 'done' ? '✓ Completed' : t.badge === 'pending' ? '⏳ Upcoming' : '● Open'}</span>
+          <div class="assignment-title">${escapeHtml(a.title)}</div>
+          <span class="assignment-badge badge-open">${a.max_marks} Marks</span>
         </div>
-        <div class="assignment-desc">${t.module ? `From module: <strong style="color:var(--text)">${escapeHtml(t.module)}</strong>` : 'Course Assignment'}</div>
-      </div>`).join('');
+        <div class="assignment-desc">${escapeHtml(a.description || '')}${due ? `<span style="margin-left:10px;color:var(--muted);font-size:.8rem;">${due}</span>` : ''}</div>
+      </div>`;
+    }).join('');
   }
 
   function renderResources() {
     const container = document.getElementById('resourcesGrid');
     const resources = [];
+    // WhatsApp always first if set
     if (activeCourse.whatsapp) {
       resources.push({ icon: '💬', iconClass: 'green', title: 'WhatsApp Community', desc: 'Join the course WhatsApp group to collaborate.', label: 'Join Group', href: activeCourse.whatsapp });
     }
-    resources.push({ icon: '📖', iconClass: 'cyan', title: 'Course Notes', desc: 'Study materials and notes.', label: 'Coming Soon', href: null });
+    // Load admin-added resources from modules JSON
+    const adminResources = Array.isArray(courseModules.resources) ? courseModules.resources : [];
+    adminResources.forEach(r => {
+      resources.push({ icon: r.icon || '🔗', iconClass: 'cyan', title: r.title, desc: r.description || '', label: 'Open →', href: r.url });
+    });
+    if (resources.length === 0) {
+      container.innerHTML = `<div class="lb-coming-soon" style="grid-column:1/-1"><div class="empty-icon">🔗</div><h3>No Resources Yet</h3><p>Your instructor hasn't added any resources yet.</p></div>`;
+      return;
+    }
     container.innerHTML = resources.map(r => `
       <div class="resource-card">
         <div class="resource-icon ${r.iconClass}">${r.icon}</div>
-        <h4>${r.title}</h4>
-        <p>${r.desc}</p>
-        ${r.href ? `<a class="resource-link" href="${escapeHtml(r.href)}" target="_blank">${r.label} →</a>` : `<span class="resource-link" style="opacity:.5;cursor:default;">${r.label}</span>`}
+        <h4>${escapeHtml(r.title)}</h4>
+        <p>${escapeHtml(r.desc)}</p>
+        ${r.href ? `<a class="resource-link" href="${escapeHtml(r.href)}" target="_blank">${r.label}</a>` : `<span class="resource-link" style="opacity:.5;cursor:default;">${r.label}</span>`}
       </div>`).join('');
   }
 

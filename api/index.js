@@ -802,6 +802,7 @@ async function submitExam(req, res) {
   const { exam_id, answers } = req.body || {};
   if (!exam_id || !answers) return res.status(400).json({ success: false, error: 'exam_id and answers required' });
 
+  // Ensure table exists with a single consistent schema (no unique constraints)
   await query(`CREATE TABLE IF NOT EXISTS user_marks (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL,
@@ -812,9 +813,13 @@ async function submitExam(req, res) {
     marks_obtained NUMERIC(8,2) NOT NULL DEFAULT 0,
     total_marks NUMERIC(8,2) NOT NULL DEFAULT 100,
     notes TEXT,
-    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(user_id, exam_id, type)
+    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
   )`);
+  // Drop any legacy unique constraints that may exist from earlier schema
+  try {
+    await query(`ALTER TABLE user_marks DROP CONSTRAINT IF EXISTS user_marks_user_id_exam_id_type_key`);
+    await query(`ALTER TABLE user_marks DROP CONSTRAINT IF EXISTS user_marks_user_id_course_id_label_type_key`);
+  } catch(e) { /* ignore */ }
 
   const examResult = await query(`SELECT * FROM exams WHERE id=$1`, [exam_id]);
   if (!examResult.rows.length) return res.status(404).json({ success: false, error: 'Exam not found' });
@@ -830,12 +835,23 @@ async function submitExam(req, res) {
     feedback.push({ id: q.id, correct, correct_answer: q.correct_answer, user_answer: userAnswer });
   });
 
-  await query(
-    `INSERT INTO user_marks (user_id, course_id, exam_id, type, label, marks_obtained, total_marks)
-     VALUES ($1,$2,$3,'exam',$4,$5,$6)
-     ON CONFLICT (user_id, exam_id, type) DO UPDATE SET marks_obtained=$5, submitted_at=NOW()`,
-    [user.id, exam.course_id, exam_id, exam.title, score, exam.total_marks]
+  // Update existing exam submission or insert new one
+  const existing = await query(
+    `SELECT id FROM user_marks WHERE user_id=$1 AND exam_id=$2 AND type='exam'`,
+    [user.id, exam_id]
   );
+  if (existing.rows.length > 0) {
+    await query(
+      `UPDATE user_marks SET marks_obtained=$1, submitted_at=NOW() WHERE id=$2`,
+      [score, existing.rows[0].id]
+    );
+  } else {
+    await query(
+      `INSERT INTO user_marks (user_id, course_id, exam_id, type, label, marks_obtained, total_marks)
+       VALUES ($1,$2,$3,'exam',$4,$5,$6)`,
+      [user.id, exam.course_id, exam_id, exam.title, score, exam.total_marks]
+    );
+  }
 
   return res.status(200).json({ success: true, score, total: exam.total_marks, feedback });
 }
@@ -856,9 +872,12 @@ async function adminMarks(req, res) {
     marks_obtained NUMERIC(8,2) NOT NULL DEFAULT 0,
     total_marks NUMERIC(8,2) NOT NULL DEFAULT 100,
     notes TEXT,
-    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    UNIQUE(user_id, course_id, label, type)
+    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
   )`);
+  try {
+    await query(`ALTER TABLE user_marks DROP CONSTRAINT IF EXISTS user_marks_user_id_exam_id_type_key`);
+    await query(`ALTER TABLE user_marks DROP CONSTRAINT IF EXISTS user_marks_user_id_course_id_label_type_key`);
+  } catch(e) { /* ignore */ }
 
   if (req.method === 'GET') {
     const { course_id } = req.query || {};
@@ -871,15 +890,11 @@ async function adminMarks(req, res) {
        ORDER BY um.submitted_at DESC`,
       [course_id]
     );
-    // Also get enrolled users for this course
-    const enrolled = await query(
-      `SELECT u.id, u.username, u.email
-       FROM purchases p JOIN users u ON u.id=p.user_id
-       WHERE p.course_id=$1 AND p.status='approved'
-       ORDER BY u.username`,
-      [course_id]
+    // Get ALL users so admin can assign marks to anyone
+    const allUsers = await query(
+      `SELECT u.id, u.username, u.email FROM users u WHERE u.is_admin=FALSE ORDER BY u.username`
     );
-    return res.status(200).json({ success: true, marks: r.rows, enrolled_users: enrolled.rows });
+    return res.status(200).json({ success: true, marks: r.rows, enrolled_users: allUsers.rows });
   }
 
   if (req.method === 'POST') {
@@ -888,7 +903,6 @@ async function adminMarks(req, res) {
     const r = await query(
       `INSERT INTO user_marks (user_id, course_id, type, label, marks_obtained, total_marks, notes)
        VALUES ($1,$2,'assignment',$3,$4,$5,$6)
-       ON CONFLICT (user_id, course_id, label, type) DO UPDATE SET marks_obtained=$4, total_marks=$5, notes=$6, submitted_at=NOW()
        RETURNING *`,
       [user_id, course_id, label||'Assignment', marks_obtained, total_marks||100, notes||null]
     );
@@ -923,6 +937,125 @@ async function userMarks(req, res) {
     [user.id, course_id]
   );
   return res.status(200).json({ success: true, marks: r.rows });
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN: DB-BACKED ASSIGNMENTS (stored in course modules JSON)
+// ═══════════════════════════════════════════════════════════════════════════════
+async function adminAssignmentsCrud(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+
+  if (req.method === 'POST') {
+    const { course_id, title, description, due_date, max_marks } = req.body || {};
+    if (!course_id || !title) return res.status(400).json({ success: false, error: 'course_id and title required' });
+    const cr = await query(`SELECT modules FROM courses WHERE id=$1`, [course_id]);
+    if (!cr.rows.length) return res.status(404).json({ success: false, error: 'Course not found' });
+    let mods = {};
+    try { mods = typeof cr.rows[0].modules === 'string' ? JSON.parse(cr.rows[0].modules) : (cr.rows[0].modules || {}); } catch(e) {}
+    if (!Array.isArray(mods.assignments_list)) mods.assignments_list = [];
+    const newAssignment = { id: Date.now().toString(), title, description: description||'', due_date: due_date||null, max_marks: max_marks||100, created_at: new Date().toISOString() };
+    mods.assignments_list.push(newAssignment);
+    await query(`UPDATE courses SET modules=$1::jsonb WHERE id=$2`, [JSON.stringify(mods), course_id]);
+    return res.status(200).json({ success: true, assignment: newAssignment, assignments: mods.assignments_list });
+  }
+
+  if (req.method === 'DELETE') {
+    const { course_id, assignment_id } = req.body || {};
+    if (!course_id || !assignment_id) return res.status(400).json({ success: false, error: 'course_id and assignment_id required' });
+    const cr = await query(`SELECT modules FROM courses WHERE id=$1`, [course_id]);
+    if (!cr.rows.length) return res.status(404).json({ success: false, error: 'Course not found' });
+    let mods = {};
+    try { mods = typeof cr.rows[0].modules === 'string' ? JSON.parse(cr.rows[0].modules) : (cr.rows[0].modules || {}); } catch(e) {}
+    if (!Array.isArray(mods.assignments_list)) mods.assignments_list = [];
+    mods.assignments_list = mods.assignments_list.filter(a => a.id !== assignment_id);
+    await query(`UPDATE courses SET modules=$1::jsonb WHERE id=$2`, [JSON.stringify(mods), course_id]);
+    return res.status(200).json({ success: true, assignments: mods.assignments_list });
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN: GIVE POINTS to any user (bonus points, not tied to an assignment)
+// ═══════════════════════════════════════════════════════════════════════════════
+async function adminPoints(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+
+  await query(`CREATE TABLE IF NOT EXISTS user_marks (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL,
+    exam_id INTEGER,
+    type VARCHAR(30) NOT NULL DEFAULT 'assignment',
+    label VARCHAR(255) DEFAULT 'Assignment',
+    marks_obtained NUMERIC(8,2) NOT NULL DEFAULT 0,
+    total_marks NUMERIC(8,2) NOT NULL DEFAULT 100,
+    notes TEXT,
+    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  )`);
+  try {
+    await query(`ALTER TABLE user_marks DROP CONSTRAINT IF EXISTS user_marks_user_id_exam_id_type_key`);
+    await query(`ALTER TABLE user_marks DROP CONSTRAINT IF EXISTS user_marks_user_id_course_id_label_type_key`);
+  } catch(e) {}
+
+  if (req.method === 'GET') {
+    // Return all users for dropdown
+    const users = await query(`SELECT id, username, email FROM users WHERE is_admin=FALSE ORDER BY username`);
+    const courses = await query(`SELECT id, title FROM courses WHERE is_active=TRUE ORDER BY title`);
+    return res.status(200).json({ success: true, users: users.rows, courses: courses.rows });
+  }
+
+  if (req.method === 'POST') {
+    const { user_id, course_id, label, points, total_marks, notes } = req.body || {};
+    if (!user_id || !course_id || points === undefined) return res.status(400).json({ success: false, error: 'user_id, course_id and points required' });
+    const r = await query(
+      `INSERT INTO user_marks (user_id, course_id, type, label, marks_obtained, total_marks, notes)
+       VALUES ($1,$2,'points',$3,$4,$5,$6) RETURNING *`,
+      [user_id, course_id, label||'Bonus Points', points, total_marks||points, notes||null]
+    );
+    return res.status(200).json({ success: true, mark: r.rows[0] });
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN: RESOURCES (stored in course modules JSON field)
+// ═══════════════════════════════════════════════════════════════════════════════
+async function adminResources(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+
+  if (req.method === 'POST') {
+    const { course_id, title, url, icon, description } = req.body || {};
+    if (!course_id || !title || !url) return res.status(400).json({ success: false, error: 'course_id, title and url required' });
+    // Fetch current course modules
+    const cr = await query(`SELECT modules FROM courses WHERE id=$1`, [course_id]);
+    if (!cr.rows.length) return res.status(404).json({ success: false, error: 'Course not found' });
+    let mods = {};
+    try { mods = typeof cr.rows[0].modules === 'string' ? JSON.parse(cr.rows[0].modules) : (cr.rows[0].modules || {}); } catch(e) {}
+    if (!Array.isArray(mods.resources)) mods.resources = [];
+    const newResource = { id: Date.now().toString(), title, url, icon: icon||'🔗', description: description||'' };
+    mods.resources.push(newResource);
+    await query(`UPDATE courses SET modules=$1::jsonb WHERE id=$2`, [JSON.stringify(mods), course_id]);
+    return res.status(200).json({ success: true, resource: newResource, resources: mods.resources });
+  }
+
+  if (req.method === 'DELETE') {
+    const { course_id, resource_id } = req.body || {};
+    if (!course_id || !resource_id) return res.status(400).json({ success: false, error: 'course_id and resource_id required' });
+    const cr = await query(`SELECT modules FROM courses WHERE id=$1`, [course_id]);
+    if (!cr.rows.length) return res.status(404).json({ success: false, error: 'Course not found' });
+    let mods = {};
+    try { mods = typeof cr.rows[0].modules === 'string' ? JSON.parse(cr.rows[0].modules) : (cr.rows[0].modules || {}); } catch(e) {}
+    if (!Array.isArray(mods.resources)) mods.resources = [];
+    mods.resources = mods.resources.filter(r => r.id !== resource_id);
+    await query(`UPDATE courses SET modules=$1::jsonb WHERE id=$2`, [JSON.stringify(mods), course_id]);
+    return res.status(200).json({ success: true, resources: mods.resources });
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
@@ -1024,6 +1157,9 @@ export default async function handler(req, res) {
     if (path.endsWith('/_public/leaderboard') || path.endsWith('/public/leaderboard')) return await publicLeaderboard(req, res);
     if (path.endsWith('/_public/exam')        || path.endsWith('/public/exam'))        return await publicExam(req, res);
     if (path.endsWith('/exam/submit'))         return await submitExam(req, res);
+    if (path.endsWith('/admin/resources'))       return await adminResources(req, res);
+    if (path.endsWith('/admin/assignments-crud')) return await adminAssignmentsCrud(req, res);
+    if (path.endsWith('/admin/points'))           return await adminPoints(req, res);
 
     return res.status(404).json({ success: false, error: `No route: ${path}` });
   } catch (err) {
