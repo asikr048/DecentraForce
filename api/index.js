@@ -703,6 +703,253 @@ async function adminTestimonials(req, res) {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN: EXAMS  (MCQ or link-based, per course)
+// ═══════════════════════════════════════════════════════════════════════════════
+async function adminExams(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+
+  // Ensure tables exist
+  await query(`CREATE TABLE IF NOT EXISTS exams (
+    id SERIAL PRIMARY KEY,
+    course_id INTEGER NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    type VARCHAR(20) NOT NULL DEFAULT 'mcq',   -- 'mcq' | 'link'
+    link_url TEXT,
+    total_marks INTEGER NOT NULL DEFAULT 100,
+    duration_minutes INTEGER DEFAULT 60,
+    questions JSONB DEFAULT '[]'::jsonb,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+  )`);
+
+  if (req.method === 'GET') {
+    const { course_id } = req.query || {};
+    let r;
+    if (course_id) {
+      r = await query(`SELECT * FROM exams WHERE course_id=$1 ORDER BY created_at DESC`, [course_id]);
+    } else {
+      r = await query(`SELECT * FROM exams ORDER BY created_at DESC`);
+    }
+    return res.status(200).json({ success: true, exams: r.rows });
+  }
+
+  if (req.method === 'POST') {
+    const { course_id, title, type, link_url, total_marks, duration_minutes, questions } = req.body || {};
+    if (!course_id || !title) return res.status(400).json({ success: false, error: 'course_id and title required' });
+    const r = await query(
+      `INSERT INTO exams (course_id, title, type, link_url, total_marks, duration_minutes, questions)
+       VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *`,
+      [course_id, title, type||'mcq', link_url||null, total_marks||100, duration_minutes||60, JSON.stringify(questions||[])]
+    );
+    return res.status(200).json({ success: true, exam: r.rows[0] });
+  }
+
+  if (req.method === 'PUT') {
+    const { id, title, type, link_url, total_marks, duration_minutes, questions, is_active } = req.body || {};
+    if (!id) return res.status(400).json({ success: false, error: 'id required' });
+    const r = await query(
+      `UPDATE exams SET title=$1, type=$2, link_url=$3, total_marks=$4, duration_minutes=$5, questions=$6, is_active=$7
+       WHERE id=$8 RETURNING *`,
+      [title, type||'mcq', link_url||null, total_marks||100, duration_minutes||60, JSON.stringify(questions||[]), is_active!==false, id]
+    );
+    return res.status(200).json({ success: true, exam: r.rows[0] });
+  }
+
+  if (req.method === 'DELETE') {
+    const { id } = req.body || {};
+    if (!id) return res.status(400).json({ success: false, error: 'id required' });
+    await query(`DELETE FROM exams WHERE id=$1`, [id]);
+    return res.status(200).json({ success: true });
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PUBLIC: GET exam for a course (without answers)
+// ═══════════════════════════════════════════════════════════════════════════════
+async function publicExam(req, res) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
+  const { course_id } = req.query || {};
+  if (!course_id) return res.status(400).json({ success: false, error: 'course_id required' });
+
+  const r = await query(
+    `SELECT id, course_id, title, type, link_url, total_marks, duration_minutes,
+       CASE WHEN type='mcq' THEN
+         (SELECT jsonb_agg(jsonb_build_object(
+           'id', q->>'id', 'question', q->>'question',
+           'options', q->'options', 'marks', q->'marks'
+         )) FROM jsonb_array_elements(questions) q)
+       ELSE '[]'::jsonb END AS questions
+     FROM exams WHERE course_id=$1 AND is_active=TRUE ORDER BY created_at DESC LIMIT 1`,
+    [course_id]
+  );
+  if (!r.rows.length) return res.status(200).json({ success: true, exam: null });
+  return res.status(200).json({ success: true, exam: r.rows[0] });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// USER: SUBMIT MCQ EXAM
+// ═══════════════════════════════════════════════════════════════════════════════
+async function submitExam(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const token = req.cookies?.session_token;
+  if (!token) return res.status(401).json({ success: false, error: 'Not authenticated' });
+  const userResult = await query(`SELECT id, username FROM users WHERE session_token=$1 AND session_expires>NOW()`, [token]);
+  if (!userResult.rows.length) return res.status(401).json({ success: false, error: 'Invalid session' });
+  const user = userResult.rows[0];
+
+  const { exam_id, answers } = req.body || {};
+  if (!exam_id || !answers) return res.status(400).json({ success: false, error: 'exam_id and answers required' });
+
+  await query(`CREATE TABLE IF NOT EXISTS user_marks (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL,
+    exam_id INTEGER,
+    type VARCHAR(30) NOT NULL DEFAULT 'assignment',
+    label VARCHAR(255) DEFAULT 'Assignment',
+    marks_obtained NUMERIC(8,2) NOT NULL DEFAULT 0,
+    total_marks NUMERIC(8,2) NOT NULL DEFAULT 100,
+    notes TEXT,
+    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, exam_id, type)
+  )`);
+
+  const examResult = await query(`SELECT * FROM exams WHERE id=$1`, [exam_id]);
+  if (!examResult.rows.length) return res.status(404).json({ success: false, error: 'Exam not found' });
+  const exam = examResult.rows[0];
+  const questions = Array.isArray(exam.questions) ? exam.questions : JSON.parse(exam.questions || '[]');
+
+  let score = 0;
+  const feedback = [];
+  questions.forEach(q => {
+    const userAnswer = answers[q.id];
+    const correct = userAnswer === q.correct_answer;
+    if (correct) score += (q.marks || 1);
+    feedback.push({ id: q.id, correct, correct_answer: q.correct_answer, user_answer: userAnswer });
+  });
+
+  await query(
+    `INSERT INTO user_marks (user_id, course_id, exam_id, type, label, marks_obtained, total_marks)
+     VALUES ($1,$2,$3,'exam',$4,$5,$6)
+     ON CONFLICT (user_id, exam_id, type) DO UPDATE SET marks_obtained=$5, submitted_at=NOW()`,
+    [user.id, exam.course_id, exam_id, exam.title, score, exam.total_marks]
+  );
+
+  return res.status(200).json({ success: true, score, total: exam.total_marks, feedback });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// ADMIN: MARKS — assign assignment marks to users
+// ═══════════════════════════════════════════════════════════════════════════════
+async function adminMarks(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+
+  await query(`CREATE TABLE IF NOT EXISTS user_marks (
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    course_id INTEGER NOT NULL,
+    exam_id INTEGER,
+    type VARCHAR(30) NOT NULL DEFAULT 'assignment',
+    label VARCHAR(255) DEFAULT 'Assignment',
+    marks_obtained NUMERIC(8,2) NOT NULL DEFAULT 0,
+    total_marks NUMERIC(8,2) NOT NULL DEFAULT 100,
+    notes TEXT,
+    submitted_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, course_id, label, type)
+  )`);
+
+  if (req.method === 'GET') {
+    const { course_id } = req.query || {};
+    if (!course_id) return res.status(400).json({ success: false, error: 'course_id required' });
+    const r = await query(
+      `SELECT um.*, u.username, u.email
+       FROM user_marks um
+       JOIN users u ON u.id = um.user_id
+       WHERE um.course_id=$1
+       ORDER BY um.submitted_at DESC`,
+      [course_id]
+    );
+    // Also get enrolled users for this course
+    const enrolled = await query(
+      `SELECT u.id, u.username, u.email
+       FROM purchases p JOIN users u ON u.id=p.user_id
+       WHERE p.course_id=$1 AND p.status='approved'
+       ORDER BY u.username`,
+      [course_id]
+    );
+    return res.status(200).json({ success: true, marks: r.rows, enrolled_users: enrolled.rows });
+  }
+
+  if (req.method === 'POST') {
+    const { user_id, course_id, label, marks_obtained, total_marks, notes } = req.body || {};
+    if (!user_id || !course_id || marks_obtained === undefined) return res.status(400).json({ success: false, error: 'user_id, course_id, marks_obtained required' });
+    const r = await query(
+      `INSERT INTO user_marks (user_id, course_id, type, label, marks_obtained, total_marks, notes)
+       VALUES ($1,$2,'assignment',$3,$4,$5,$6)
+       ON CONFLICT (user_id, course_id, label, type) DO UPDATE SET marks_obtained=$4, total_marks=$5, notes=$6, submitted_at=NOW()
+       RETURNING *`,
+      [user_id, course_id, label||'Assignment', marks_obtained, total_marks||100, notes||null]
+    );
+    return res.status(200).json({ success: true, mark: r.rows[0] });
+  }
+
+  if (req.method === 'DELETE') {
+    const { id } = req.body || {};
+    if (!id) return res.status(400).json({ success: false, error: 'id required' });
+    await query(`DELETE FROM user_marks WHERE id=$1`, [id]);
+    return res.status(200).json({ success: true });
+  }
+
+  return res.status(405).json({ success: false, error: 'Method not allowed' });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// USER: GET OWN MARKS for a course
+// ═══════════════════════════════════════════════════════════════════════════════
+async function userMarks(req, res) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
+  const token = req.cookies?.session_token;
+  if (!token) return res.status(401).json({ success: false, error: 'Not authenticated' });
+  const userResult = await query(`SELECT id FROM users WHERE session_token=$1 AND session_expires>NOW()`, [token]);
+  if (!userResult.rows.length) return res.status(401).json({ success: false, error: 'Invalid session' });
+  const user = userResult.rows[0];
+  const { course_id } = req.query || {};
+  if (!course_id) return res.status(400).json({ success: false, error: 'course_id required' });
+
+  const r = await query(
+    `SELECT * FROM user_marks WHERE user_id=$1 AND course_id=$2 ORDER BY submitted_at DESC`,
+    [user.id, course_id]
+  );
+  return res.status(200).json({ success: true, marks: r.rows });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// PUBLIC: LEADERBOARD for a course (top users by total marks)
+// ═══════════════════════════════════════════════════════════════════════════════
+async function publicLeaderboard(req, res) {
+  if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
+  const { course_id } = req.query || {};
+  if (!course_id) return res.status(400).json({ success: false, error: 'course_id required' });
+
+  const r = await query(
+    `SELECT u.id, u.username,
+       SUM(um.marks_obtained) AS total_obtained,
+       SUM(um.total_marks) AS total_possible,
+       COUNT(um.id) AS entry_count
+     FROM user_marks um
+     JOIN users u ON u.id = um.user_id
+     WHERE um.course_id=$1
+     GROUP BY u.id, u.username
+     ORDER BY total_obtained DESC
+     LIMIT 100`,
+    [course_id]
+  );
+  return res.status(200).json({ success: true, leaderboard: r.rows });
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
 // ADMIN: REORDER
 // ═══════════════════════════════════════════════════════════════════════════════
 async function adminReorder(req, res) {
@@ -771,6 +1018,12 @@ export default async function handler(req, res) {
     if (path.endsWith('/admin/mentors'))       return await adminMentors(req, res);
     if (path.endsWith('/admin/testimonials'))  return await adminTestimonials(req, res);
     if (path.endsWith('/admin/reorder'))       return await adminReorder(req, res);
+    if (path.endsWith('/admin/exams'))         return await adminExams(req, res);
+    if (path.endsWith('/admin/marks'))         return await adminMarks(req, res);
+    if (path.endsWith('/user/marks'))          return await userMarks(req, res);
+    if (path.endsWith('/_public/leaderboard') || path.endsWith('/public/leaderboard')) return await publicLeaderboard(req, res);
+    if (path.endsWith('/_public/exam')        || path.endsWith('/public/exam'))        return await publicExam(req, res);
+    if (path.endsWith('/exam/submit'))         return await submitExam(req, res);
 
     return res.status(404).json({ success: false, error: `No route: ${path}` });
   } catch (err) {

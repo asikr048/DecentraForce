@@ -1227,9 +1227,13 @@ function renderCoursesGrid() {
           <span class="text-accent font-black text-sm">৳${esc(c.price||'0')}</span>
           <span class="text-xs text-[#3d5070]">${esc(c.enrolled_count||0)} enrolled</span>
         </div>
-        <div class="flex gap-2">
+        <div class="flex gap-2 flex-wrap">
           <button onclick="openEditCourse(${c.id})" class="flex-1 bg-[#0a1228] border border-[rgba(0,229,255,0.1)] text-white py-2 rounded-lg text-xs font-bold hover:border-[rgba(0,229,255,0.3)] hover:text-accent transition-colors">EDIT</button>
           <button onclick="deleteCourse(${c.id})" class="flex-1 bg-[rgba(255,77,141,0.06)] border border-[rgba(255,77,141,0.2)] text-accent3 py-2 rounded-lg text-xs font-bold hover:bg-[rgba(255,77,141,0.12)] transition-colors">DELETE</button>
+        </div>
+        <div class="flex gap-2 mt-1.5">
+          <button onclick="openManageExam(${c.id},'${esc(c.title)}')" class="flex-1 bg-[rgba(123,92,255,0.08)] border border-[rgba(123,92,255,0.25)] text-[#a98fff] py-2 rounded-lg text-xs font-bold hover:bg-[rgba(123,92,255,0.16)] transition-colors">🎯 EXAM</button>
+          <button onclick="openManageMarks(${c.id},'${esc(c.title)}')" class="flex-1 bg-[rgba(0,229,255,0.06)] border border-[rgba(0,229,255,0.2)] text-accent py-2 rounded-lg text-xs font-bold hover:bg-[rgba(0,229,255,0.12)] transition-colors">📊 MARKS</button>
         </div>
       </div>
     </div>`;
@@ -2008,5 +2012,425 @@ function fmtDate(iso) {
   return new Date(iso).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
 }
 </script>
+
+<!-- ══ EXAM MANAGEMENT MODAL ══════════════════════════════════════════════ -->
+<div id="examModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);overflow-y:auto;">
+  <div style="max-width:720px;margin:40px auto;padding:20px;">
+    <div style="background:#0d1630;border:1px solid rgba(0,229,255,.15);border-radius:18px;padding:32px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div>
+          <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#e8eeff;">Manage Exam</h2>
+          <p id="examModalCourseName" style="color:#7d8fb3;font-size:.85rem;margin-top:2px;"></p>
+        </div>
+        <button onclick="closeExamModal()" style="background:rgba(255,255,255,.06);border:none;color:#7d8fb3;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:1.1rem;">✕</button>
+      </div>
+
+      <!-- Existing exam -->
+      <div id="existingExamArea" style="margin-bottom:24px;display:none;">
+        <div style="background:#0a1228;border:1px solid rgba(0,229,255,.1);border-radius:12px;padding:18px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div>
+              <div id="existingExamTitle" style="font-weight:700;color:#e8eeff;font-size:.95rem;"></div>
+              <div id="existingExamMeta" style="color:#7d8fb3;font-size:.78rem;margin-top:3px;"></div>
+            </div>
+            <div style="display:flex;gap:8px;">
+              <button onclick="editExistingExam()" style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:#00e5ff;padding:7px 14px;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;">EDIT</button>
+              <button onclick="deleteExam()" style="background:rgba(255,77,141,.06);border:1px solid rgba(255,77,141,.2);color:#ff4d8d;padding:7px 14px;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;">DELETE</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Exam form -->
+      <div id="examFormArea">
+        <input type="hidden" id="examId">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div>
+            <label style="display:block;font-size:.75rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Exam Title</label>
+            <input id="examTitle" type="text" placeholder="e.g., Final Assessment" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:10px 14px;color:#e8eeff;font-size:.88rem;outline:none;">
+          </div>
+          <div>
+            <label style="display:block;font-size:.75rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Exam Type</label>
+            <select id="examType" onchange="toggleExamType()" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:10px 14px;color:#e8eeff;font-size:.88rem;outline:none;">
+              <option value="mcq">MCQ (Auto-graded)</option>
+              <option value="link">External Link</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div>
+            <label style="display:block;font-size:.75rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Total Marks</label>
+            <input id="examTotalMarks" type="number" placeholder="100" value="100" min="1" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:10px 14px;color:#e8eeff;font-size:.88rem;outline:none;">
+          </div>
+          <div>
+            <label style="display:block;font-size:.75rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">Duration (mins)</label>
+            <input id="examDuration" type="number" placeholder="60" value="60" min="1" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:10px 14px;color:#e8eeff;font-size:.88rem;outline:none;">
+          </div>
+        </div>
+        <!-- Link URL (shown for link type) -->
+        <div id="examLinkArea" style="display:none;margin-bottom:16px;">
+          <label style="display:block;font-size:.75rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;">External Exam URL</label>
+          <input id="examLinkUrl" type="url" placeholder="https://forms.google.com/..." style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:10px 14px;color:#e8eeff;font-size:.88rem;outline:none;">
+        </div>
+        <!-- MCQ builder -->
+        <div id="examMcqArea" style="margin-bottom:20px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+            <label style="font-size:.75rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;">Questions</label>
+            <button onclick="addQuestion()" style="background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);color:#00e5ff;padding:6px 14px;border-radius:8px;font-size:.78rem;font-weight:700;cursor:pointer;">+ Add Question</button>
+          </div>
+          <div id="questionsContainer" style="display:flex;flex-direction:column;gap:14px;max-height:380px;overflow-y:auto;padding-right:4px;">
+            <p style="color:#3d5070;font-size:.8rem;text-align:center;padding:16px;">No questions yet. Click "Add Question" to start.</p>
+          </div>
+        </div>
+        <button onclick="saveExam()" style="width:100%;background:linear-gradient(135deg,#7b5cff,#00e5ff);border:none;color:#fff;padding:14px;border-radius:10px;font-weight:700;font-size:.95rem;cursor:pointer;letter-spacing:.04em;">SAVE EXAM</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MARKS MANAGEMENT MODAL ══════════════════════════════════════════════ -->
+<div id="marksModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);overflow-y:auto;">
+  <div style="max-width:800px;margin:40px auto;padding:20px;">
+    <div style="background:#0d1630;border:1px solid rgba(0,229,255,.15);border-radius:18px;padding:32px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+        <div>
+          <h2 style="font-family:'Syne',sans-serif;font-weight:800;font-size:1.3rem;color:#e8eeff;">Assign Marks</h2>
+          <p id="marksModalCourseName" style="color:#7d8fb3;font-size:.85rem;margin-top:2px;"></p>
+        </div>
+        <button onclick="closeMarksModal()" style="background:rgba(255,255,255,.06);border:none;color:#7d8fb3;border-radius:8px;padding:8px 14px;cursor:pointer;font-size:1.1rem;">✕</button>
+      </div>
+
+      <!-- Add marks form -->
+      <div style="background:#0a1228;border:1px solid rgba(0,229,255,.08);border-radius:12px;padding:20px;margin-bottom:24px;">
+        <h3 style="font-size:.85rem;font-weight:700;color:#e8eeff;margin-bottom:16px;">Assign New Mark</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px;">
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Student</label>
+            <select id="marksUserId" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.85rem;outline:none;">
+              <option value="">Select student…</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Assignment Label</label>
+            <input id="marksLabel" type="text" placeholder="e.g., Assignment 1, Quiz 2" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.85rem;outline:none;">
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px;">
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Marks Obtained</label>
+            <input id="marksObtained" type="number" placeholder="0" min="0" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.85rem;outline:none;">
+          </div>
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Total Marks</label>
+            <input id="marksTotalMarks" type="number" placeholder="100" value="100" min="1" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.85rem;outline:none;">
+          </div>
+          <div>
+            <label style="display:block;font-size:.72rem;font-weight:700;color:#6a80a0;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;">Notes (optional)</label>
+            <input id="marksNotes" type="text" placeholder="Feedback…" style="width:100%;background:#050a18;border:1px solid rgba(0,229,255,.12);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.85rem;outline:none;">
+          </div>
+        </div>
+        <button onclick="assignMark()" style="background:linear-gradient(135deg,#7b5cff,#00e5ff);border:none;color:#fff;padding:11px 28px;border-radius:9px;font-weight:700;font-size:.85rem;cursor:pointer;">Assign Mark</button>
+      </div>
+
+      <!-- Existing marks table -->
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <h3 style="font-size:.85rem;font-weight:700;color:#e8eeff;">All Marks for this Course</h3>
+          <button onclick="loadMarksForCourse(currentMarksState.courseId)" style="background:transparent;border:none;color:#4a6080;cursor:pointer;font-size:.8rem;">↻ Refresh</button>
+        </div>
+        <div id="marksTableArea" style="max-height:360px;overflow-y:auto;border-radius:10px;border:1px solid rgba(0,229,255,.08);">
+          <table style="width:100%;border-collapse:collapse;">
+            <thead style="position:sticky;top:0;background:#111d3a;z-index:1;">
+              <tr>
+                <th style="padding:10px 14px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:#6a80a0;font-weight:600;">Student</th>
+                <th style="padding:10px 14px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:#6a80a0;font-weight:600;">Label</th>
+                <th style="padding:10px 14px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:#6a80a0;font-weight:600;">Score</th>
+                <th style="padding:10px 14px;text-align:left;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:#6a80a0;font-weight:600;">Type</th>
+                <th style="padding:10px 14px;text-align:center;font-size:.72rem;text-transform:uppercase;letter-spacing:.07em;color:#6a80a0;font-weight:600;">Del</th>
+              </tr>
+            </thead>
+            <tbody id="marksTableBody">
+              <tr><td colspan="5" style="text-align:center;padding:20px;color:#3d5070;font-size:.85rem;">Loading…</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// EXAM MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+let currentExamState = { courseId: null, courseTitle: '', exam: null };
+
+async function openManageExam(courseId, courseTitle) {
+  currentExamState = { courseId, courseTitle, exam: null };
+  document.getElementById('examModalCourseName').textContent = courseTitle;
+  document.getElementById('examModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  resetExamForm();
+  await loadCourseExam(courseId);
+}
+
+function closeExamModal() {
+  document.getElementById('examModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+async function loadCourseExam(courseId) {
+  try {
+    const res  = await fetch(`/api/admin/exams?course_id=${courseId}`, { credentials: 'include' });
+    const data = await res.json();
+    if (data.success && data.exams && data.exams.length > 0) {
+      currentExamState.exam = data.exams[0];
+      showExistingExam(currentExamState.exam);
+      document.getElementById('examFormArea').style.display = 'none';
+    } else {
+      document.getElementById('existingExamArea').style.display = 'none';
+      document.getElementById('examFormArea').style.display = 'block';
+    }
+  } catch(e) {
+    document.getElementById('existingExamArea').style.display = 'none';
+    document.getElementById('examFormArea').style.display = 'block';
+  }
+}
+
+function showExistingExam(exam) {
+  document.getElementById('existingExamArea').style.display = 'block';
+  document.getElementById('existingExamTitle').textContent = exam.title;
+  const qs = Array.isArray(exam.questions) ? exam.questions.length : JSON.parse(exam.questions||'[]').length;
+  document.getElementById('existingExamMeta').textContent =
+    `${exam.type === 'link' ? 'External Link' : `MCQ · ${qs} question${qs!==1?'s':''}`} · ${exam.total_marks} marks · ${exam.duration_minutes} min`;
+}
+
+function editExistingExam() {
+  const exam = currentExamState.exam;
+  if (!exam) return;
+  document.getElementById('existingExamArea').style.display = 'none';
+  document.getElementById('examFormArea').style.display = 'block';
+  document.getElementById('examId').value = exam.id;
+  document.getElementById('examTitle').value = exam.title;
+  document.getElementById('examType').value = exam.type;
+  document.getElementById('examTotalMarks').value = exam.total_marks;
+  document.getElementById('examDuration').value = exam.duration_minutes;
+  document.getElementById('examLinkUrl').value = exam.link_url || '';
+  toggleExamType();
+  const questions = Array.isArray(exam.questions) ? exam.questions : JSON.parse(exam.questions || '[]');
+  const container = document.getElementById('questionsContainer');
+  container.innerHTML = '';
+  questions.forEach(q => addQuestion(q));
+}
+
+async function deleteExam() {
+  if (!currentExamState.exam) return;
+  if (!confirm('Delete this exam? All student submissions will also be removed.')) return;
+  const res  = await fetch('/api/admin/exams', { method: 'DELETE', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: currentExamState.exam.id }) });
+  const data = await res.json();
+  if (data.success) {
+    currentExamState.exam = null;
+    document.getElementById('existingExamArea').style.display = 'none';
+    resetExamForm();
+    document.getElementById('examFormArea').style.display = 'block';
+    showAdminToast('Exam deleted', 'success');
+  } else showAdminToast(data.error || 'Delete failed', 'error');
+}
+
+function toggleExamType() {
+  const t = document.getElementById('examType').value;
+  document.getElementById('examLinkArea').style.display = t === 'link' ? 'block' : 'none';
+  document.getElementById('examMcqArea').style.display  = t === 'mcq'  ? 'block' : 'none';
+}
+
+let qCounter = 0;
+function addQuestion(existing) {
+  qCounter++;
+  const qId = existing ? existing.id : `q${Date.now()}_${qCounter}`;
+  const opts = existing ? (Array.isArray(existing.options) ? existing.options : ['', '', '', '']) : ['', '', '', ''];
+  const correctIdx = existing ? (existing.correct_answer !== undefined ? parseInt(existing.correct_answer) : 0) : 0;
+  const marks = existing ? (existing.marks || 1) : 1;
+  const qText = existing ? (existing.question || '') : '';
+
+  const container = document.getElementById('questionsContainer');
+  const p = container.querySelector('p');
+  if (p) p.remove();
+
+  const div = document.createElement('div');
+  div.style.cssText = 'background:#050a18;border:1px solid rgba(0,229,255,.1);border-radius:12px;padding:18px;position:relative;';
+  div.dataset.qid = qId;
+  div.innerHTML = `
+    <div style="display:flex;gap:10px;margin-bottom:12px;align-items:center;">
+      <input type="text" placeholder="Question text…" value="${escAdm(qText)}" data-field="question"
+        style="flex:1;background:#0a1228;border:1px solid rgba(0,229,255,.1);border-radius:8px;padding:9px 12px;color:#e8eeff;font-size:.88rem;outline:none;">
+      <input type="number" placeholder="Marks" value="${marks}" min="1" data-field="marks"
+        style="width:72px;background:#0a1228;border:1px solid rgba(0,229,255,.1);border-radius:8px;padding:9px 10px;color:#00e5ff;font-size:.85rem;outline:none;text-align:center;">
+      <button onclick="this.closest('[data-qid]').remove()" style="background:rgba(255,77,141,.08);border:1px solid rgba(255,77,141,.2);color:#ff4d8d;border-radius:6px;padding:6px 10px;cursor:pointer;font-size:.8rem;">✕</button>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
+      ${opts.map((o, i) => `
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="radio" name="correct_${qId}" value="${i}" ${i===correctIdx?'checked':''} style="accent-color:#00e5ff;width:15px;height:15px;flex-shrink:0;" title="Mark as correct answer">
+          <input type="text" placeholder="Option ${i+1}" value="${escAdm(o)}" data-opt="${i}"
+            style="flex:1;background:#0a1228;border:1px solid rgba(0,229,255,.06);border-radius:8px;padding:8px 10px;color:#e8eeff;font-size:.83rem;outline:none;">
+        </div>`).join('')}
+    </div>
+    <div style="font-size:.7rem;color:#3d5070;">● Select the radio button next to the correct answer</div>`;
+  container.appendChild(div);
+}
+
+function collectQuestions() {
+  const questions = [];
+  document.querySelectorAll('#questionsContainer [data-qid]').forEach(div => {
+    const qId = div.dataset.qid;
+    const question = div.querySelector('[data-field="question"]').value.trim();
+    const marks    = parseInt(div.querySelector('[data-field="marks"]').value) || 1;
+    const options  = [];
+    div.querySelectorAll('[data-opt]').forEach(inp => options.push(inp.value.trim()));
+    const correctRadio = div.querySelector(`input[name="correct_${qId}"]:checked`);
+    const correct_answer = correctRadio ? correctRadio.value : '0';
+    if (question) questions.push({ id: qId, question, options, correct_answer, marks });
+  });
+  return questions;
+}
+
+function resetExamForm() {
+  document.getElementById('examId').value = '';
+  document.getElementById('examTitle').value = '';
+  document.getElementById('examType').value = 'mcq';
+  document.getElementById('examTotalMarks').value = '100';
+  document.getElementById('examDuration').value = '60';
+  document.getElementById('examLinkUrl').value = '';
+  document.getElementById('questionsContainer').innerHTML = '<p style="color:#3d5070;font-size:.8rem;text-align:center;padding:16px;">No questions yet. Click "Add Question" to start.</p>';
+  toggleExamType();
+}
+
+async function saveExam() {
+  const id    = document.getElementById('examId').value;
+  const title = document.getElementById('examTitle').value.trim();
+  const type  = document.getElementById('examType').value;
+  const total = parseInt(document.getElementById('examTotalMarks').value) || 100;
+  const dur   = parseInt(document.getElementById('examDuration').value) || 60;
+  const link  = document.getElementById('examLinkUrl').value.trim();
+  if (!title) { showAdminToast('Exam title is required', 'error'); return; }
+  if (type === 'link' && !link) { showAdminToast('External URL is required for link type', 'error'); return; }
+  const questions = type === 'mcq' ? collectQuestions() : [];
+  const body = { course_id: currentExamState.courseId, title, type, link_url: link || null, total_marks: total, duration_minutes: dur, questions };
+  if (id) body.id = parseInt(id);
+  const method = id ? 'PUT' : 'POST';
+  const res  = await fetch('/api/admin/exams', { method, credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) });
+  const data = await res.json();
+  if (data.success) {
+    showAdminToast(id ? 'Exam updated!' : 'Exam created!', 'success');
+    currentExamState.exam = data.exam;
+    showExistingExam(data.exam);
+    document.getElementById('examFormArea').style.display = 'none';
+    document.getElementById('existingExamArea').style.display = 'block';
+  } else showAdminToast(data.error || 'Save failed', 'error');
+}
+
+// ═══════════════════════════════════════════════════════════
+// MARKS MANAGEMENT
+// ═══════════════════════════════════════════════════════════
+let currentMarksState = { courseId: null, courseTitle: '' };
+
+async function openManageMarks(courseId, courseTitle) {
+  currentMarksState = { courseId, courseTitle };
+  document.getElementById('marksModalCourseName').textContent = courseTitle;
+  document.getElementById('marksModal').style.display = 'block';
+  document.body.style.overflow = 'hidden';
+  document.getElementById('marksTotalMarks').value = '100';
+  document.getElementById('marksObtained').value = '';
+  document.getElementById('marksLabel').value = '';
+  document.getElementById('marksNotes').value = '';
+  await loadMarksForCourse(courseId);
+}
+
+function closeMarksModal() {
+  document.getElementById('marksModal').style.display = 'none';
+  document.body.style.overflow = '';
+}
+
+async function loadMarksForCourse(courseId) {
+  const tbody = document.getElementById('marksTableBody');
+  tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#3d5070;">Loading…</td></tr>';
+  try {
+    const res  = await fetch(`/api/admin/marks?course_id=${courseId}`, { credentials: 'include' });
+    const data = await res.json();
+    // Populate student dropdown
+    const sel = document.getElementById('marksUserId');
+    sel.innerHTML = '<option value="">Select student…</option>';
+    if (data.enrolled_users && data.enrolled_users.length > 0) {
+      data.enrolled_users.forEach(u => {
+        sel.innerHTML += `<option value="${u.id}">${escAdm(u.username)} (${escAdm(u.email)})</option>`;
+      });
+    }
+    // Render marks table
+    const marks = data.marks || [];
+    if (marks.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#3d5070;font-size:.85rem;">No marks assigned yet.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = marks.map(m => {
+      const pct = m.total_marks ? Math.round((m.marks_obtained / m.total_marks) * 100) : 0;
+      const color = pct >= 80 ? '#22c55e' : pct >= 50 ? '#00e5ff' : '#ff4d8d';
+      return `<tr style="border-top:1px solid rgba(0,229,255,.06);">
+        <td style="padding:10px 14px;color:#e8eeff;font-size:.85rem;">${escAdm(m.username)}</td>
+        <td style="padding:10px 14px;color:#7d8fb3;font-size:.83rem;">${escAdm(m.label||'Assignment')}</td>
+        <td style="padding:10px 14px;"><span style="color:${color};font-weight:700;">${m.marks_obtained}</span><span style="color:#3d5070;font-size:.78rem;"> / ${m.total_marks}</span><span style="color:#3d5070;font-size:.72rem;margin-left:4px;">${pct}%</span></td>
+        <td style="padding:10px 14px;"><span style="font-size:.72rem;text-transform:uppercase;color:#7d8fb3;background:#0a1228;padding:2px 8px;border-radius:10px;">${m.type||'assignment'}</span></td>
+        <td style="padding:10px 14px;text-align:center;"><button onclick="deleteMark(${m.id})" style="background:none;border:none;color:#ff4d8d;cursor:pointer;font-size:.85rem;">✕</button></td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:#ff4d8d;">Error loading marks</td></tr>';
+  }
+}
+
+async function assignMark() {
+  const userId  = document.getElementById('marksUserId').value;
+  const label   = document.getElementById('marksLabel').value.trim();
+  const obtained = parseFloat(document.getElementById('marksObtained').value);
+  const total    = parseFloat(document.getElementById('marksTotalMarks').value) || 100;
+  const notes    = document.getElementById('marksNotes').value.trim();
+  if (!userId) { showAdminToast('Please select a student', 'error'); return; }
+  if (!label)  { showAdminToast('Assignment label is required', 'error'); return; }
+  if (isNaN(obtained) || obtained < 0) { showAdminToast('Enter valid marks obtained', 'error'); return; }
+  if (obtained > total) { showAdminToast('Marks obtained cannot exceed total marks', 'error'); return; }
+  const res  = await fetch('/api/admin/marks', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ user_id: parseInt(userId), course_id: currentMarksState.courseId, label, marks_obtained: obtained, total_marks: total, notes: notes || null }) });
+  const data = await res.json();
+  if (data.success) {
+    showAdminToast('Mark assigned!', 'success');
+    document.getElementById('marksObtained').value = '';
+    document.getElementById('marksLabel').value = '';
+    document.getElementById('marksNotes').value = '';
+    document.getElementById('marksUserId').value = '';
+    await loadMarksForCourse(currentMarksState.courseId);
+  } else showAdminToast(data.error || 'Failed', 'error');
+}
+
+async function deleteMark(id) {
+  if (!confirm('Remove this mark entry?')) return;
+  const res  = await fetch('/api/admin/marks', { method: 'DELETE', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) });
+  const data = await res.json();
+  if (data.success) {
+    showAdminToast('Mark removed', 'success');
+    await loadMarksForCourse(currentMarksState.courseId);
+  } else showAdminToast(data.error || 'Failed', 'error');
+}
+
+// Close modals on backdrop click
+document.getElementById('examModal').addEventListener('click', function(e) { if (e.target === this) closeExamModal(); });
+document.getElementById('marksModal').addEventListener('click', function(e) { if (e.target === this) closeMarksModal(); });
+
+function escAdm(s) {
+  const d = document.createElement('div'); d.textContent = String(s||''); return d.innerHTML;
+}
+function showAdminToast(msg, type) {
+  if (typeof showToast === 'function') { showToast(msg, type); return; }
+  alert(msg);
+}
+</script>
+
 </body>
 </html>
