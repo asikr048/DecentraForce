@@ -568,27 +568,100 @@
     to   { opacity: 1; transform: translateY(0); }
   }
 
+  /* ══════════ HAMBURGER & MOBILE NAV ══════════ */
+  .hamburger {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    width: 44px; height: 44px;
+    background: transparent;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    padding: 8px;
+    transition: border-color 0.2s;
+    flex-shrink: 0;
+  }
+  .hamburger:hover { border-color: rgba(0,229,255,.4); }
+  .hamburger span {
+    display: block; width: 20px; height: 2px;
+    background: var(--text); border-radius: 2px;
+    transition: all 0.3s ease; transform-origin: center;
+  }
+  .hamburger.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+  .mobile-nav {
+    display: none;
+    position: fixed; top: 70px; left: 0; right: 0;
+    background: rgba(5, 10, 24, 0.98);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 20px 20px;
+    z-index: 99; flex-direction: column; gap: 4px;
+    animation: slideDownMenu 0.25s ease;
+  }
+  .mobile-nav.open { display: flex; }
+  @keyframes slideDownMenu {
+    from { opacity: 0; transform: translateY(-8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .mobile-nav a {
+    display: block; padding: 12px 16px;
+    color: var(--muted); text-decoration: none;
+    font-size: 0.95rem; font-weight: 500;
+    border-radius: 8px; transition: all 0.2s;
+  }
+  .mobile-nav a:hover, .mobile-nav a.active { background: rgba(0,229,255,.08); color: var(--accent); }
+  .mobile-nav-divider { height: 1px; background: var(--border); margin: 10px 0; }
+  .mobile-nav-btns { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .mobile-nav-btns .btn { width: 100%; justify-content: center; }
+
   /* ══════════ RESPONSIVE ══════════ */
   @media (max-width: 900px) {
-    .nav-links { display: none; }
+    .nav-links { display: none !important; }
+    .hamburger { display: flex; }
+    .nav-right .btn { display: none; }
     .hero { flex-direction: column; text-align: center; padding: 100px 5% 60px; gap: 50px; }
     .hero p { max-width: 100%; }
     .hero-btns { justify-content: center; }
     .how-grid { grid-template-columns: 1fr; }
     .footer-top { grid-template-columns: 1fr 1fr; }
   }
+  @media (max-width: 768px) {
+    nav { padding: 0 16px; }
+    .courses-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+    .stats-bar { flex-direction: column; gap: 20px; text-align: center; }
+    .section-header { flex-direction: column; gap: 16px; text-align: center; }
+    .hero h1 { font-size: clamp(2rem, 7vw, 3rem); }
+  }
   @media (max-width: 600px) {
-    .hero-visual { min-height: 320px; }
-    .orbit-ring { width: 260px; height: 260px; }
-    .orbit-ring-2 { width: 180px; height: 180px; }
-    .center-badge { width: 110px; height: 110px; }
-    .center-badge .big-num { font-size: 1.5rem; }
+    .hero-visual { min-height: 280px; }
+    .orbit-ring { width: 240px; height: 240px; }
+    .orbit-ring-2 { width: 165px; height: 165px; }
+    .center-badge { width: 100px; height: 100px; }
+    .center-badge .big-num { font-size: 1.4rem; }
     .footer-top { grid-template-columns: 1fr; }
-    .cta-section { padding: 40px 24px; }
-    .cta-btns { flex-direction: column; align-items: center; }
+    .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    .footer-links { justify-content: center; flex-wrap: wrap; }
+    .cta-section { padding: 40px 20px; }
+    .cta-btns { flex-direction: column; align-items: stretch; }
+    .cta-btns .btn { text-align: center; justify-content: center; }
     .logo { font-size: 1.1rem; }
     .logo-icon { width: 32px; height: 32px; font-size: 0.75rem; }
+    .courses-grid { grid-template-columns: 1fr; }
+    .hero-btns { flex-direction: column; width: 100%; }
+    .hero-btns .btn { width: 100%; justify-content: center; }
+    .eyebrow { font-size: 0.72rem; }
   }
+  @media (max-width: 400px) {
+    .hero h1 { font-size: 1.8rem; }
+    .hero-btns .btn { font-size: 0.9rem; padding: 12px 16px; }
+  }
+
 
   /* ══════════ CHECKOUT MODAL ══════════ */
 /* ══════════ CHECKOUT MODAL ══════════ */
@@ -930,8 +1003,26 @@
         </div>
       </div>
     </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
+
+<!-- Mobile Nav -->
+<div class="mobile-nav" id="mobileNav">
+  <a href="#" class="active">Home</a>
+  <a href="my-courses.html">Courses</a>
+  <a href="my-courses.html?tab=nanodegree">NanoDegree</a>
+  <a href="my-courses.html?tab=free">বাংলায় শিখি</a>
+  <a href="my-courses.html">Explore</a>
+  <div class="mobile-nav-divider"></div>
+  <div class="mobile-nav-btns">
+    <a href="login.html" class="btn btn-ghost" data-auth="login">Log In</a>
+    <a href="register.html" class="btn btn-primary" data-auth="register">Create Account</a>
+  </div>
+</div>
 
 <section class="hero">
   <div class="hero-content">
@@ -1820,6 +1911,24 @@ window.addEventListener('storage', (e) => {
     }
     buildMarquee();
   });
+
+  // Mobile nav toggle
+  (function() {
+    const hamburger = document.getElementById('hamburger');
+    const mobileNav = document.getElementById('mobileNav');
+    if (!hamburger || !mobileNav) return;
+    hamburger.addEventListener('click', (e) => {
+      e.stopPropagation();
+      hamburger.classList.toggle('open');
+      mobileNav.classList.toggle('open');
+    });
+    document.addEventListener('click', (e) => {
+      if (!hamburger.contains(e.target) && !mobileNav.contains(e.target)) {
+        hamburger.classList.remove('open');
+        mobileNav.classList.remove('open');
+      }
+    });
+  })();
 </script>
 
 <div class="modal-overlay" id="checkoutModal">
