@@ -517,6 +517,42 @@ async function adminGrantAccess(req, res) {
   return res.status(405).json({ error: 'Method not allowed' });
 }
 
+// ── USER: POST /api/user/update-profile ───────────────────────────────────────
+async function userUpdateProfile(req, res) {
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+  const token = req.cookies?.session_token;
+  if (!token) return res.status(401).json({ success: false, error: 'Not authenticated' });
+  const userResult = await query(
+    `SELECT id, username, email, password_hash FROM users WHERE session_token=$1 AND session_expires>NOW()`,
+    [token]
+  );
+  if (!userResult.rows.length) return res.status(401).json({ success: false, error: 'Invalid or expired session' });
+  const user = userResult.rows[0];
+  const { type, newUsername, newEmail, currentPassword, newPassword } = req.body || {};
+
+  if (type === 'profile') {
+    if (!newUsername || newUsername.trim().length < 2)
+      return res.status(400).json({ success: false, error: 'Display name must be at least 2 characters' });
+    if (!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail))
+      return res.status(400).json({ success: false, error: 'Valid email required' });
+    const dup = await query('SELECT id FROM users WHERE email=$1 AND id!=$2', [newEmail.toLowerCase().trim(), user.id]);
+    if (dup.rows.length) return res.status(400).json({ success: false, error: 'Email already in use by another account' });
+    await query('UPDATE users SET username=$1, email=$2 WHERE id=$3', [newUsername.trim(), newEmail.toLowerCase().trim(), user.id]);
+    return res.status(200).json({ success: true, message: 'Profile updated successfully' });
+  }
+
+  if (type === 'password') {
+    if (!currentPassword || !newPassword || newPassword.length < 8)
+      return res.status(400).json({ success: false, error: 'Current password and new password (min 8 characters) required' });
+    const valid = await bcrypt.compare(currentPassword, user.password_hash);
+    if (!valid) return res.status(400).json({ success: false, error: 'Current password is incorrect' });
+    await query('UPDATE users SET password_hash=$1 WHERE id=$2', [await bcrypt.hash(newPassword, 10), user.id]);
+    return res.status(200).json({ success: true, message: 'Password updated successfully' });
+  }
+
+  return res.status(400).json({ success: false, error: 'Invalid update type' });
+}
+
 // ── ADMIN: POST /api/admin/update-profile ─────────────────────────────────────
 async function adminUpdateProfile(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
@@ -730,6 +766,7 @@ export default async function handler(req, res) {
     if (path.endsWith('/admin/courses'))       return await adminCourses(req, res);
     if (path.endsWith('/admin/users'))         return await adminUsers(req, res);
     if (path.endsWith('/admin/grant-access'))  return await adminGrantAccess(req, res);
+    if (path.endsWith('/user/update-profile'))  return await userUpdateProfile(req, res);
     if (path.endsWith('/admin/update-profile')) return await adminUpdateProfile(req, res);
     if (path.endsWith('/admin/mentors'))       return await adminMentors(req, res);
     if (path.endsWith('/admin/testimonials'))  return await adminTestimonials(req, res);
