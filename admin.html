@@ -12,9 +12,8 @@
 <link rel="apple-touch-icon" href="/assets/favicon-180x180.png">
 <link rel="mask-icon" href="/assets/favicon.svg" color="#7b5cff">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin Panel — DecentraForce</title>
-<link rel="stylesheet" href="styles/global.css">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 <script src="scripts/floating-feedback.js"></script>
@@ -54,85 +53,6 @@
     background-color: #050a18;
     color: #e8eeff;
     overflow-x: hidden;
-  }
-  
-  /* Responsive adjustments for admin */
-  @media (max-width: 1024px) {
-    .admin-layout {
-      flex-direction: column;
-    }
-    .admin-sidebar {
-      width: 100%;
-      max-width: 100%;
-      border-right: none;
-      border-bottom: 1px solid rgba(0, 229, 255, 0.12);
-    }
-    .admin-content {
-      width: 100%;
-    }
-    .tab-content {
-      padding: 20px;
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .admin-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 15px;
-    }
-    .admin-header h1 {
-      font-size: 1.8rem;
-    }
-    .tab-buttons {
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .tab-btn {
-      flex: 1 0 calc(50% - 8px);
-      min-width: 0;
-      padding: 12px 10px;
-      font-size: 0.9rem;
-    }
-    .data-table {
-      display: block;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-    .modal {
-      width: 95%;
-      margin: 10px;
-    }
-    .toast {
-      bottom: 20px;
-      right: 20px;
-      left: 20px;
-      max-width: calc(100% - 40px);
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .admin-header h1 {
-      font-size: 1.5rem;
-    }
-    .tab-btn {
-      flex: 1 0 100%;
-      padding: 10px;
-    }
-    .form-row {
-      flex-direction: column;
-      gap: 15px;
-    }
-    .form-col {
-      width: 100%;
-    }
-    .btn-gold, .btn-primary, .btn-outline {
-      width: 100%;
-      justify-content: center;
-    }
-    .admin-input {
-      padding: 10px 14px;
-    }
   }
 
   /* Admin Nav Tabs */

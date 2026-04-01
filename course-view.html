@@ -372,82 +372,19 @@
   @keyframes spin { to { transform: rotate(360deg); } }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* ─── MOBILE DRAWER ─── */
-  .mobile-menu-btn {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 40px; height: 40px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    color: var(--text);
-    transition: all 0.2s;
-    flex-shrink: 0;
-    margin-right: 10px;
-  }
-  .mobile-menu-btn:hover { border-color: rgba(0,229,255,.4); color: var(--accent); }
-  .mobile-menu-btn .bars { display: flex; flex-direction: column; gap: 4px; }
-  .mobile-menu-btn span {
-    display: block; width: 16px; height: 1.5px;
-    background: currentColor; border-radius: 2px;
-    transition: all 0.3s; transform-origin: center;
-  }
-  .mobile-menu-btn.open .bar1 { transform: translateY(5.5px) rotate(45deg); }
-  .mobile-menu-btn.open .bar2 { opacity: 0; }
-  .mobile-menu-btn.open .bar3 { transform: translateY(-5.5px) rotate(-45deg); }
-
-  .drawer-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.55);
-    backdrop-filter: blur(4px);
-    z-index: 200;
-  }
-  .drawer-overlay.open { display: block; }
-
-  .mobile-drawer {
-    display: none;
-    position: fixed; top: 0; left: 0; bottom: 0;
-    width: 260px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    z-index: 201;
-    flex-direction: column;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    overflow-y: auto;
-  }
-  .mobile-drawer.open { display: flex; transform: translateX(0); }
-
   @media (max-width: 768px) {
     :root { --sidebar-w: 0px; }
     .sidebar { display: none; }
     .main { margin-left: 0; }
-    .course-header { padding: 20px 16px 18px; }
-    .tab-nav { padding: 0 16px; gap: 16px; }
-    .content-area { padding: 20px 16px 50px; }
+    .course-header { padding: 20px 20px 18px; }
+    .tab-nav { padding: 0 16px; }
+    .content-area { padding: 24px 20px 50px; }
     .stat-cards { grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .resources-grid { grid-template-columns: 1fr; }
-    .topbar { padding: 0 12px; }
+    .topbar { padding: 0 16px; }
     .student-id-badge { display: none; }
-    .course-header h1 { font-size: 1.2rem; }
-    .mobile-menu-btn { display: flex; }
-    .unified-course-layout { flex-direction: column; }
-    .video-sidebar { width: 100%; }
-    .acc-lecture-item { padding: 10px 12px; }
+    .course-header h1 { font-size: 1.25rem; }
   }
-  @media (max-width: 480px) {
-    .stat-cards { grid-template-columns: 1fr 1fr; }
-    .course-header { padding: 16px 12px; }
-    .content-area { padding: 16px 12px 50px; }
-    .tab-nav { gap: 12px; overflow-x: auto; padding-bottom: 4px; }
-    .tab-item { white-space: nowrap; font-size: 0.85rem; }
-    .custom-controls-bar { padding: 6px 8px; gap: 6px; }
-    .timeline-slider-container { order: -1; flex: 1 1 100%; margin-bottom: 4px; }
-  }
-
 
   /* ─── UNIFIED MODULE LAYOUT ─── */
   .unified-course-layout { display: flex; gap: 24px; align-items: flex-start; }
@@ -753,47 +690,6 @@
 
 <div class="app-shell">
 
-  <!-- Mobile drawer overlay -->
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-
-  <!-- Mobile drawer -->
-  <div class="mobile-drawer" id="mobileDrawer">
-    <a href="index.html" class="sidebar-logo" style="padding:20px;border-bottom:1px solid var(--border);">
-      <div class="logo-icon">DF</div>
-      <div>Decentra<span>Force</span><span class="tagline">Your Web3 University</span></div>
-    </a>
-    <nav class="sidebar-nav">
-      <div class="nav-section-label" style="margin-top:6px;">Navigate</div>
-      <button class="nav-item active" onclick="switchTab('module');closeDrawer()">
-        <div class="nav-icon">📚</div> Module
-      </button>
-      <button class="nav-item" onclick="switchTab('assignment');closeDrawer()">
-        <div class="nav-icon">📝</div> Assignment
-      </button>
-      <button class="nav-item" onclick="switchTab('resources');closeDrawer()">
-        <div class="nav-icon">🔗</div> Resources
-      </button>
-      <button class="nav-item" onclick="switchTab('leaderboard');closeDrawer()">
-        <div class="nav-icon">🏆</div> Leader Board
-      </button>
-      <button class="nav-item" onclick="switchTab('announcements');closeDrawer()">
-        <div class="nav-icon">📢</div> Announcements
-      </button>
-      <div class="nav-divider"></div>
-      <a href="my-courses.html" class="nav-item">
-        <div class="nav-icon">⊞</div> My Courses
-      </a>
-    </nav>
-    <div class="sidebar-footer">
-      <a href="my-courses.html" class="back-btn">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        Back to My Courses
-      </a>
-    </div>
-  </div>
-
   <aside class="sidebar">
     <a href="index.html" class="sidebar-logo">
       <div class="logo-icon">DF</div>
@@ -852,13 +748,6 @@
 
     <header class="topbar">
       <div class="topbar-left">
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
-          <div class="bars">
-            <span class="bar1"></span>
-            <span class="bar2"></span>
-            <span class="bar3"></span>
-          </div>
-        </button>
         <div class="topbar-breadcrumb">
           <a href="my-courses.html">My Courses</a>
           <span class="chevron">›</span>
@@ -1687,28 +1576,6 @@
   window.setMainQuality    = setMainQuality;
 
   document.addEventListener('DOMContentLoaded', initApp);
-</script>
-
-<script>
-  // Mobile drawer
-  function closeDrawer() {
-    document.getElementById('mobileDrawer').classList.remove('open');
-    document.getElementById('drawerOverlay').classList.remove('open');
-    document.getElementById('mobileMenuBtn').classList.remove('open');
-  }
-  (function() {
-    const btn = document.getElementById('mobileMenuBtn');
-    const drawer = document.getElementById('mobileDrawer');
-    const overlay = document.getElementById('drawerOverlay');
-    if (!btn) return;
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      btn.classList.toggle('open');
-      drawer.classList.toggle('open');
-      overlay.classList.toggle('open');
-    });
-    overlay.addEventListener('click', closeDrawer);
-  })();
 </script>
 </body>
 </html>

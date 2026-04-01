@@ -371,69 +371,14 @@
   /* ─── ANIMATIONS ─── */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* ─── MOBILE DRAWER ─── */
-  .mobile-menu-btn {
-    display: none;
-    align-items: center;
-    justify-content: center;
-    width: 40px; height: 40px;
-    background: transparent;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    cursor: pointer;
-    color: var(--text);
-    transition: all 0.2s;
-    flex-shrink: 0;
-    margin-right: 10px;
-  }
-  .mobile-menu-btn:hover { border-color: rgba(0,229,255,.4); color: var(--accent); }
-  .mobile-menu-btn span {
-    display: block; width: 16px; height: 1.5px;
-    background: currentColor; border-radius: 2px;
-    transition: all 0.3s; transform-origin: center;
-  }
-  .mobile-menu-btn .bar1, .mobile-menu-btn .bar3 { transition: transform 0.3s, opacity 0.2s; }
-  .mobile-menu-btn.open .bar1 { transform: translateY(5px) rotate(45deg); }
-  .mobile-menu-btn.open .bar2 { opacity: 0; }
-  .mobile-menu-btn.open .bar3 { transform: translateY(-5px) rotate(-45deg); }
-  .mobile-menu-btn .bars { display: flex; flex-direction: column; gap: 4px; }
-
-  .drawer-overlay {
-    display: none;
-    position: fixed; inset: 0;
-    background: rgba(0,0,0,.5);
-    backdrop-filter: blur(4px);
-    z-index: 200;
-  }
-  .drawer-overlay.open { display: block; }
-
-  .mobile-drawer {
-    display: none;
-    position: fixed; top: 0; left: 0; bottom: 0;
-    width: 260px;
-    background: var(--surface);
-    border-right: 1px solid var(--border);
-    z-index: 201;
-    flex-direction: column;
-    transform: translateX(-100%);
-    transition: transform 0.3s ease;
-    overflow-y: auto;
-  }
-  .mobile-drawer.open { display: flex; transform: translateX(0); }
-
   @media (max-width: 768px) {
     :root { --sidebar-w: 0px; }
     .sidebar { display: none; }
     .main { margin-left: 0; }
     .page-body { padding: 20px 16px; }
-    .courses-grid { grid-template-columns: 1fr; gap: 16px; }
-    .topbar { padding: 0 12px; }
+    .courses-grid { grid-template-columns: 1fr; }
+    .topbar { padding: 0 16px; }
     .student-id-badge { display: none; }
-    .mobile-menu-btn { display: flex; }
-    .page-header h1 { font-size: 1.4rem; }
-    .page-header { margin-bottom: 20px; }
-    .tabs { gap: 4px; flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
-    .tab-btn { white-space: nowrap; font-size: 0.85rem; padding: 8px 14px; }
     
     /* Modal responsive improvements */
     .modal { max-width: 95%; margin: 10px; }
@@ -446,15 +391,6 @@
     .btn-coupon { width: 100%; }
     .payment-methods { justify-content: center; }
   }
-  @media (max-width: 480px) {
-    .topbar { height: 56px; }
-    .page-body { padding: 16px 12px; }
-    .page-header h1 { font-size: 1.25rem; }
-    .course-card { border-radius: 12px; }
-    .card-footer { flex-direction: column; align-items: flex-start; gap: 10px; }
-    .card-footer .btn { width: 100%; justify-content: center; }
-  }
-
 
   /* ══════════ CHECKOUT MODAL ══════════ */
   .modal-overlay {
@@ -794,46 +730,6 @@
 
 <div class="app-shell">
 
-  <!-- Mobile drawer overlay -->
-  <div class="drawer-overlay" id="drawerOverlay"></div>
-
-  <!-- Mobile drawer -->
-  <div class="mobile-drawer" id="mobileDrawer">
-    <a href="index.html" class="sidebar-logo" style="padding:20px;border-bottom:1px solid var(--border);">
-      <div class="logo-icon">DF</div>
-      <div>Decentra<span>Force</span><span class="tagline">Your Web3 University</span></div>
-    </a>
-    <nav class="sidebar-nav">
-      <button class="nav-item active" onclick="showPanel('courses');closeDrawer()">
-        <div class="nav-icon">⊞</div>My Courses
-      </button>
-      <button class="nav-item" onclick="showPanel('profile');closeDrawer()">
-        <div class="nav-icon">◎</div>Profile
-      </button>
-      <button class="nav-item" onclick="showPanel('rewards');closeDrawer()">
-        <div class="nav-icon">🏆</div>Rewards
-      </button>
-      <div class="nav-divider"></div>
-      <button class="nav-item" onclick="showPanel('courses');setTab('enrolled');closeDrawer()">
-        <div class="nav-icon">🎓</div>Enrolled
-      </button>
-      <button class="nav-item" onclick="showPanel('courses');setTab('premium');closeDrawer()">
-        <div class="nav-icon">💳</div>Premium
-      </button>
-      <button class="nav-item" onclick="showPanel('courses');setTab('free');closeDrawer()">
-        <div class="nav-icon">🎁</div>Free Courses
-      </button>
-    </nav>
-    <div class="sidebar-footer">
-      <a href="index.html" class="back-btn">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-          <path d="M9 11L5 7l4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-        </svg>
-        Back to Home
-      </a>
-    </div>
-  </div>
-
   <aside class="sidebar">
     <a href="index.html" class="sidebar-logo">
       <div class="logo-icon">DF</div>
@@ -887,13 +783,6 @@
 
     <header class="topbar">
       <div class="topbar-left">
-        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Open menu">
-          <div class="bars">
-            <span class="bar1"></span>
-            <span class="bar2"></span>
-            <span class="bar3"></span>
-          </div>
-        </button>
         <div class="topbar-breadcrumb">
           <a href="index.html">Home</a>
           <span class="chevron">›</span>
@@ -1780,26 +1669,5 @@ function getCourseButton(course, type, isPending) {
   </div>
 </div>
 
-<script>
-  // Mobile drawer
-  function closeDrawer() {
-    document.getElementById('mobileDrawer').classList.remove('open');
-    document.getElementById('drawerOverlay').classList.remove('open');
-    document.getElementById('mobileMenuBtn').classList.remove('open');
-  }
-  (function() {
-    const btn = document.getElementById('mobileMenuBtn');
-    const drawer = document.getElementById('mobileDrawer');
-    const overlay = document.getElementById('drawerOverlay');
-    if (!btn) return;
-    btn.addEventListener('click', (e) => {
-      e.stopPropagation();
-      btn.classList.toggle('open');
-      drawer.classList.toggle('open');
-      overlay.classList.toggle('open');
-    });
-    overlay.addEventListener('click', closeDrawer);
-  })();
-</script>
 </body>
 </html>
