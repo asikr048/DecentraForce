@@ -272,6 +272,9 @@
       </div>
     </div>
   </div>
+
+  <script src="scripts/auth.js"></script>
+  
 <script>
   let activeCourse = null;
 
@@ -387,8 +390,7 @@
     // 5. Attach Purchase Action
       purchaseBtn.addEventListener('click', () => {
         // Check if user is logged in
-        if (window.auth && !window.auth.isLoggedIn) {
-          document.getElementById('loginPromptModal').classList.add('open');
+if (!window.auth || !window.auth.isLoggedIn) {          document.getElementById('loginPromptModal').classList.add('open');
           document.body.style.overflow = 'hidden';
           return;
         }
