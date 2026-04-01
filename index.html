@@ -1583,6 +1583,7 @@ window.addEventListener('storage', (e) => {
 
       // Make the card itself open the appropriate page based on enrollment status
         card.addEventListener('click', function() {
+          console.log('Course click:', course.id, { isEnrolled, isPending });
           if (isEnrolled) {
             // If enrolled, go directly to course content
             window.location.href = `course-view.html?id=${course.id}`;
@@ -1748,6 +1749,7 @@ window.addEventListener('storage', (e) => {
       const pendingPurchases = purchases.filter(p => p && p.status === 'pending');
       enrolledCourseIds = approvedPurchases.map(p => p.courseId?.toString()).filter(Boolean);
       pendingCourseIds = pendingPurchases.map(p => p.courseId?.toString()).filter(Boolean);
+      console.log('Enrollment debug:', { enrolledCourseIds, pendingCourseIds, purchases });
     } catch (error) {
       console.error('Error fetching purchases for enrollment status:', error);
     }
