@@ -300,42 +300,42 @@ async function authForgotPassword(req, res) {
   await query('DELETE FROM password_reset_tokens WHERE user_id=$1', [user.id]);
   await query('INSERT INTO password_reset_tokens (user_id,token,expires_at) VALUES ($1,$2,$3)', [user.id, pin, pinExpires]);
 
-  // Send via EmailJS
+  // Send via Resend
   try {
-    const privateKey = process.env.EMAILJS_PRIVATE_KEY;
-    if (!privateKey) {
-      console.error('EmailJS Error: EMAILJS_PRIVATE_KEY env var is not set! Go to Vercel → Settings → Environment Variables and add it.');
+    const resendApiKey = process.env.RESEND_API_KEY;
+    if (!resendApiKey) {
+      console.error('Resend Error: RESEND_API_KEY env var is not set!');
     }
 
-    const emailPayload = {
-      service_id: 'service_wn7dn1f',
-      template_id: 'template_2067o6n',
-      user_id: 'TxlilKkHJZDum1C5v',  // Public Key
-      accessToken: privateKey,          // Private Key — required for server-side calls
-      template_params: {
-        to_email: email,
-        pin,
-        username: user.username,
-        app_name: 'DecentraForce'
-      }
-    };
-
-    console.log('Sending EmailJS request to:', email, '| Has private key:', !!privateKey);
-
-    const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+    const emailRes = await fetch('https://api.resend.com/emails', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(emailPayload)
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${resendApiKey}`
+      },
+      body: JSON.stringify({
+        from: 'DecentraForce <onboarding@resend.dev>',
+        to: [email],
+        subject: 'Your Password Reset PIN',
+        html: `
+          <p>Hello <strong>${user.username}</strong>,</p>
+          <p>You requested a password reset for <strong>DecentraForce</strong>.</p>
+          <p>Your 6-digit reset PIN is: <strong style="font-size:24px;letter-spacing:4px">${pin}</strong></p>
+          <p>This PIN expires in 10 minutes.</p>
+          <p>If you did not request this, please ignore this email.</p>
+          <p>Best regards,<br/>The DecentraForce Team</p>
+        `
+      })
     });
 
-    const responseText = await emailRes.text();
+    const responseData = await emailRes.json();
     if (!emailRes.ok) {
-      console.error('EmailJS Failed — HTTP', emailRes.status, ':', responseText);
+      console.error('Resend Failed — HTTP', emailRes.status, ':', JSON.stringify(responseData));
     } else {
-      console.log('EmailJS Success:', responseText);
+      console.log('Resend Success — Email ID:', responseData.id);
     }
   } catch(e) {
-    console.error('Network Error during EmailJS fetch:', e.message);
+    console.error('Network Error during Resend fetch:', e.message);
   }
 
   // ✅ FIX: Send the success response back to the frontend
