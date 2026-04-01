@@ -302,24 +302,40 @@ async function authForgotPassword(req, res) {
 
   // Send via EmailJS
   try {
+    const privateKey = process.env.EMAILJS_PRIVATE_KEY;
+    if (!privateKey) {
+      console.error('EmailJS Error: EMAILJS_PRIVATE_KEY env var is not set! Go to Vercel → Settings → Environment Variables and add it.');
+    }
+
+    const emailPayload = {
+      service_id: 'service_wn7dn1f',
+      template_id: 'template_2067o6n',
+      user_id: 'TxlilKkHJZDum1C5v',  // Public Key
+      accessToken: privateKey,          // Private Key — required for server-side calls
+      template_params: {
+        to_email: email,
+        pin,
+        username: user.username,
+        app_name: 'DecentraForce'
+      }
+    };
+
+    console.log('Sending EmailJS request to:', email, '| Has private key:', !!privateKey);
+
     const emailRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-      method: 'POST', 
+      method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        service_id: 'service_wn7dn1f', 
-        template_id: 'template_2067o6n', 
-        user_id: 'TxlilKkHJZDum1C5v',
-        // If EmailJS complains about origin/security, uncomment the next line and add your Private Key:
-        accessToken: process.env.EMAILJS_PRIVATE_KEY,
-        template_params: { to_email: email, pin, username: user.username, app_name: 'DecentraForce' }})
+      body: JSON.stringify(emailPayload)
     });
 
+    const responseText = await emailRes.text();
     if (!emailRes.ok) {
-      const errorText = await emailRes.text();
-      console.error('EmailJS Failed:', errorText); // Check your Vercel Logs for this!
+      console.error('EmailJS Failed — HTTP', emailRes.status, ':', responseText);
+    } else {
+      console.log('EmailJS Success:', responseText);
     }
-  } catch(e) { 
-    console.error('Network Error during EmailJS fetch:', e); 
+  } catch(e) {
+    console.error('Network Error during EmailJS fetch:', e.message);
   }
 
   // ✅ FIX: Send the success response back to the frontend
