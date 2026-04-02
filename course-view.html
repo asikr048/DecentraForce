@@ -5,7 +5,9 @@
 <link rel="icon" type="image/png" href="/assets/favicon.png">
 <link rel="apple-touch-icon" href="/assets/favicon-180x180.png">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
 <title>Course — DecentraForce</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
@@ -822,6 +824,25 @@
     }
     .mob-module-toggle-bar { margin: 0 14px 12px; }
   }
+  @media (max-width: 768px) {
+  /* ... your existing mobile css ... */
+
+  /* 1. Stop iOS from auto-zooming on input focus */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="url"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+  
+  /* 2. Stop double-tap to zoom on UI elements */
+  button, a, .tab-btn, .nav-btn, .control-btn, .nav-item {
+    touch-action: manipulation !important;
+  }
+}
 </style>
 </head>
 <body>
