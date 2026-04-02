@@ -389,12 +389,24 @@
   /* ─── ANIMATIONS ─── */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
+  /* Sidebar overlay — hidden by default, shown only when sidebar is open on mobile */
+  .sidebar-overlay {
+    display: none;
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 55; /* below topbar (z-60) so hamburger stays tappable */
+  }
+  .sidebar-overlay.mob-open {
+    display: block;
+    pointer-events: all;
+  }
+
   @media (max-width: 768px) {
     :root { --sidebar-w: 0px; }
-    .sidebar { display: none; position: fixed; top: 0; left: 0; height: 100%; width: 260px; z-index: 200; transform: translateX(-100%); transition: transform 0.3s ease; }
+    .sidebar { display: none; position: fixed; top: 0; left: 0; height: 100%; width: 260px; z-index: 65; transform: translateX(-100%); transition: transform 0.3s ease; }
     .sidebar.mob-open { display: flex !important; transform: translateX(0); }
-    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 199; }
-    .sidebar-overlay.mob-open { display: block; }
     .mob-menu-btn { display: flex !important; }
     .main { margin-left: 0; }
     .page-body { padding: 20px 16px; }
