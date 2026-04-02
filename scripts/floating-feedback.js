@@ -260,7 +260,8 @@ function shouldShowFeedbackButton() {
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     if (shouldShowFeedbackButton()) {
-        initFloatingFeedback();
+        // Small delay to ensure all DOM elements are fully rendered
+        setTimeout(initFloatingFeedback, 100);
     }
 });
 

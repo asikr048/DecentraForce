@@ -571,11 +571,15 @@
   /* ══════════ RESPONSIVE ══════════ */
   @media (max-width: 900px) {
     .nav-links { display: none; }
+    /* Hide login/register buttons on mobile — accessible via hamburger menu */
+    .btn[data-auth="login"], .btn[data-auth="register"] { display: none !important; }
     .hero { flex-direction: column; text-align: center; padding: 100px 5% 60px; gap: 50px; }
     .hero p { max-width: 100%; }
     .hero-btns { justify-content: center; }
     .how-grid { grid-template-columns: 1fr; }
     .footer-top { grid-template-columns: 1fr 1fr; }
+    /* Fix dropdown overflow on small screens */
+    .user-dropdown { right: -10px; width: 240px; }
   }
   @media (max-width: 600px) {
     .hero-visual { min-height: 320px; }

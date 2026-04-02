@@ -348,16 +348,17 @@ function initMobileMenu() {
         mobileMenu.style.cssText = `
             display: none;
             position: fixed;
-            top: 70px;
+            top: 64px;
             left: 0;
             right: 0;
             background: rgba(5, 10, 24, 0.98);
             backdrop-filter: blur(20px);
             border-bottom: 1px solid var(--border);
-            padding: 20px;
-            z-index: 99;
+            padding: 16px;
+            z-index: 98;
             flex-direction: column;
-            gap: 15px;
+            gap: 4px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
         `;
         
         // Copy nav links to mobile menu
@@ -367,12 +368,40 @@ function initMobileMenu() {
             links.style.cssText = `
                 display: flex;
                 flex-direction: column;
-                gap: 15px;
+                gap: 4px;
                 list-style: none;
+                padding: 0;
+                margin: 0;
             `;
+            // Style cloned links
+            links.querySelectorAll('a').forEach(a => {
+                a.style.cssText = 'display:block;padding:12px 16px;color:var(--muted);text-decoration:none;border-radius:8px;font-size:0.95rem;transition:all 0.2s;';
+                a.addEventListener('mouseenter', () => a.style.background = 'rgba(0,229,255,0.07)');
+                a.addEventListener('mouseleave', () => a.style.background = '');
+            });
             mobileMenu.appendChild(links);
         }
-        
+
+        // Add Login / Register links to mobile menu
+        const divider = document.createElement('div');
+        divider.style.cssText = 'height:1px;background:var(--border);margin:10px 0;';
+        mobileMenu.appendChild(divider);
+
+        const loginLink = document.querySelector('a[data-auth="login"]');
+        const registerLink = document.querySelector('a[data-auth="register"]');
+        if (loginLink) {
+            const a = loginLink.cloneNode(true);
+            a.removeAttribute('data-auth');
+            a.style.cssText = 'display:block;padding:12px 16px;color:var(--muted);text-decoration:none;border-radius:8px;font-size:0.95rem;border:1px solid var(--border);text-align:center;';
+            mobileMenu.appendChild(a);
+        }
+        if (registerLink) {
+            const a = registerLink.cloneNode(true);
+            a.removeAttribute('data-auth');
+            a.style.cssText = 'display:block;padding:12px 16px;background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;text-decoration:none;border-radius:8px;font-size:0.95rem;font-weight:700;text-align:center;margin-top:8px;';
+            mobileMenu.appendChild(a);
+        }
+
         document.body.appendChild(mobileMenu);
         
         // Toggle menu

@@ -12,7 +12,7 @@
 <link rel="apple-touch-icon" href="/assets/favicon-180x180.png">
 <link rel="mask-icon" href="/assets/favicon.svg" color="#7b5cff">
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>My Courses — DecentraForce</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
 <style>
@@ -140,6 +140,23 @@
     border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
     padding: 0 32px; position: sticky; top: 0; z-index: 60;
   }
+
+  /* Mobile hamburger — hidden on desktop, shown on mobile via media query */
+  .mob-menu-btn {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    width: 38px; height: 38px;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: border-color 0.2s;
+  }
+  .mob-menu-btn:hover { border-color: var(--accent); color: var(--accent); }
 
   .topbar-left { display: flex; align-items: center; gap: 10px; }
   .topbar-breadcrumb { font-size: .85rem; color: var(--muted); display: flex; align-items: center; gap: 6px; }
@@ -374,7 +391,11 @@
 
   @media (max-width: 768px) {
     :root { --sidebar-w: 0px; }
-    .sidebar { display: none; }
+    .sidebar { display: none; position: fixed; top: 0; left: 0; height: 100%; width: 260px; z-index: 200; transform: translateX(-100%); transition: transform 0.3s ease; }
+    .sidebar.mob-open { display: flex !important; transform: translateX(0); }
+    .sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 199; }
+    .sidebar-overlay.mob-open { display: block; }
+    .mob-menu-btn { display: flex !important; }
     .main { margin-left: 0; }
     .page-body { padding: 20px 16px; }
     .courses-grid { grid-template-columns: 1fr; }
@@ -709,7 +730,7 @@
     border-radius: 10px;
     color: var(--text);
     font-family: 'DM Sans', sans-serif;
-    font-size: 0.95rem;
+    font-size: 16px; /* Prevents iOS Safari auto-zoom on focus */
   }
   
   .form-group select:focus,
@@ -743,6 +764,8 @@
 
 <div class="blob blob-1"></div>
 <div class="blob blob-2"></div>
+
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
 <div class="app-shell">
 
@@ -799,6 +822,9 @@
 
     <header class="topbar">
       <div class="topbar-left">
+        <button class="mob-menu-btn" id="mobMenuBtn" aria-label="Open navigation">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
         <div class="topbar-breadcrumb">
           <a href="index.html">Home</a>
           <span class="chevron">›</span>
@@ -1736,7 +1762,7 @@ function getCourseButton(course, type, isPending) {
       <div id="paymentDetailsForm" style="display: none; background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 20px;">
         <div class="form-group" style="margin-bottom: 16px;">
           <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Payment Method *</label>
-          <select id="paymentMethod" class="feedback-input" style="padding: 12px; margin: 0; background:var(--surface2);">
+          <select id="paymentMethod" class="feedback-input" style="padding: 12px; margin: 0; background:var(--surface2); font-size:16px;">
             <option value="">Select method...</option>
             <option value="bkash">bKash</option>
             <option value="nagad">Nagad</option>
@@ -1747,12 +1773,12 @@ function getCourseButton(course, type, isPending) {
         
         <div class="form-group" style="margin-bottom: 16px;">
           <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Sender Number *</label>
-          <input type="text" id="senderNumber" class="feedback-input" placeholder="01XXXXXXXXX" style="padding: 12px; margin: 0; background:var(--surface2);">
+          <input type="text" id="senderNumber" class="feedback-input" placeholder="01XXXXXXXXX" style="padding: 12px; margin: 0; background:var(--surface2); font-size:16px;">
         </div>
         
         <div class="form-group" style="margin-bottom: 16px;">
           <label style="font-size: 0.85rem; margin-bottom: 6px; color:var(--muted);">Transaction ID *</label>
-          <input type="text" id="transactionId" class="feedback-input" placeholder="TrxID" style="padding: 12px; margin: 0; background:var(--surface2);">
+          <input type="text" id="transactionId" class="feedback-input" placeholder="TrxID" style="padding: 12px; margin: 0; background:var(--surface2); font-size:16px;">
         </div>
       </div>
 
@@ -1764,5 +1790,43 @@ function getCourseButton(course, type, isPending) {
   </div>
 </div>
 
+
+<script>
+// ── Mobile sidebar toggle ──────────────────────────────────────
+(function() {
+  const btn      = document.getElementById('mobMenuBtn');
+  const sidebar  = document.querySelector('.sidebar');
+  const overlay  = document.getElementById('sidebarOverlay');
+  if (!btn || !sidebar || !overlay) return;
+
+  function openSidebar() {
+    sidebar.classList.add('mob-open');
+    overlay.classList.add('mob-open');
+    btn.setAttribute('aria-expanded', 'true');
+    btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>';
+  }
+
+  function closeSidebar() {
+    sidebar.classList.remove('mob-open');
+    overlay.classList.remove('mob-open');
+    btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '<svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>';
+  }
+
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    sidebar.classList.contains('mob-open') ? closeSidebar() : openSidebar();
+  });
+
+  overlay.addEventListener('click', closeSidebar);
+
+  // Close sidebar when a nav item is tapped on mobile
+  sidebar.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 768) closeSidebar();
+    });
+  });
+})();
+</script>
 </body>
 </html>
