@@ -273,6 +273,10 @@
       </button>
 
       <p class="nav-group-label mt-4 mb-2">Account</p>
+      <button onclick="showTab('backup')" class="tab-btn" data-tab="backup">
+        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Backup & Restore
+      </button>
       <button onclick="showTab('profile')" class="tab-btn" data-tab="profile">
         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
         Settings
@@ -1043,6 +1047,86 @@
           </div>
         </div>
       </div>
+
+      <!-- ═══ BACKUP & RESTORE ═══ -->
+      <div id="tab-backup" class="hidden">
+        <div class="flex items-center justify-between mb-7">
+          <div>
+            <h1 class="page-title">Backup &amp; Restore</h1>
+            <p class="page-subtitle">Download all user data as a .txt file, or restore from a backup</p>
+          </div>
+        </div>
+
+        <!-- Export Card -->
+        <div class="card mb-6" style="border:1px solid rgba(0,229,255,0.1);">
+          <div style="display:flex;align-items:flex-start;gap:18px;margin-bottom:22px;">
+            <div style="width:42px;height:42px;border-radius:10px;background:rgba(0,229,255,0.08);border:1px solid rgba(0,229,255,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg style="width:20px;height:20px;color:#00e5ff;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            </div>
+            <div>
+              <h3 style="font-size:1rem;font-weight:700;color:#e8eeff;margin:0 0 4px;">Export All User Data</h3>
+              <p style="font-size:0.82rem;color:#4a6080;margin:0;">Downloads a <strong style="color:#7d9bc0;">.txt</strong> backup containing every user's username, email, hashed password, role, enrollment status, enrolled courses, and all marks/grades. Keep this file safe — it's everything you need to recover if your database goes down.</p>
+            </div>
+          </div>
+          <div id="backupExportStatus" style="display:none;margin-bottom:14px;padding:10px 14px;border-radius:8px;font-size:0.82rem;"></div>
+          <button onclick="downloadBackupTxt()" id="btnDownloadBackup"
+            style="display:inline-flex;align-items:center;gap:8px;background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3);color:#00e5ff;padding:10px 22px;border-radius:10px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:background .15s;"
+            onmouseover="this.style.background='rgba(0,229,255,0.18)'" onmouseout="this.style.background='rgba(0,229,255,0.1)'">
+            <svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+            Download Backup (.txt)
+          </button>
+        </div>
+
+        <!-- Import Card -->
+        <div class="card" style="border:1px solid rgba(212,175,55,0.15);">
+          <div style="display:flex;align-items:flex-start;gap:18px;margin-bottom:22px;">
+            <div style="width:42px;height:42px;border-radius:10px;background:rgba(212,175,55,0.07);border:1px solid rgba(212,175,55,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+              <svg style="width:20px;height:20px;color:#d4af37;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+            </div>
+            <div>
+              <h3 style="font-size:1rem;font-weight:700;color:#e8eeff;margin:0 0 4px;">Restore from Backup</h3>
+              <p style="font-size:0.82rem;color:#4a6080;margin:0;">Upload a previously exported backup <strong style="color:#7d9bc0;">.txt</strong> file to restore users and their enrollments. Existing accounts are updated (never deleted). Course enrollments are re-linked if the course still exists in your database.</p>
+            </div>
+          </div>
+
+          <!-- Drop zone -->
+          <div id="backupDropZone"
+            onclick="document.getElementById('backupFileInput').click()"
+            ondragover="event.preventDefault();this.style.borderColor='#d4af37';"
+            ondragleave="this.style.borderColor='rgba(212,175,55,0.25)';"
+            ondrop="handleBackupDrop(event)"
+            style="border:2px dashed rgba(212,175,55,0.25);border-radius:12px;padding:32px 20px;text-align:center;cursor:pointer;transition:border-color .2s;margin-bottom:16px;">
+            <svg style="width:32px;height:32px;color:#d4af37;opacity:.5;margin:0 auto 10px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+            <p id="backupDropLabel" style="font-size:0.85rem;color:#5a7095;margin:0;">Drop your backup .txt file here, or <span style="color:#d4af37;font-weight:600;">click to browse</span></p>
+          </div>
+          <input type="file" id="backupFileInput" accept=".txt" style="display:none;" onchange="handleBackupFileSelect(event)">
+
+          <!-- Preview table -->
+          <div id="backupPreview" style="display:none;margin-bottom:16px;">
+            <p style="font-size:0.8rem;font-weight:700;color:#4a6080;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">Preview — Users in backup file</p>
+            <div style="max-height:300px;overflow-y:auto;border-radius:10px;border:1px solid rgba(0,229,255,0.08);">
+              <table class="data-table">
+                <thead><tr>
+                  <th>#</th><th>Username</th><th>Email</th><th>Role</th><th>Verified</th><th>Enrolled Courses</th><th>Marks Entries</th>
+                </tr></thead>
+                <tbody id="backupPreviewBody"></tbody>
+              </table>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-top:14px;flex-wrap:wrap;gap:10px;">
+              <p id="backupPreviewSummary" style="font-size:0.82rem;color:#5a7095;margin:0;"></p>
+              <button onclick="runBackupImport()" id="btnRunImport"
+                style="display:inline-flex;align-items:center;gap:8px;background:rgba(212,175,55,0.1);border:1px solid rgba(212,175,55,0.35);color:#d4af37;padding:10px 22px;border-radius:10px;font-size:0.85rem;font-weight:700;cursor:pointer;transition:background .15s;"
+                onmouseover="this.style.background='rgba(212,175,55,0.2)'" onmouseout="this.style.background='rgba(212,175,55,0.1)'">
+                <svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg>
+                Restore All Users
+              </button>
+            </div>
+          </div>
+
+          <div id="backupImportStatus" style="display:none;margin-top:10px;padding:12px 16px;border-radius:10px;font-size:0.85rem;"></div>
+        </div>
+      </div>
+      <!-- ═══ END BACKUP & RESTORE ═══ -->
 
       <!-- ═══ PROFILE / SETTINGS ═══ -->
       <!-- ═══ ROLES ═══ -->
@@ -3055,5 +3139,170 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 </script>
 
+
+<script>
+/* BACKUP & RESTORE */
+let backupImportData = null;
+
+async function downloadBackupTxt() {
+  const btn = document.getElementById('btnDownloadBackup');
+  const statusEl = document.getElementById('backupExportStatus');
+  btn.disabled = true; btn.textContent = 'Exporting...'; statusEl.style.display = 'none';
+  try {
+    const res  = await fetch('/api/admin/backup/export', { credentials: 'include' });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Export failed');
+
+    const lines = [];
+    const ts = new Date(data.exported_at).toLocaleString();
+    lines.push('='.repeat(70));
+    lines.push('  DECENTRAFORCE — USER DATA BACKUP');
+    lines.push('  Exported: ' + ts);
+    lines.push('  Total users: ' + data.users.length);
+    lines.push('='.repeat(70));
+    lines.push('');
+
+    for (const u of data.users) {
+      const userMarks = (data.marks_by_user || {})[u.id] || [];
+      lines.push('-'.repeat(60));
+      lines.push('USER ID       : ' + u.id);
+      lines.push('Username      : ' + u.username);
+      lines.push('Email         : ' + u.email);
+      lines.push('Password Hash : ' + u.password_hash);
+      lines.push('Role          : ' + (u.is_admin ? 'admin' : (u.role || 'user')));
+      lines.push('Verified      : ' + (u.verified ? 'Yes' : 'No'));
+      lines.push('Joined        : ' + new Date(u.created_at).toLocaleString());
+
+      const courses = Array.isArray(u.courses) ? u.courses.filter(c => c.course_id) : [];
+      if (courses.length) {
+        lines.push('Enrollments   :');
+        for (const c of courses) {
+          lines.push('  - [' + c.course_id + '] ' + c.title + ' (enrolled ' + new Date(c.granted_at).toLocaleDateString() + ')');
+        }
+      } else { lines.push('Enrollments   : None'); }
+
+      if (userMarks.length) {
+        lines.push('Marks/Grades  :');
+        for (const m of userMarks) {
+          const pct = m.total_marks ? Math.round((m.marks_obtained / m.total_marks) * 100) : 0;
+          lines.push('  - Course: ' + (m.course_title || m.course_id) + ' | ' + (m.label || m.type) + ' | ' + m.marks_obtained + '/' + m.total_marks + ' (' + pct + '%)');
+          if (m.notes) lines.push('    Notes: ' + m.notes);
+        }
+      } else { lines.push('Marks/Grades  : None'); }
+      lines.push('');
+    }
+
+    lines.push('='.repeat(70));
+    lines.push('END OF BACKUP — ' + ts);
+    lines.push('='.repeat(70));
+    lines.push('');
+    lines.push('~~~ MACHINE_RESTORE_PAYLOAD_START ~~~');
+    lines.push(JSON.stringify({ exported_at: data.exported_at, users: data.users, marks_by_user: data.marks_by_user }));
+    lines.push('~~~ MACHINE_RESTORE_PAYLOAD_END ~~~');
+
+    const blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'decentraforce-backup-' + new Date().toISOString().slice(0,10) + '.txt';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(a.href);
+
+    statusEl.textContent = '✓ Backup downloaded — ' + data.users.length + ' user(s) exported at ' + ts;
+    statusEl.style.cssText = 'display:block;background:rgba(0,229,255,0.07);border:1px solid rgba(0,229,255,0.2);color:#00e5ff;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:14px;';
+  } catch(e) {
+    statusEl.textContent = '✗ ' + e.message;
+    statusEl.style.cssText = 'display:block;background:rgba(255,77,141,0.08);border:1px solid rgba(255,77,141,0.25);color:#ff4d8d;padding:10px 14px;border-radius:8px;font-size:0.82rem;margin-bottom:14px;';
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg style="width:16px;height:16px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg> Download Backup (.txt)';
+  }
+}
+
+function handleBackupDrop(e) {
+  e.preventDefault();
+  document.getElementById('backupDropZone').style.borderColor = 'rgba(212,175,55,0.25)';
+  const file = e.dataTransfer.files[0];
+  if (file) parseBackupFile(file);
+}
+function handleBackupFileSelect(e) { const file = e.target.files[0]; if (file) parseBackupFile(file); }
+
+function parseBackupFile(file) {
+  const statusEl  = document.getElementById('backupImportStatus');
+  const previewEl = document.getElementById('backupPreview');
+  statusEl.style.display = 'none'; previewEl.style.display = 'none'; backupImportData = null;
+  if (!file.name.endsWith('.txt')) { showBackupStatus('error','Please upload a .txt backup file exported from this dashboard.'); return; }
+  document.getElementById('backupDropLabel').textContent = 'Reading: ' + file.name + ' ...';
+  const reader = new FileReader();
+  reader.onload = function(ev) {
+    try {
+      const text = ev.target.result;
+      const startMarker = '~~~ MACHINE_RESTORE_PAYLOAD_START ~~~';
+      const endMarker   = '~~~ MACHINE_RESTORE_PAYLOAD_END ~~~';
+      const si = text.indexOf(startMarker), ei = text.indexOf(endMarker);
+      if (si === -1 || ei === -1) throw new Error('Not a valid DecentraForce backup (missing payload markers).');
+      const payload = JSON.parse(text.slice(si + startMarker.length, ei).trim());
+      if (!Array.isArray(payload.users)) throw new Error('Backup payload malformed (no users array).');
+      backupImportData = payload;
+      renderBackupPreview(payload);
+      document.getElementById('backupDropLabel').textContent = '✓ Loaded: ' + file.name;
+    } catch(e) {
+      document.getElementById('backupDropLabel').innerHTML = 'Drop your backup .txt file here, or <span style="color:#d4af37;font-weight:600;">click to browse</span>';
+      showBackupStatus('error','✗ Parse error: ' + e.message);
+    }
+  };
+  reader.readAsText(file);
+}
+
+function renderBackupPreview(payload) {
+  const tbody = document.getElementById('backupPreviewBody');
+  const ts = payload.exported_at ? new Date(payload.exported_at).toLocaleString() : 'Unknown';
+  tbody.innerHTML = payload.users.map(function(u, i) {
+    const courses = (u.courses || []).filter(function(c){ return c.course_id; });
+    const marks   = (payload.marks_by_user || {})[u.id] || [];
+    const roleLabel = u.is_admin
+      ? '<span class="badge" style="background:rgba(255,107,107,0.12);color:#ff6b6b;border:1px solid rgba(255,107,107,0.3);">Admin</span>'
+      : (u.role === 'manager' ? '<span class="badge" style="background:rgba(0,229,255,0.1);color:#00e5ff;">Manager</span>' : '<span class="badge badge-gray">User</span>');
+    return '<tr>'
+      + '<td class="text-[#4a6080]">' + (i+1) + '</td>'
+      + '<td class="font-semibold text-white">' + esc(u.username) + '</td>'
+      + '<td class="text-[#4a6080]">' + esc(u.email) + '</td>'
+      + '<td>' + roleLabel + '</td>'
+      + '<td>' + (u.verified ? '<span class="badge badge-green">Yes</span>' : '<span class="badge badge-gray">No</span>') + '</td>'
+      + '<td><span class="badge badge-blue">' + courses.length + '</span></td>'
+      + '<td><span class="badge" style="background:rgba(212,175,55,0.1);color:#d4af37;border:1px solid rgba(212,175,55,0.25);">' + marks.length + '</span></td>'
+      + '</tr>';
+  }).join('');
+  document.getElementById('backupPreviewSummary').textContent = payload.users.length + ' user(s) found in backup from ' + ts;
+  document.getElementById('backupPreview').style.display = 'block';
+}
+
+async function runBackupImport() {
+  if (!backupImportData || !backupImportData.users) { showBackupStatus('error','No backup loaded. Please upload a file first.'); return; }
+  const btn = document.getElementById('btnRunImport');
+  btn.disabled = true; btn.textContent = 'Restoring...';
+  try {
+    const res  = await fetch('/api/admin/backup/import', {
+      method: 'POST', credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ users: backupImportData.users })
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || 'Import failed');
+    showBackupStatus('success','✓ ' + data.message);
+    if (typeof loadUsers === 'function') loadUsers();
+  } catch(e) {
+    showBackupStatus('error','✗ ' + e.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<svg style="width:15px;height:15px;" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l4-4m0 0l4 4m-4-4v12"/></svg> Restore All Users';
+  }
+}
+
+function showBackupStatus(type, msg) {
+  const el = document.getElementById('backupImportStatus');
+  const ok = type === 'success';
+  el.textContent = msg;
+  el.style.cssText = 'display:block;background:' + (ok ? 'rgba(0,229,255,0.07)' : 'rgba(255,77,141,0.08)') + ';border:1px solid ' + (ok ? 'rgba(0,229,255,0.2)' : 'rgba(255,77,141,0.25)') + ';color:' + (ok ? '#00e5ff' : '#ff4d8d') + ';padding:12px 16px;border-radius:10px;font-size:0.85rem;';
+}
+</script>
 </body>
 </html>

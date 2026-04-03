@@ -1236,12 +1236,120 @@ export default async function handler(req, res) {
     if (path.endsWith('/admin/resources'))       return await adminResources(req, res);
     if (path.endsWith('/admin/assignments-crud')) return await adminAssignmentsCrud(req, res);
     if (path.endsWith('/admin/points'))           return await adminPoints(req, res);
+    if (path.endsWith('/admin/backup/export'))    return await adminBackupExport(req, res);
+    if (path.endsWith('/admin/backup/import'))    return await adminBackupImport(req, res);
 
     return res.status(404).json({ success: false, error: `No route: ${path}` });
   } catch (err) {
     console.error('API Error:', err);
     return res.status(500).json({ success: false, error: err.message });
   }
+}
+
+// ── ADMIN: GET /api/admin/backup/export ───────────────────────────────────────
+// Returns full user snapshot: credentials, enrollments, marks
+async function adminBackupExport(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+  if (req.method !== 'GET') return res.status(405).json({ error: 'GET only' });
+
+  // Users with their enrolled courses
+  const usersR = await query(`
+    SELECT u.id, u.username, u.email, u.password_hash, u.verified,
+           u.is_admin, u.role, u.created_at,
+           COALESCE(json_agg(
+             json_build_object('course_id', uc.course_id, 'title', c.title, 'granted_at', uc.granted_at)
+           ) FILTER (WHERE uc.course_id IS NOT NULL), '[]') AS courses
+    FROM users u
+    LEFT JOIN user_courses uc ON uc.user_id = u.id
+    LEFT JOIN courses c ON c.id = uc.course_id
+    GROUP BY u.id ORDER BY u.created_at ASC
+  `);
+
+  // All marks
+  const marksR = await query(`
+    SELECT um.user_id, u.username, um.course_id, c.title AS course_title,
+           um.label, um.marks_obtained, um.total_marks, um.type, um.notes, um.submitted_at
+    FROM user_marks um
+    LEFT JOIN users u ON u.id = um.user_id
+    LEFT JOIN courses c ON c.id = um.course_id
+    ORDER BY um.user_id, um.submitted_at
+  `);
+
+  // Group marks by user_id
+  const marksByUser = {};
+  for (const m of marksR.rows) {
+    if (!marksByUser[m.user_id]) marksByUser[m.user_id] = [];
+    marksByUser[m.user_id].push(m);
+  }
+
+  return res.status(200).json({
+    success: true,
+    exported_at: new Date().toISOString(),
+    users: usersR.rows,
+    marks_by_user: marksByUser
+  });
+}
+
+// ── ADMIN: POST /api/admin/backup/import ──────────────────────────────────────
+// Restores users + enrollments from a backup payload (upserts, never deletes)
+async function adminBackupImport(req, res) {
+  const admin = await requireAdmin(req, res); if (!admin) return;
+  if (req.method !== 'POST') return res.status(405).json({ error: 'POST only' });
+
+  const { users } = req.body || {};
+  if (!Array.isArray(users) || !users.length)
+    return res.status(400).json({ success: false, error: 'users array required' });
+
+  let restored = 0, skipped = 0, coursesLinked = 0;
+
+  for (const u of users) {
+    if (!u.email || !u.username || !u.password_hash) { skipped++; continue; }
+    try {
+      // Upsert user — on conflict by email, restore password_hash + username if not admin
+      const upsert = await query(`
+        INSERT INTO users (username, email, password_hash, verified, is_admin, role, created_at)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        ON CONFLICT (email) DO UPDATE
+          SET password_hash = EXCLUDED.password_hash,
+              username      = EXCLUDED.username,
+              verified      = EXCLUDED.verified,
+              role          = EXCLUDED.role
+        RETURNING id
+      `, [
+        u.username, u.email.toLowerCase(), u.password_hash,
+        u.verified ?? false, u.is_admin ?? false, u.role || 'user',
+        u.created_at || new Date().toISOString()
+      ]);
+
+      const userId = upsert.rows[0].id;
+      restored++;
+
+      // Re-link course enrollments
+      if (Array.isArray(u.courses)) {
+        for (const c of u.courses) {
+          if (!c.course_id) continue;
+          // Only link if course still exists
+          const cExists = await query('SELECT id FROM courses WHERE id=$1', [c.course_id]);
+          if (!cExists.rows.length) continue;
+          await query(`
+            INSERT INTO user_courses (user_id, course_id, granted_by, granted_at)
+            VALUES ($1, $2, $3, $4)
+            ON CONFLICT (user_id, course_id) DO NOTHING
+          `, [userId, c.course_id, admin.id, c.granted_at || new Date().toISOString()]);
+          coursesLinked++;
+        }
+      }
+    } catch (e) {
+      console.error('Import row error:', e.message);
+      skipped++;
+    }
+  }
+
+  return res.status(200).json({
+    success: true,
+    message: `Restored ${restored} user(s), linked ${coursesLinked} enrollment(s). Skipped ${skipped}.`,
+    restored, coursesLinked, skipped
+  });
 }
 
 export const config = {
