@@ -56,10 +56,28 @@
     
     /* Modules/Curriculum Styling */
     .module-item { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; margin-bottom: 16px; overflow: hidden; }
-    .module-header { padding: 20px; background: rgba(17, 29, 58, 0.4); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1.1rem; border-bottom: 1px solid var(--border); }
-    .module-body { padding: 20px; color: var(--muted); font-size: 0.95rem; line-height: 1.6; }
-    .module-body ul { padding-left: 20px; margin-top: 10px; }
-    .module-body li { margin-bottom: 8px; }
+    .module-header { padding: 18px 20px; background: rgba(17, 29, 58, 0.6); font-family: 'Syne', sans-serif; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: space-between; gap: 12px; cursor: pointer; user-select: none; transition: background 0.2s; }
+    .module-header:hover { background: rgba(17, 29, 58, 0.9); }
+    .module-header-left { display: flex; align-items: center; gap: 12px; }
+    .module-number { width: 28px; height: 28px; border-radius: 50%; background: rgba(0,229,255,0.12); border: 1px solid rgba(0,229,255,0.25); display: grid; place-items: center; font-size: 0.75rem; font-weight: 800; color: var(--accent); flex-shrink: 0; }
+    .module-title-text { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .module-lecture-count { font-size: 0.78rem; color: var(--muted); font-weight: 400; font-family: 'DM Sans', sans-serif; white-space: nowrap; }
+    .module-chevron { color: var(--muted); transition: transform 0.3s; flex-shrink: 0; }
+    .module-item.open .module-chevron { transform: rotate(180deg); }
+    .module-body { padding: 0 0 4px 0; display: none; border-top: 1px solid var(--border); }
+    .module-item.open .module-body { display: block; }
+    .lecture-row { display: flex; align-items: center; gap: 12px; padding: 12px 20px; border-bottom: 1px solid rgba(0,229,255,0.05); transition: background 0.15s; }
+    .lecture-row:last-child { border-bottom: none; }
+    .lecture-row:hover { background: rgba(0,229,255,0.03); }
+    .lecture-lock { width: 28px; height: 28px; border-radius: 8px; background: rgba(123,92,255,0.1); border: 1px solid rgba(123,92,255,0.2); display: grid; place-items: center; flex-shrink: 0; }
+    .lecture-info { flex: 1; min-width: 0; }
+    .lecture-title { font-size: 0.9rem; color: #a4b5d6; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .lecture-duration { font-size: 0.78rem; color: var(--muted); margin-top: 2px; }
+    .lecture-locked-badge { font-size: 0.7rem; color: var(--accent2); background: rgba(123,92,255,0.1); border: 1px solid rgba(123,92,255,0.2); padding: 2px 8px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+    .curriculum-summary { display: flex; gap: 20px; flex-wrap: wrap; margin-bottom: 24px; padding: 16px 20px; background: rgba(0,229,255,0.04); border: 1px solid rgba(0,229,255,0.1); border-radius: 12px; }
+    .curriculum-stat { display: flex; align-items: center; gap: 8px; font-size: 0.9rem; color: var(--muted); }
+    .curriculum-stat strong { color: var(--text); font-weight: 700; }
+    .curriculum-empty { color: var(--muted); font-size: 0.95rem; text-align: center; padding: 32px 20px; }
 
     /* === RIGHT COLUMN: STICKY PURCHASE CARD === */
     .sticky-card { position: sticky; top: 100px; background: var(--surface); border: 1px solid rgba(0,229,255,0.2); border-radius: 20px; overflow: hidden; box-shadow: 0 24px 50px rgba(0,0,0,0.5); margin-left: 10px; }
@@ -368,41 +386,85 @@
       const currContainer = document.getElementById('curriculumContainer');
       const assignContainer = document.getElementById('assignmentsContainer');
 
-      // Helper function to render JSON data into readable UI blocks
-      function renderModuleBlocks(dataObj, defaultTitle) {
-        if (!dataObj || Object.keys(dataObj).length === 0) {
-          return `<div class="module-item"><div class="module-header">${defaultTitle}</div><div class="module-body">Content will be uploaded shortly by the instructor.</div></div>`;
+      // Render Curriculum — shows module titles & lecture titles only, no video links
+      function renderCurriculum(modules) {
+        const curriculum = modules.curriculum || [];
+
+        if (!curriculum.length) {
+          return `<div class="curriculum-empty">
+            <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:0 auto 12px;display:block;color:var(--muted)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.746 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+            Curriculum content will be available shortly.
+          </div>`;
         }
-        
-        let html = '';
-        // If the admin saved an array or structured object, iterate it
-        for (const [key, value] of Object.entries(dataObj)) {
-          // Skip internal metadata tags
-          if (['category', 'level', 'assignments'].includes(key.toLowerCase())) continue;
-          
-          let contentStr = '';
-          if (typeof value === 'object') {
-             contentStr = '<ul>' + Object.values(value).map(v => `<li>${v}</li>`).join('') + '</ul>';
-          } else {
-             contentStr = String(value).replace(/\n/g, '<br>');
-          }
-          
-          html += `
-            <div class="module-item">
-              <div class="module-header">${key.replace(/_/g, ' ').toUpperCase()}</div>
-              <div class="module-body">${contentStr}</div>
-            </div>`;
-        }
-        return html || `<div class="module-item"><div class="module-header">${defaultTitle}</div><div class="module-body">Content will be updated soon.</div></div>`;
+
+        // Summary bar
+        const totalLectures = curriculum.reduce((sum, m) => sum + (m.lectures ? m.lectures.length : 0), 0);
+        let html = `<div class="curriculum-summary">
+          <div class="curriculum-stat"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg><strong>${curriculum.length}</strong> Modules</div>
+          <div class="curriculum-stat"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><strong>${totalLectures}</strong> Lectures</div>
+          <div class="curriculum-stat"><svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>Enroll to unlock full access</div>
+        </div>`;
+
+        curriculum.forEach((mod, idx) => {
+          const lectures = mod.lectures || [];
+          const moduleId = `mod-${idx}`;
+          html += `<div class="module-item" id="${moduleId}">
+            <div class="module-header" onclick="toggleModule('${moduleId}')">
+              <div class="module-header-left">
+                <div class="module-number">${idx + 1}</div>
+                <span class="module-title-text">${escHTML(mod.moduleTitle || `Module ${idx + 1}`)}</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px">
+                <span class="module-lecture-count">${lectures.length} lecture${lectures.length !== 1 ? 's' : ''}</span>
+                <svg class="module-chevron" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"/></svg>
+              </div>
+            </div>
+            <div class="module-body">
+              ${lectures.length === 0
+                ? `<div class="lecture-row"><span class="lecture-title" style="color:var(--muted);font-style:italic">No lectures added yet.</span></div>`
+                : lectures.map((lec) => `
+                  <div class="lecture-row">
+                    <div class="lecture-lock">
+                      <svg width="13" height="13" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="color:var(--accent2)"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+                    </div>
+                    <div class="lecture-info">
+                      <div class="lecture-title">${escHTML(lec.title || 'Untitled Lecture')}</div>
+                      ${lec.duration ? `<div class="lecture-duration">⏱ ${escHTML(lec.duration)}</div>` : ''}
+                    </div>
+                    <span class="lecture-locked-badge">🔒 Enrolled Only</span>
+                  </div>`).join('')
+              }
+            </div>
+          </div>`;
+        });
+
+        return html;
+      }
+
+      function escHTML(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
       }
 
       // Render Curriculum
-      currContainer.innerHTML = renderModuleBlocks(parsedModules, 'Course Syllabus');
+      currContainer.innerHTML = renderCurriculum(parsedModules);
       
       // Render Assignments (if a specific "assignments" key exists, otherwise generic)
       if (parsedModules.assignments || parsedModules.Assignments) {
         const assignData = parsedModules.assignments || parsedModules.Assignments;
-        assignContainer.innerHTML = renderModuleBlocks({ "Assignments & Tasks": assignData }, 'Assignments');
+        let assignHTML = '';
+        const assignArr = Array.isArray(assignData) ? assignData : Object.values(assignData);
+        assignArr.forEach((a, i) => {
+          assignHTML += `<div class="module-item">
+            <div class="module-header" style="cursor:default">
+              <div class="module-header-left">
+                <div class="module-number">${i + 1}</div>
+                <span class="module-title-text">${escHTML(typeof a === 'string' ? a : (a.title || `Assignment ${i+1}`))}</span>
+              </div>
+              <span class="lecture-locked-badge">🔒 Enrolled Only</span>
+            </div>
+          </div>`;
+        });
+        assignContainer.innerHTML = assignHTML || assignContainer.innerHTML;
       }
 
       // 5. Attach Purchase Action
@@ -512,6 +574,12 @@ if (!window.auth || !window.auth.isLoggedIn) {          document.getElementById(
     });
   });
 
+
+// === CURRICULUM ACCORDION ===
+  function toggleModule(id) {
+    const el = document.getElementById(id);
+    if (el) el.classList.toggle('open');
+  }
 
 // === LOGIN PROMPT MODAL LOGIC ===
   function closeLoginPromptModal() {
